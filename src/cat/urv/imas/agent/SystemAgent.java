@@ -21,20 +21,12 @@ import cat.urv.imas.onthology.InitialGameSettings;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.gui.GraphicInterface;
 import cat.urv.imas.behaviour.system.RequestResponseBehaviour;
-import cat.urv.imas.map.Cell;
-import jade.Boot;
 import jade.core.*;
 import jade.domain.*;
 import jade.domain.FIPAAgentManagement.*;
 import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.*;
-import jade.wrapper.AgentContainer;
-import jade.wrapper.AgentController;
-import jade.wrapper.StaleProxyException;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 /**
  * System agent that controls the GUI and loads initial configuration settings.
@@ -151,39 +143,6 @@ public class SystemAgent extends ImasAgent {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        /*
-        ---------------
-        MY CODE - START
-        ---------------
-         */
-
-        // 4. Load all agents defined in game.settings
-        int numDiggers = this.game.getAgentList().get(AgentType.DIGGER).size();
-        int numProspectors = this.game.getAgentList().get(AgentType.PROSPECTOR).size();
-
-        AgentContainer container = this.getContainerController();
-
-        UtilsAgents.createAgent(container,"DiggerCoordinatorAgent","cat.urv.imas.agent.DiggerCoordinatorAgent" , null);
-        UtilsAgents.createAgent(container,"DiggerCoordinatorGoldAgent","cat.urv.imas.agent.DiggerCoordinatorGoldAgent" , null);
-        UtilsAgents.createAgent(container,"DiggerCoordinatorSilverAgent","cat.urv.imas.agent.DiggerCoordinatorSilverAgent" , null);
-        UtilsAgents.createAgent(container,"ProspectorCoordinatorAgent","cat.urv.imas.agent.ProspectorCoordinatorAgent" , null);
-
-        for (int i = 1; i <= numDiggers; i++ ){
-
-            UtilsAgents.createAgent(container,"DiggerAgent"+i,"cat.urv.imas.agent.DiggerAgent" , null);
-        }
-
-        for (int i = 1; i <= numProspectors; i++ ){
-
-            UtilsAgents.createAgent(container,"ProspectorAgent"+i,"cat.urv.imas.agent.ProspectorAgent" , null);
-        }
-
-        /*
-        ---------------
-        MY CODE - END
-        ---------------
-         */
-
 
         // search CoordinatorAgent
         ServiceDescription searchCriterion = new ServiceDescription();

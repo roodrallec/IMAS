@@ -56,18 +56,6 @@ public enum AgentType {
         public String getShortString() {
             return "S";
         }
-    },
-    SILVER_DIGGER_COORDINATOR {
-        @Override
-        public String getShortString() {
-            return "DC_S";
-        }
-    },
-    GOLD_DIGGER_COORDINATOR {
-        @Override
-        public String getShortString() {
-            return "DC_G";
-        }
     };
     public abstract String getShortString();
 }
