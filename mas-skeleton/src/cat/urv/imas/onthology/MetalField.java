@@ -5,11 +5,13 @@
  */
 package cat.urv.imas.onthology;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Josep Famadas
  */
-public class MetalField {
+public class MetalField implements Serializable{
 
     private int[] position;
     private String type;

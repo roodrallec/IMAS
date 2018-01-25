@@ -17,7 +17,7 @@
  */
 package cat.urv.imas.agent;
 
-import cat.urv.imas.onthology.GameSettings;
+import cat.urv.imas.onthology.*;
 import cat.urv.imas.behaviour.coordinator.*;
 import cat.urv.imas.onthology.MessageContent;
 import jade.core.*;
@@ -43,6 +43,8 @@ public class CoordinatorAgent extends ImasAgent {
     private AID systemAgent;
     private AID diggerCoordinatorAgent;
     private AID prospectorCoordinatorAgent;
+    
+    private MetalFieldList currentMFL;
 
     /**
      * Builds the coordinator agent.
@@ -73,6 +75,14 @@ public class CoordinatorAgent extends ImasAgent {
 
     public void setProspectorCoordinatorAgent(AID prospectorCoordinatorAgent) {
         this.prospectorCoordinatorAgent = prospectorCoordinatorAgent;
+    }
+
+    public MetalFieldList getCurrentMFL() {
+        return currentMFL;
+    }
+
+    public void setCurrentMFL(MetalFieldList currentMFL) {
+        this.currentMFL = currentMFL;
     }
     
     

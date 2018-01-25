@@ -21,9 +21,12 @@ import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import jade.proto.AchieveREInitiator;
 import cat.urv.imas.agent.CoordinatorAgent;
-import cat.urv.imas.onthology.GameSettings;
+import cat.urv.imas.onthology.*;
 import cat.urv.imas.onthology.MessageContent;
 import jade.domain.FIPANames;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Behaviour for the Coordinator agent to deal with AGREE messages. 
@@ -72,7 +75,27 @@ public class RequesterBehaviour extends AchieveREInitiator {
             mapmsg.addReceiver(agent.getDiggerCoordinatorAgent());
             mapmsg.addReceiver(agent.getProspectorCoordinatorAgent());
             mapmsg.setContentObject(agent.getGame());
+            agent.log("Map sent to underlying levels.");
             agent.send(mapmsg);
+            
+            
+            /************PROVES**************/
+            
+            MetalField mf = new MetalField(new int[]{1,2},"G",3);
+            MetalField mf2 = new MetalField(new int[]{1,3},"G",3);
+            List<MetalField> metalFields = new ArrayList<MetalField>();
+            metalFields.add(mf);
+            metalFields.add(mf2);
+            MetalFieldList currentMFL = new MetalFieldList(metalFields);
+            agent.setCurrentMFL(currentMFL);
+            
+            ACLMessage mflmsg = new ACLMessage(ACLMessage.INFORM);
+            mflmsg.clearAllReceiver();
+            mflmsg.addReceiver(agent.getDiggerCoordinatorAgent());
+            mflmsg.setContentObject((Serializable) agent.getCurrentMFL());
+            agent.send(mflmsg);
+            
+            /***********END PROVES***********/
         } catch (Exception e) {
             agent.errorLog("Incorrect content: " + e.toString());
         }

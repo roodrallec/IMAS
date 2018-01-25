@@ -38,15 +38,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * A request-responder behaviour for System agent, answering to queries
- * from the Coordinator agent. The Coordinator Agent sends a REQUEST of the whole
- * game information and the System Agent sends an AGREE and then an INFORM
- * with the city information.
+ * This method handles the Map sent from above
  */
 public class MapHandling extends AchieveREResponder {
 
     /**
-     * Sets up the System agent and the template of messages to catch.
+     * Sets up the template of messages to catch.
      *
      * @param agent The agent owning this behaviour
      * @param mt Template to receive future responses in this conversation
@@ -57,107 +54,73 @@ public class MapHandling extends AchieveREResponder {
     }
 
     /**
-     * When System Agent receives a REQUEST message, it agrees. Only if
-     * message type is AGREE, method prepareResultNotification() will be invoked.
+     * Triggers when receives a message following the template
      *
      * @param msg message received.
-     * @return AGREE message when all was ok, or FAILURE otherwise.
      */
     @Override
     protected ACLMessage handleRequest(ACLMessage msg) {
-        try {
-            DiggerCoordinatorAgent agent = (DiggerCoordinatorAgent)this.getAgent();
-            
-            // If receives a MAP
+        // Declares the current agent so you can use its getters and setters (and other methods)
+        DiggerCoordinatorAgent agent = (DiggerCoordinatorAgent)this.getAgent();
+        try {         
+            // If the received message is a map.
             if(msg.getContentObject().getClass().equals(cat.urv.imas.onthology.InitialGameSettings.class)){
-                try { // Receive map from above level
-                    agent.setGame((GameSettings) msg.getContentObject());
-                    agent.log("MAP Updated");
-                } catch (Exception e) {
-                    agent.log("ERROR while updating map.");
-                    agent.errorLog(e.getMessage());
-                    e.printStackTrace();
-                }
-                try { // Send map to below level
-                    ACLMessage mapmsg = new ACLMessage(ACLMessage.INFORM);
-                    mapmsg.clearAllReceiver();
-                    for (int i = 1; i <= agent.getNumDiggers(); i++ ){
-                        mapmsg.addReceiver(agent.getDiggerAgents().get(i-1));
-                    }
-                    mapmsg.addReceiver(agent.getGoldDiggerCoordinatorAgent());
-                    mapmsg.addReceiver(agent.getSilverDiggerCoordinatorAgent());
-                    mapmsg.setContentObject(agent.getGame());
-                    //agent.send(mapmsg);
-                    agent.log("Map sent to underlying level");
-                    return mapmsg;
-                } catch (IOException ex) {
-                    agent.log("Map could not be send.");
-                    Logger.getLogger(MapHandling.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-            
-            // If receives a MetalField List
-            else if(msg.getContentObject().getClass().equals(cat.urv.imas.onthology.MetalFieldList.class)){
+                // sets the value of the agents map to the received map.
+                agent.setGame((GameSettings) msg.getContentObject());
+                agent.log("MAP Updated");
+                // Send map to below level
                 ACLMessage mapmsg = new ACLMessage(ACLMessage.INFORM);
                 mapmsg.clearAllReceiver();
                 for (int i = 1; i <= agent.getNumDiggers(); i++ ){
                     mapmsg.addReceiver(agent.getDiggerAgents().get(i-1));
                 }
-                try {
-                    mapmsg.setContentObject(msg.getContentObject());
-                    agent.send(mapmsg);
-                    agent.log("New metal Fields sent to Diggers.");
-                } catch (IOException ex) {
-                    Logger.getLogger(MapHandling.class.getName()).log(Level.SEVERE, null, ex);
-                    agent.log("Error sending new metal fields list.");
-                }              
+                mapmsg.setContentObject(agent.getGame());
+                agent.log("Map sent to underlying level");
+                return mapmsg;
+            }
+            // If the received message is a MetalField List
+            else if(msg.getContentObject().getClass().equals(cat.urv.imas.onthology.MetalFieldList.class)){
+                // Sets the value of the current MFL to the received one.
+                agent.setCurrentMFL((MetalFieldList)msg.getContentObject());
+                // Sends the MetalField List to the diggers.
+                ACLMessage mflmsg = new ACLMessage(ACLMessage.INFORM);
+                mflmsg.setProtocol(MessageContent.SELECTIVITY);
+                mflmsg.clearAllReceiver();
+                for (int i = 1; i <= agent.getNumDiggers(); i++ ){
+                    mflmsg.addReceiver(agent.getDiggerAgents().get(i-1));
+                }
+                mflmsg.setContentObject(msg.getContentObject());
+                agent.log("New metal Fields sent to Diggers.");    
+                return mflmsg;
             }
             
-            
-            
+            // If the received message is a String
             else{
                 switch((String)msg.getContentObject()){
+                    // If it is a MAP_RECEIVED
                     case MessageContent.MAP_RECEIVED:
-                        int updatedmaps = agent.getUpdatedmaps() + 1;
-                        if(updatedmaps < agent.getNumDiggers()){
-                            agent.setUpdatedmaps(updatedmaps);
-                        }
-                        else{
-                            agent.setUpdatedmaps(0);
-                            agent.log("All diggers have map updated.");
-                        }
+                        return null;     
                 }
-            }
-            
+            }     
         } catch (UnreadableException ex) {
+            Logger.getLogger(MapHandling.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
             Logger.getLogger(MapHandling.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }
 
-    /**
-     * After sending an AGREE message on prepareResponse(), this behaviour
-     * sends an INFORM message with the whole game settings.
-     *
-     * NOTE: This method is called after the response has been sent and only when one
-     * of the following two cases arise: the response was an agree message OR no
-     * response message was sent.
-     *
+    /*
      * @param msg ACLMessage the received message
      * @param response ACLMessage the previously sent response message
      * @return ACLMessage to be sent as a result notification, of type INFORM
      * when all was ok, or FAILURE otherwise.
      */
-    /*
     @Override
     protected ACLMessage prepareResultNotification(ACLMessage msg, ACLMessage response) { //Useless method
         return null;
-
     }
-    */
-    /**
-     * No need for any specific action to reset this behaviour
-     */
+
     @Override
     public void reset() {
     }

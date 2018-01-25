@@ -28,23 +28,22 @@ import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.*;
 import java.util.ArrayList;
 
-/**
- * The main Coordinator agent. 
- * TODO: This coordinator agent should get the game settings from the System
- * agent every round and share the necessary information to other coordinators.
- */
+
 public class DiggerAgent extends ImasAgent {
 
     /*      ATTRIBUTES      */
     private AID diggerCoordinatorAgent;
-    private AID goldDiggerCoordinatorAgent;
-    private AID silverDiggerCoordinatorAgent;
     
     private GameSettings game;
     
-    /**
-     * Builds the coordinator agent.
-     */
+    private int[] currentPosition; //This has to be initializaed (TODO Aleix)
+    
+    private boolean waitingMapFlag = true;
+    
+    private MetalFieldList currentMFL;
+    
+    
+    /*      METHODS     */
     public DiggerAgent() {
         super(AgentType.DIGGER);
     }
@@ -61,12 +60,41 @@ public class DiggerAgent extends ImasAgent {
         return diggerCoordinatorAgent;
     }
 
-    public AID getGoldDiggerCoordinatorAgent() {
-        return goldDiggerCoordinatorAgent;
+    public int[] getCurrentPosition() {
+        return currentPosition;
     }
 
-    public AID getSilverDiggerCoordinatorAgent() {
-        return silverDiggerCoordinatorAgent;
+    public void setCurrentPosition(int[] currentPosition) {
+        this.currentPosition = currentPosition;
+    }
+
+    public boolean isWaitingMapFlag() {
+        return waitingMapFlag;
+    }
+
+    public void setWaitingMapFlag(boolean waitingMapFlag) {
+        this.waitingMapFlag = waitingMapFlag;
+    }
+
+    public MetalFieldList getCurrentMFL() {
+        return currentMFL;
+    }
+
+    public void setCurrentMFL(MetalFieldList currentMFL) {
+        this.currentMFL = currentMFL;
+    }
+       
+    
+  
+    public float[] computeBids(MetalFieldList metalFields){
+        
+        float[] bids = new float[metalFields.getMetalFields().size()];
+        //TODO: itera cada metalfield i per cada un computa la bid
+        for (int i = 0; i < bids.length; i++ ){
+            bids[i] = i; //EXEMPLE, S'HA DE FER
+        }
+        
+        return bids;       
     }
     
 
@@ -100,40 +128,25 @@ public class DiggerAgent extends ImasAgent {
             doDelete();
         }
         
-        /*      SEARCHS     */
         
+        /*      SEARCHS     */
         // search CoordinatorAgent
         ServiceDescription searchCriterion = new ServiceDescription();
         searchCriterion.setType(AgentType.DIGGER_COORDINATOR.toString());
-        this.diggerCoordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);
-        
-        // search goldDiggerCoordinatorAgent
-        searchCriterion.setType(AgentType.GOLD_DIGGER_COORDINATOR.toString());
-        this.goldDiggerCoordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);
-        
-        // search silverDiggerCoordinatorAgent
-        searchCriterion.setType(AgentType.SILVER_DIGGER_COORDINATOR.toString());
-        this.silverDiggerCoordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);
-        
+        this.diggerCoordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);        
         
         
         /*      BEHAVIOURS        */
         
-        // Waits for map from DiggerCoordinatorAgent.
-        MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
-        this.addBehaviour(new MapHandling(this, mt));
+        // It triggers ONLY for the voting protocol (Selectivity)
+        MessageTemplate mt1 = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),MessageTemplate.MatchProtocol(MessageContent.SELECTIVITY));
+        this.addBehaviour(new SelectivityVoting(this, mt1));
+        
+        // It triggers when the received message is an INFORM.
+        MessageTemplate mt2 = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),MessageTemplate.MatchProtocol(null));
+        this.addBehaviour(new MapHandling(this, mt2));
     }
     
-    public float[] computeBids(MetalFieldList metalFields){
-        
-        float[] bids = new float[metalFields.getMetalFields().size()];
-        //TODO: itera cada metalfield i per cada un computa la bid
-        for (int i = 0; i < bids.length; i++ ){
-            bids[i] = i; //EXEMPLE, S'HA DE FER
-        }
-        
-        return bids;
-        
-        
-    }
+    
+
 }

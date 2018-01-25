@@ -98,8 +98,7 @@ public class ProspectorAgent extends ImasAgent {
             doDelete();
         }
         
-        /*      SEARCHS     */
-        
+        /*      SEARCHS     */        
         // search ProspectorCoordinatorAgent
         ServiceDescription searchCriterion = new ServiceDescription();
         searchCriterion.setType(AgentType.PROSPECTOR_COORDINATOR.toString());
@@ -107,8 +106,7 @@ public class ProspectorAgent extends ImasAgent {
         
         
         
-        /*      BEHAVIOURS        */
-        
+        /*      BEHAVIOURS        */        
         // It triggers when the received message is an INFORM.
         MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
         this.addBehaviour(new MapHandling(this, mt));

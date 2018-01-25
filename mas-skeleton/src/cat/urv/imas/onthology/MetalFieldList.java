@@ -5,6 +5,7 @@
  */
 package cat.urv.imas.onthology;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +13,7 @@ import java.util.List;
  *
  * @author Josep Famadas
  */
-public class MetalFieldList {
+public class MetalFieldList implements Serializable{
     
     private List<MetalField> metalFields = new ArrayList<MetalField>();
 

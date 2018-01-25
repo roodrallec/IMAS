@@ -20,7 +20,7 @@ package cat.urv.imas.agent;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.behaviour.diggercoordinator.*;
 import cat.urv.imas.onthology.InitialGameSettings;
-import cat.urv.imas.onthology.MessageContent;
+import cat.urv.imas.onthology.*;
 import jade.core.*;
 import jade.domain.*;
 import jade.domain.FIPAAgentManagement.*;
@@ -38,27 +38,25 @@ public class DiggerCoordinatorAgent extends ImasAgent {
 
     
     
-    // ATTRIBUTES
+    /*      ATTRIBUTES      */
     private AID coordinatorAgent;
-    private AID goldDiggerCoordinatorAgent;
-    private AID silverDiggerCoordinatorAgent;
     private List<AID> diggerAgents = new ArrayList<AID>();
    
     private GameSettings game;
     
-    private int updatedmaps = 0;
+    private int receivedBids = 0;
     
     private int numDiggers = InitialGameSettings.load("game.settings").getAgentList().get(AgentType.DIGGER).size();
     
+    private MetalFieldList currentMFL;
     
-    /**
-     * Builds the coordinator agent.
-     */
+    private List<float[]> bids = new ArrayList<float[]>(this.numDiggers);
+    
+    
+    /*      METHODS     */
     public DiggerCoordinatorAgent() {
         super(AgentType.DIGGER_COORDINATOR);
     }
-    
-    // GETTERS AND SETTERS
     
     public void setGame(GameSettings game) {
         this.game = game;
@@ -80,21 +78,30 @@ public class DiggerCoordinatorAgent extends ImasAgent {
         return coordinatorAgent;
     }
 
-    public AID getGoldDiggerCoordinatorAgent() {
-        return goldDiggerCoordinatorAgent;
+    public int getReceivedBids() {
+        return receivedBids;
     }
 
-    public AID getSilverDiggerCoordinatorAgent() {
-        return silverDiggerCoordinatorAgent;
+    public void setReceivedBids(int receivedBids) {
+        this.receivedBids = receivedBids;
     }
 
-    public int getUpdatedmaps() {
-        return updatedmaps;
+    public MetalFieldList getCurrentMFL() {
+        return currentMFL;
     }
 
-    public void setUpdatedmaps(int updatedmaps) {
-        this.updatedmaps = updatedmaps;
+    public void setCurrentMFL(MetalFieldList currentMFL) {
+        this.currentMFL = currentMFL;
     }
+
+    public List<float[]> getBids() {
+        return bids;
+    }
+
+    public void setBids(List<float[]> bids) {
+        this.bids = bids;
+    }
+    
     
     
 
@@ -134,14 +141,6 @@ public class DiggerCoordinatorAgent extends ImasAgent {
         searchCriterion.setType(AgentType.COORDINATOR.toString());
         this.coordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);
         
-        // search goldDiggerCoordinatorAgent
-        searchCriterion.setType(AgentType.GOLD_DIGGER_COORDINATOR.toString());
-        this.goldDiggerCoordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);
-        
-        // search silverDiggerCoordinatorAgent
-        searchCriterion.setType(AgentType.SILVER_DIGGER_COORDINATOR.toString());
-        this.silverDiggerCoordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);
-        
         // search DiggerAgents
         searchCriterion.setType(AgentType.DIGGER.toString());
         
@@ -154,9 +153,15 @@ public class DiggerCoordinatorAgent extends ImasAgent {
         
         /*      BEHAVIOURS        */
         
-        // Waits for map from Coordinator and sends it to gold and silver subcoord and diggers.
-        MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
-        this.addBehaviour(new MapHandling(this, mt));
+        
+        // It triggers ONLY for the voting protocol (Selectivity)
+        MessageTemplate mt1 = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),MessageTemplate.MatchProtocol(MessageContent.SELECTIVITY));
+        this.addBehaviour(new SelectivityVoting(this, mt1));
+        
+        // It triggers when the received message is an INFORM.
+        MessageTemplate mt2 = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
+        this.addBehaviour(new MapHandling(this, mt2));
+
         
         
         

@@ -15,22 +15,23 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cat.urv.imas.behaviour.prospector;
+package cat.urv.imas.behaviour.diggercoordinator;
 
-import cat.urv.imas.behaviour.diggercoordinator.*;
 import cat.urv.imas.behaviour.coordinator.*;
 import cat.urv.imas.behaviour.system.*;
 import cat.urv.imas.agent.AgentType;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.AchieveREResponder;
-import cat.urv.imas.agent.ProspectorAgent;
+import cat.urv.imas.agent.DiggerCoordinatorAgent;
 import cat.urv.imas.map.Cell;
 import cat.urv.imas.map.PathCell;
-import cat.urv.imas.onthology.GameSettings;
+import cat.urv.imas.onthology.*;
 import cat.urv.imas.onthology.MessageContent;
+import jade.core.AID;
 import jade.lang.acl.UnreadableException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -39,7 +40,7 @@ import java.util.logging.Logger;
 /**
  * This method handles the Map sent from above
  */
-public class MapHandling extends AchieveREResponder {
+public class SelectivityVoting extends AchieveREResponder {
 
     /**
      * Sets up the template of messages to catch.
@@ -47,15 +48,11 @@ public class MapHandling extends AchieveREResponder {
      * @param agent The agent owning this behaviour
      * @param mt Template to receive future responses in this conversation
      */
-    public MapHandling(ProspectorAgent agent, MessageTemplate mt) {
+    public SelectivityVoting(DiggerCoordinatorAgent agent, MessageTemplate mt) {
         super(agent, mt);
-        agent.log("Waiting for the updated map.");
+        agent.log("Waiting for bids.");
     }
 
-    
-    
-    
-    // PARTE 1 DE LA RESPUESTA
     /**
      * Triggers when receives a message following the template
      *
@@ -64,22 +61,32 @@ public class MapHandling extends AchieveREResponder {
     @Override
     protected ACLMessage handleRequest(ACLMessage msg) {
         // Declares the current agent so you can use its getters and setters (and other methods)
-        ProspectorAgent agent = (ProspectorAgent)this.getAgent();
+        DiggerCoordinatorAgent agent = (DiggerCoordinatorAgent)this.getAgent();
         try {
-            // If the received message is a map.
-            if(msg.getContentObject().getClass() == cat.urv.imas.onthology.InitialGameSettings.class){
-                // sets the value of the agents map to the received map.
-                agent.setGame((GameSettings) msg.getContentObject());
-                agent.log("MAP Updated");            
+            float[] bids = (float[]) msg.getContentObject();
+            List<AID> diggers = agent.getDiggerAgents();
+            int currentDigger = diggers.indexOf(msg.getSender());
+            List aux = agent.getBids();
+            aux.set(currentDigger, bids);
+            agent.setBids(aux);
+            
+            int receivedBids = agent.getReceivedBids()+1;
+            
+            if(receivedBids == agent.getNumDiggers()){
+                agent.setReceivedBids(0);
+                agent.log("Received all bids.");
+                
             }
+            
+            
+
+                 
         } catch (UnreadableException ex) {
-            Logger.getLogger(MapHandling.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SelectivityVoting.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }
 
-    
-    // PARTE 2 DE LA RESPUESTA (SOLO SE EJECUTA SI LA 1 DEVUELVE NULL O AGREE)
     /*
      * @param msg ACLMessage the received message
      * @param response ACLMessage the previously sent response message
@@ -91,7 +98,6 @@ public class MapHandling extends AchieveREResponder {
         return null;
     }
 
-    
     @Override
     public void reset() {
     }
