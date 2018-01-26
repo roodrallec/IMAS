@@ -62,37 +62,29 @@ public class MapHandling extends AchieveREResponder {
     protected ACLMessage handleRequest(ACLMessage msg) {
         // Declares the current agent so you can use its getters and setters (and other methods)
         ProspectorAgent agent = (ProspectorAgent)this.getAgent();
+        ACLMessage reply = msg.createReply();
+        reply.setPerformative(ACLMessage.INFORM);
+        
         try {
             // If the received message is a map.
             if(msg.getContentObject().getClass() == cat.urv.imas.onthology.InitialGameSettings.class){
                 // sets the value of the agents map to the received map.
                 GameSettings game = (GameSettings) msg.getContentObject();
                 agent.setMapView(game.getMap());
-                agent.log("MAP Updated; Searching for Metals...");
+                agent.log("MAP Updated; Searching for Metals...");  
                 agent.searchForMetal();
-                agent.log("MetalSearched");                
-            }
+                agent.log("MetalSearched");             
+                reply.setContentObject(agent.getMapView());
+            }           
+            
         } catch (UnreadableException ex) {
             Logger.getLogger(MapHandling.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(MapHandling.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return null;
+        
+        return reply;
     }
-
-    
-    // PARTE 2 DE LA RESPUESTA (SOLO SE EJECUTA SI LA 1 DEVUELVE NULL O AGREE)
-    /*
-     * @param msg ACLMessage the received message
-     * @param response ACLMessage the previously sent response message
-     * @return ACLMessage to be sent as a result notification, of type INFORM
-     * when all was ok, or FAILURE otherwise.
-     */
-    @Override
-    protected ACLMessage prepareResultNotification(ACLMessage msg, ACLMessage response) { //Useless method
-        ProspectorAgent agent = (ProspectorAgent)this.getAgent();
-        //Join the submap back into the map
-        return null;
-    }
-
     
     @Override
     public void reset() {

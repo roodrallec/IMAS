@@ -79,8 +79,11 @@ public class MapHandling extends AchieveREResponder {
                 }
                 mapmsg.setContentObject(agent.getGame());
                 agent.log("Map sent to underlying level");
-                return mapmsg;
-                
+                return mapmsg;                
+            }
+            
+            if(msg.getContentObject().getClass() == cat.urv.imas.map.Cell.class) { 
+                int a = 1;
             }
         } catch (UnreadableException ex) {
             Logger.getLogger(MapHandling.class.getName()).log(Level.SEVERE, null, ex);

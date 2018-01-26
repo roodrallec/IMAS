@@ -19,6 +19,7 @@ package cat.urv.imas.agent;
 
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.behaviour.prospectorcoordinator.*;
+import cat.urv.imas.map.Cell;
 import cat.urv.imas.onthology.InitialGameSettings;
 import cat.urv.imas.onthology.MessageContent;
 import jade.core.*;
@@ -48,7 +49,11 @@ public class ProspectorCoordinatorAgent extends ImasAgent {
     public ProspectorCoordinatorAgent() {
         super(AgentType.PROSPECTOR_COORDINATOR);
     }
-
+    
+    public void updateMap(Cell[][] subMap) {
+        
+    }
+            
     public GameSettings getGame() {
         return game;
     }
