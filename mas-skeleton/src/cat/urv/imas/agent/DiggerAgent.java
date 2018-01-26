@@ -27,6 +27,8 @@ import jade.domain.FIPAAgentManagement.*;
 import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.*;
 import java.util.ArrayList;
+import static java.lang.Math.abs;
+import java.util.List;
 
 
 public class DiggerAgent extends ImasAgent {
@@ -43,6 +45,10 @@ public class DiggerAgent extends ImasAgent {
     private MetalFieldList currentMFL;
     
     private MetalField currentMF;
+    
+    private double [] parameters; //{gamma,beta,mu}
+    
+    private int usedSlots;
     
     
     /*      METHODS     */
@@ -93,15 +99,46 @@ public class DiggerAgent extends ImasAgent {
     public void setCurrentMF(MetalField currentMF) {
         this.currentMF = currentMF;
     }
+
+    public int getUsedSlots() {
+        return usedSlots;
+    }
+
+    public void setUsedSlots(int usedSlots) {
+        this.usedSlots = usedSlots;
+    }
+
+    public double[] getParameters() {
+        return parameters;
+    }
+
+    public void setParameters(double[] parameters) {
+        this.parameters = parameters;
+    }
        
-    
   
     public double[] computeBids(MetalFieldList metalFields){
         
         double[] bids = new double[metalFields.getMetalFields().size()];
+        List mfl = this.getCurrentMFL().getMetalFields();
+        double carryingbid = -this.getParameters()[2]*1.0*this.usedSlots;
+        int EmptySlots = this.game.getDiggersCapacity()-this.usedSlots;
         //TODO: itera cada metalfield i per cada un computa la bid
         for (int i = 0; i < bids.length; i++ ){
-            bids[i] = i; //EXEMPLE, S'HA DE FER
+            MetalField mf = (MetalField) mfl.get(i);
+            double distbid = 1.0*abs(this.currentPosition[0]-mf.getPosition()[0]) + 1.0*abs(this.currentPosition[1]-mf.getPosition()[1]);
+            double unitbid = 0;
+            if (EmptySlots > mf.getQuantity()){
+                 unitbid = this.getParameters()[0]*1.0*mf.getQuantity()/EmptySlots;
+            }
+            else if (EmptySlots < mf.getQuantity()){
+                 unitbid = this.getParameters()[1]*1.0*EmptySlots;
+            }
+            else{
+                 unitbid = this.getParameters()[0]*1.0*mf.getQuantity()/EmptySlots + this.getParameters()[1]*1.0*EmptySlots;
+            }
+            
+            bids[i] = 1.0/distbid + unitbid + carryingbid; //EXEMPLE, S'HA DE FER
         }
         
         return bids;       
@@ -126,6 +163,12 @@ public class DiggerAgent extends ImasAgent {
         sd1.setType(AgentType.DIGGER.toString());
         sd1.setName(getLocalName());
         sd1.setOwnership(OWNER);
+        
+        // PROVES! //
+        this.currentPosition = new int[] {1,2};
+        this.parameters = new double [] {0.5,0.5,0.5};
+        this.usedSlots = 0;
+                
         
         DFAgentDescription dfd = new DFAgentDescription();
         dfd.addServices(sd1);
