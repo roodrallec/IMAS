@@ -50,6 +50,8 @@ public class DiggerAgent extends ImasAgent {
     
     private int usedSlots;
     
+    private String metaltype;
+    
     
     /*      METHODS     */
     public DiggerAgent() {
@@ -115,6 +117,14 @@ public class DiggerAgent extends ImasAgent {
     public void setParameters(double[] parameters) {
         this.parameters = parameters;
     }
+    
+    public String getMetaltype() {
+        return metaltype;
+    }
+
+    public void setMetaltype(String metaltype) {
+        this.metaltype = metaltype;
+    }
        
   
     public double[] computeBids(MetalFieldList metalFields){
@@ -126,22 +136,28 @@ public class DiggerAgent extends ImasAgent {
         //TODO: itera cada metalfield i per cada un computa la bid
         for (int i = 0; i < bids.length-1; i++ ){
             MetalField mf = (MetalField) mfl.get(i);
-            double distbid = 1.0*abs(this.currentPosition[0]-mf.getPosition()[0]) + 1.0*abs(this.currentPosition[1]-mf.getPosition()[1]);
-            double unitbid = 0;
-            if (EmptySlots > mf.getQuantity()){
-                 unitbid = this.getParameters()[0]*1.0*mf.getQuantity()/EmptySlots;
-            }
-            else if (EmptySlots < mf.getQuantity()){
-                 unitbid = this.getParameters()[1]*1.0*EmptySlots;
+            if (mf.getType() != this.metaltype && this.metaltype!= "N"){
+             bids[i] = -1.0;
             }
             else{
-                 unitbid = this.getParameters()[0]*1.0*mf.getQuantity()/EmptySlots + this.getParameters()[1]*1.0*EmptySlots;
+                double distbid = 1.0*abs(this.currentPosition[0]-mf.getPosition()[0]) + 1.0*abs(this.currentPosition[1]-mf.getPosition()[1]);
+                double unitbid = 0;
+                if (EmptySlots > mf.getQuantity()){
+                    unitbid = this.getParameters()[0]*1.0*mf.getQuantity()/EmptySlots;
+                }
+                else if (EmptySlots < mf.getQuantity()){
+                     unitbid = this.getParameters()[1]*1.0*EmptySlots;
+                }
+                else{
+                     unitbid = this.getParameters()[0]*1.0*mf.getQuantity()/EmptySlots + this.getParameters()[1]*1.0*EmptySlots;
+                }
+                if(distbid == 0){
+                    bids[i] = 10000;
+                }
+                else{
+                    bids[i] = 1.0/distbid + unitbid + carryingbid; //EXEMPLE, S'HA DE FER   
             }
-            if(distbid == 0){
-                bids[i] = 10000;
-            }
-            else{
-                bids[i] = 1.0/distbid + unitbid + carryingbid; //EXEMPLE, S'HA DE FER   
+            
             }
             
         }
@@ -169,7 +185,7 @@ public class DiggerAgent extends ImasAgent {
         sd1.setType(AgentType.DIGGER.toString());
         sd1.setName(getLocalName());
         sd1.setOwnership(OWNER);
-        
+        this.setMetaltype("N");
         // PROVES! //
         this.currentPosition = new int[] {1,2};
         this.parameters = new double [] {0.5,0.5,0.5};
