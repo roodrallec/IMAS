@@ -69,8 +69,9 @@ public class MapHandling extends AchieveREResponder {
             // If the received message is a map.
             if(msg.getContentObject().getClass() == cat.urv.imas.onthology.InitialGameSettings.class){
                 // sets the value of the agents map to the received map.
-                agent.setGame((GameSettings) msg.getContentObject());
-                agent.log("MAP Updated");            
+                GameSettings game = (GameSettings) msg.getContentObject();
+                agent.setView(game.getMap());
+                agent.log("MAP Updated; Searching for Metals...");                
             }
         } catch (UnreadableException ex) {
             Logger.getLogger(MapHandling.class.getName()).log(Level.SEVERE, null, ex);
@@ -88,6 +89,9 @@ public class MapHandling extends AchieveREResponder {
      */
     @Override
     protected ACLMessage prepareResultNotification(ACLMessage msg, ACLMessage response) { //Useless method
+        ProspectorAgent agent = (ProspectorAgent)this.getAgent();
+        agent.searchForMetal();
+        agent.log("MetalFound=");
         return null;
     }
 

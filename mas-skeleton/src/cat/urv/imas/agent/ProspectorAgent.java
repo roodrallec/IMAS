@@ -17,7 +17,9 @@
  */
 package cat.urv.imas.agent;
 
+import java.util.ArrayList;
 import cat.urv.imas.onthology.GameSettings;
+import cat.urv.imas.map.Cell;
 import cat.urv.imas.behaviour.prospector.*;
 import cat.urv.imas.onthology.MessageContent;
 import jade.core.*;
@@ -32,26 +34,39 @@ public class ProspectorAgent extends ImasAgent {
     /*      ATTRIBUTES      */
     private AID prospectorCoordinatorAgent;
     
-    private GameSettings game;
-    
+    private Cell[] subMap = new Cell[8];
+        
     private int[] currentPosition; //This has to be initializaed (TODO Aleix)
-    
-    
-    
-   
+ 
     /*      METHODS     */
     public ProspectorAgent() {
         super(AgentType.PROSPECTOR);
     }
-
-    public GameSettings getGame() {
-        return game;
+/* Takes a whole map and stores just the agents view */
+    public void setView(Cell[][] map) {         
+        this.currentPosition = new int[] {1,3};
+        int row = this.currentPosition[0];
+        int column = this.currentPosition[1];
+        
+        int idx = 0;
+        for(int r=row-1; r > row+1; r++) {
+            for(int c=column-1; c > column+1; c++) {
+                if (!(r == row && c == column)) {                  
+                    subMap[idx] = map[r][c];
+                    idx++;
+                }
+            }
+        } 
     }
 
-    public void setGame(GameSettings game) {
-        this.game = game;
-    }
-
+    public ArrayList<Cell> searchForMetal() {
+        ArrayList<Cell> metalFound = new ArrayList<Cell>();
+//        for(Cell c: this.subMap) {
+//            this.log(c.toString());
+//        }
+        return metalFound;
+    }   
+    
     public AID getProspectorCoordinatorAgent() {
         return prospectorCoordinatorAgent;
     }
