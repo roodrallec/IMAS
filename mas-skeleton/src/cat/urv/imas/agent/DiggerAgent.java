@@ -119,12 +119,12 @@ public class DiggerAgent extends ImasAgent {
   
     public double[] computeBids(MetalFieldList metalFields){
         
-        double[] bids = new double[metalFields.getMetalFields().size()];
+        double[] bids = new double[metalFields.getMetalFields().size()+1];
         List mfl = this.getCurrentMFL().getMetalFields();
         double carryingbid = -this.getParameters()[2]*1.0*this.usedSlots;
         int EmptySlots = this.game.getDiggersCapacity()-this.usedSlots;
         //TODO: itera cada metalfield i per cada un computa la bid
-        for (int i = 0; i < bids.length; i++ ){
+        for (int i = 0; i < bids.length-1; i++ ){
             MetalField mf = (MetalField) mfl.get(i);
             double distbid = 1.0*abs(this.currentPosition[0]-mf.getPosition()[0]) + 1.0*abs(this.currentPosition[1]-mf.getPosition()[1]);
             double unitbid = 0;
@@ -137,9 +137,15 @@ public class DiggerAgent extends ImasAgent {
             else{
                  unitbid = this.getParameters()[0]*1.0*mf.getQuantity()/EmptySlots + this.getParameters()[1]*1.0*EmptySlots;
             }
+            if(distbid == 0){
+                bids[i] = 10000;
+            }
+            else{
+                bids[i] = 1.0/distbid + unitbid + carryingbid; //EXEMPLE, S'HA DE FER   
+            }
             
-            bids[i] = 1.0/distbid + unitbid + carryingbid; //EXEMPLE, S'HA DE FER
         }
+        bids[bids.length-1] = this.game.getDiggersCapacity()-this.getUsedSlots();
         
         return bids;       
     }

@@ -53,6 +53,8 @@ public class DiggerCoordinatorAgent extends ImasAgent {
     
     private List<double[]> bids ;
     
+    private List<Integer> slots = new ArrayList<Integer>();
+    
     
     /*      METHODS     */
     public DiggerCoordinatorAgent() {
@@ -102,9 +104,18 @@ public class DiggerCoordinatorAgent extends ImasAgent {
     public void setBids(List<double[]> bids) {
         this.bids = bids;
     }
+
+    public List<Integer> getSlots() {
+        return slots;
+    }
+
+    public void setSlots(List<Integer> slots) {
+        this.slots = slots;
+    }
     
     
     public int[] metalFieldAssignation(){
+        int count = 0;
         List mfl = this.currentMFL.getMetalFields();
         List bidslist = new ArrayList<double[]>();
         int[] matching = new int[this.getNumDiggers()];
@@ -113,7 +124,7 @@ public class DiggerCoordinatorAgent extends ImasAgent {
         double[] onesarray = new double[mfl.size()];
         Arrays.fill(onesarray,-1.0);
         int k = 0;
-        while (!mfl.isEmpty()|| k < this.numDiggers){
+        while (count < mfl.size() && k < this.numDiggers){
 
             k = k+1;
             double maxbid = -1.0;
@@ -135,11 +146,12 @@ public class DiggerCoordinatorAgent extends ImasAgent {
                 aux[metal] = -1.0;
                 bidslist.set(i,aux);
             }
-            if(mfl.size() == 1){
-                matching[digger] = metal;
-                break;
+            if(((MetalField)mfl.get(metal)).getQuantity() > this.getSlots().get(digger)){
+                ((MetalField)mfl.get(metal)).setQuantity(((MetalField)mfl.get(metal)).getQuantity()-this.getSlots().get(digger));
             }
-            mfl.remove(0);
+            else{
+                count+=1;
+            }
             matching[digger] = metal;
         }
     return matching;  
@@ -192,6 +204,8 @@ public class DiggerCoordinatorAgent extends ImasAgent {
             this.diggerAgents.add(UtilsAgents.searchAgent(this, searchCriterion));
             double[] val = {};
             this.bids.add(val);
+            Integer val2 = 0;
+            this.slots.add(val2);
         }
         // searchAgent is a blocking method, so we will obtain always a correct AID
         
