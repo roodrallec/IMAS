@@ -77,12 +77,21 @@ public class SelectivityVotingDCA extends AchieveREResponder {
                 agent.log("Received all bids.");
                 int[] matching = agent.metalFieldAssignation();
                 agent.log("MetalField Matching Done");
+                for (int i = 0; i < agent.getNumDiggers(); i++){
+                    ACLMessage metassigned = new ACLMessage(ACLMessage.INFORM);
+                    metassigned.addReceiver(agent.getDiggerAgents().get(i));
+                    metassigned.setLanguage(MessageContent.SELECTIVITY);
+                    metassigned.setContentObject(matching[i]);
+                    agent.send(metassigned);
+                }
             }
             
             
 
                  
         } catch (UnreadableException ex) {
+            Logger.getLogger(SelectivityVotingDCA.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
             Logger.getLogger(SelectivityVotingDCA.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;

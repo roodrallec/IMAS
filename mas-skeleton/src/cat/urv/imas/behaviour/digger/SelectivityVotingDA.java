@@ -33,6 +33,7 @@ import cat.urv.imas.onthology.MessageContent;
 import jade.lang.acl.UnreadableException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -69,6 +70,7 @@ public class SelectivityVotingDA extends AchieveREResponder {
             if(msg.getContentObject().getClass().equals(cat.urv.imas.onthology.MetalFieldList.class)){
                 MetalFieldList metalFields = (MetalFieldList)msg.getContentObject();
                 agent.log("MetalFieldList received. Computing bids...");
+                agent.setCurrentMFL(metalFields);
                 while(agent.isWaitingMapFlag())
                 {}
                 // calls the method computeBids() froms itself to calculate the bid for each metal field
@@ -80,7 +82,20 @@ public class SelectivityVotingDA extends AchieveREResponder {
                 agent.log("Bids sent to DiggerCoordinator.");
                 agent.setWaitingMapFlag(true);
                 return bidmsg;
-            }  
+            }
+            else if(msg.getContentObject().getClass().equals(Integer.class)){
+                int metalF = (int) msg.getContentObject();
+                if (metalF == -1){
+                    agent.log("No metal assigned. Follow Prospector.");
+                    // Contract Net
+                }
+                else{
+                    List mf = agent.getCurrentMFL().getMetalFields();
+                    agent.setCurrentMF((MetalField) mf.get(metalF));
+                    agent.log("Metal Field Assigned [x,y]: " + Arrays.toString(agent.getCurrentMF().getPosition()));
+                }
+        }
+            
         } catch (UnreadableException ex) {
             Logger.getLogger(SelectivityVotingDA.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {

@@ -20,7 +20,7 @@ package cat.urv.imas.agent;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.behaviour.digger.*;
 import cat.urv.imas.onthology.MessageContent;
-import cat.urv.imas.onthology.MetalFieldList;
+import cat.urv.imas.onthology.*;
 import jade.core.*;
 import jade.domain.*;
 import jade.domain.FIPAAgentManagement.*;
@@ -41,6 +41,8 @@ public class DiggerAgent extends ImasAgent {
     private boolean waitingMapFlag = true;
     
     private MetalFieldList currentMFL;
+    
+    private MetalField currentMF;
     
     
     /*      METHODS     */
@@ -82,6 +84,14 @@ public class DiggerAgent extends ImasAgent {
 
     public void setCurrentMFL(MetalFieldList currentMFL) {
         this.currentMFL = currentMFL;
+    }
+
+    public MetalField getCurrentMF() {
+        return currentMF;
+    }
+
+    public void setCurrentMF(MetalField currentMF) {
+        this.currentMF = currentMF;
     }
        
     
