@@ -51,9 +51,6 @@ public class MapHandling extends AchieveREResponder {
         super(agent, mt);
         agent.log("Waiting for the updated map.");
     }
-
-    
-    
     
     // PARTE 1 DE LA RESPUESTA
     /**
@@ -70,8 +67,10 @@ public class MapHandling extends AchieveREResponder {
             if(msg.getContentObject().getClass() == cat.urv.imas.onthology.InitialGameSettings.class){
                 // sets the value of the agents map to the received map.
                 GameSettings game = (GameSettings) msg.getContentObject();
-                agent.setView(game.getMap());
-                agent.log("MAP Updated; Searching for Metals...");                
+                agent.setMapView(game.getMap());
+                agent.log("MAP Updated; Searching for Metals...");
+                agent.searchForMetal();
+                agent.log("MetalSearched");                
             }
         } catch (UnreadableException ex) {
             Logger.getLogger(MapHandling.class.getName()).log(Level.SEVERE, null, ex);
@@ -90,8 +89,7 @@ public class MapHandling extends AchieveREResponder {
     @Override
     protected ACLMessage prepareResultNotification(ACLMessage msg, ACLMessage response) { //Useless method
         ProspectorAgent agent = (ProspectorAgent)this.getAgent();
-        agent.searchForMetal();
-        agent.log("MetalFound=");
+        //Join the submap back into the map
         return null;
     }
 

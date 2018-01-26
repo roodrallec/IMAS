@@ -19,14 +19,16 @@ package cat.urv.imas.agent;
 
 import java.util.ArrayList;
 import cat.urv.imas.onthology.GameSettings;
-import cat.urv.imas.map.Cell;
+import cat.urv.imas.map.*;
 import cat.urv.imas.behaviour.prospector.*;
 import cat.urv.imas.onthology.MessageContent;
+import cat.urv.imas.onthology.MetalType;
 import jade.core.*;
 import jade.domain.*;
 import jade.domain.FIPAAgentManagement.*;
 import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.*;
+import java.util.Map;
 
 
 public class ProspectorAgent extends ImasAgent {
@@ -34,7 +36,7 @@ public class ProspectorAgent extends ImasAgent {
     /*      ATTRIBUTES      */
     private AID prospectorCoordinatorAgent;
     
-    private Cell[] subMap = new Cell[8];
+    private Cell[] mapView = new Cell[8];
         
     private int[] currentPosition; //This has to be initializaed (TODO Aleix)
  
@@ -43,29 +45,33 @@ public class ProspectorAgent extends ImasAgent {
         super(AgentType.PROSPECTOR);
     }
 /* Takes a whole map and stores just the agents view */
-    public void setView(Cell[][] map) {         
+    public void setMapView(Cell[][] map) {         
         this.currentPosition = new int[] {1,3};
         int row = this.currentPosition[0];
         int column = this.currentPosition[1];
         
         int idx = 0;
-        for(int r=row-1; r > row+1; r++) {
-            for(int c=column-1; c > column+1; c++) {
+        for(int r=row-1; r <= row+1; r++) {
+            for(int c=column-1; c <= column+1; c++) {
                 if (!(r == row && c == column)) {                  
-                    subMap[idx] = map[r][c];
+                    mapView[idx] = map[r][c];
                     idx++;
                 }
             }
         } 
     }
 
-    public ArrayList<Cell> searchForMetal() {
-        ArrayList<Cell> metalFound = new ArrayList<Cell>();
-//        for(Cell c: this.subMap) {
-//            this.log(c.toString());
-//        }
-        return metalFound;
+    public void searchForMetal() {
+        for(Cell c: this.mapView) {
+            if (c instanceof SettableFieldCell) {
+                ((SettableFieldCell) c).detectMetal();
+            }            
+        }
     }   
+    
+    public Cell[] getMapView() {
+        return mapView;
+    }
     
     public AID getProspectorCoordinatorAgent() {
         return prospectorCoordinatorAgent;
