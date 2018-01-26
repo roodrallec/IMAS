@@ -75,6 +75,7 @@ public class RequesterBehaviour extends AchieveREInitiator {
             mapmsg.addReceiver(agent.getDiggerCoordinatorAgent());
             mapmsg.addReceiver(agent.getProspectorCoordinatorAgent());
             mapmsg.setContentObject(agent.getGame());
+            mapmsg.setLanguage(MessageContent.GET_MAP);
             agent.log("Map sent to underlying levels.");
             agent.send(mapmsg);
             
@@ -93,6 +94,7 @@ public class RequesterBehaviour extends AchieveREInitiator {
             mflmsg.clearAllReceiver();
             mflmsg.addReceiver(agent.getDiggerCoordinatorAgent());
             mflmsg.setContentObject((Serializable) agent.getCurrentMFL());
+            mflmsg.setLanguage(MessageContent.GET_MAP);
             agent.send(mflmsg);
             
             /***********END PROVES***********/

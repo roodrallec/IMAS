@@ -46,11 +46,11 @@ public class DiggerCoordinatorAgent extends ImasAgent {
     
     private int receivedBids = 0;
     
-    private int numDiggers = InitialGameSettings.load("game.settings").getAgentList().get(AgentType.DIGGER).size();
+    private int numDiggers;
     
     private MetalFieldList currentMFL;
     
-    private List<float[]> bids = new ArrayList<float[]>(this.numDiggers);
+    private List<double[]> bids ;
     
     
     /*      METHODS     */
@@ -94,16 +94,18 @@ public class DiggerCoordinatorAgent extends ImasAgent {
         this.currentMFL = currentMFL;
     }
 
-    public List<float[]> getBids() {
+    public List<double[]> getBids() {
         return bids;
     }
 
-    public void setBids(List<float[]> bids) {
+    public void setBids(List<double[]> bids) {
         this.bids = bids;
     }
     
     
-    
+    public void metalFieldAssignation(){
+        
+    }         
 
     
     /**
@@ -112,6 +114,9 @@ public class DiggerCoordinatorAgent extends ImasAgent {
      */
     @Override
     protected void setup() {
+        this.numDiggers = InitialGameSettings.load("game.settings").getAgentList().get(AgentType.DIGGER).size();
+        this.bids= new ArrayList<double[]>();
+        
 
         /* ** Very Important Line (VIL) ***************************************/
         this.setEnabledO2ACommunication(true, 1);
@@ -147,6 +152,8 @@ public class DiggerCoordinatorAgent extends ImasAgent {
         for (int i = 1; i <= this.numDiggers; i++ ){
             searchCriterion.setName("DiggerAgent"+i);
             this.diggerAgents.add(UtilsAgents.searchAgent(this, searchCriterion));
+            double[] val = {};
+            this.bids.add(val);
         }
         // searchAgent is a blocking method, so we will obtain always a correct AID
         
@@ -155,12 +162,12 @@ public class DiggerCoordinatorAgent extends ImasAgent {
         
         
         // It triggers ONLY for the voting protocol (Selectivity)
-        MessageTemplate mt1 = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),MessageTemplate.MatchProtocol(MessageContent.SELECTIVITY));
-        this.addBehaviour(new SelectivityVoting(this, mt1));
+        MessageTemplate mt1 = MessageTemplate.MatchLanguage(MessageContent.SELECTIVITY);
+        this.addBehaviour(new SelectivityVotingDCA(this, mt1));
         
         // It triggers when the received message is an INFORM.
-        MessageTemplate mt2 = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
-        this.addBehaviour(new MapHandling(this, mt2));
+        MessageTemplate mt2 = MessageTemplate.MatchLanguage(MessageContent.GET_MAP);
+        this.addBehaviour(new MapHandlingDCA(this, mt2));
 
         
         

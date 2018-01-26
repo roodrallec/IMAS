@@ -86,9 +86,9 @@ public class DiggerAgent extends ImasAgent {
        
     
   
-    public float[] computeBids(MetalFieldList metalFields){
+    public double[] computeBids(MetalFieldList metalFields){
         
-        float[] bids = new float[metalFields.getMetalFields().size()];
+        double[] bids = new double[metalFields.getMetalFields().size()];
         //TODO: itera cada metalfield i per cada un computa la bid
         for (int i = 0; i < bids.length; i++ ){
             bids[i] = i; //EXEMPLE, S'HA DE FER
@@ -139,12 +139,12 @@ public class DiggerAgent extends ImasAgent {
         /*      BEHAVIOURS        */
         
         // It triggers ONLY for the voting protocol (Selectivity)
-        MessageTemplate mt1 = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),MessageTemplate.MatchProtocol(MessageContent.SELECTIVITY));
-        this.addBehaviour(new SelectivityVoting(this, mt1));
+        MessageTemplate mt1 = MessageTemplate.MatchLanguage(MessageContent.SELECTIVITY);
+        this.addBehaviour(new SelectivityVotingDA(this, mt1));
         
         // It triggers when the received message is an INFORM.
-        MessageTemplate mt2 = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),MessageTemplate.MatchProtocol(null));
-        this.addBehaviour(new MapHandling(this, mt2));
+        MessageTemplate mt2 =MessageTemplate.MatchLanguage(MessageContent.GET_MAP);
+        this.addBehaviour(new MapHandlingDA(this, mt2));
     }
     
     

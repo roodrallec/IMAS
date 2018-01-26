@@ -41,7 +41,7 @@ import java.util.logging.Logger;
 /**
  * This method handles the Map sent from above
  */
-public class SelectivityVoting extends AchieveREResponder {
+public class SelectivityVotingDA extends AchieveREResponder {
 
     /**
      * Sets up the template of messages to catch.
@@ -49,7 +49,7 @@ public class SelectivityVoting extends AchieveREResponder {
      * @param agent The agent owning this behaviour
      * @param mt Template to receive future responses in this conversation
      */
-    public SelectivityVoting(DiggerAgent agent, MessageTemplate mt) {
+    public SelectivityVotingDA(DiggerAgent agent, MessageTemplate mt) {
         super(agent, mt);
         agent.log("Waiting for the voting to start.");
     }
@@ -72,9 +72,9 @@ public class SelectivityVoting extends AchieveREResponder {
                 while(agent.isWaitingMapFlag())
                 {}
                 // calls the method computeBids() froms itself to calculate the bid for each metal field
-                float[] bids = agent.computeBids(metalFields);
+                double[] bids = agent.computeBids(metalFields);
                 ACLMessage bidmsg = new ACLMessage(ACLMessage.INFORM);
-                bidmsg.setProtocol(MessageContent.SELECTIVITY);
+                bidmsg.setLanguage(MessageContent.SELECTIVITY);
                 bidmsg.addReceiver(agent.getDiggerCoordinatorAgent());
                 bidmsg.setContentObject(bids);
                 agent.log("Bids sent to DiggerCoordinator.");
@@ -82,9 +82,9 @@ public class SelectivityVoting extends AchieveREResponder {
                 return bidmsg;
             }  
         } catch (UnreadableException ex) {
-            Logger.getLogger(SelectivityVoting.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SelectivityVotingDA.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(SelectivityVoting.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SelectivityVotingDA.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }

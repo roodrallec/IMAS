@@ -40,7 +40,7 @@ import java.util.logging.Logger;
 /**
  * This method handles the Map sent from above
  */
-public class SelectivityVoting extends AchieveREResponder {
+public class MapHandlingDCA extends AchieveREResponder {
 
     /**
      * Sets up the template of messages to catch.
@@ -48,9 +48,9 @@ public class SelectivityVoting extends AchieveREResponder {
      * @param agent The agent owning this behaviour
      * @param mt Template to receive future responses in this conversation
      */
-    public SelectivityVoting(DiggerCoordinatorAgent agent, MessageTemplate mt) {
+    public MapHandlingDCA(DiggerCoordinatorAgent agent, MessageTemplate mt) {
         super(agent, mt);
-        agent.log("Waiting for bids.");
+        agent.log("Waiting for the updated map.");
     }
 
     /**
@@ -62,27 +62,51 @@ public class SelectivityVoting extends AchieveREResponder {
     protected ACLMessage handleRequest(ACLMessage msg) {
         // Declares the current agent so you can use its getters and setters (and other methods)
         DiggerCoordinatorAgent agent = (DiggerCoordinatorAgent)this.getAgent();
-        try {
-            float[] bids = (float[]) msg.getContentObject();
-            List<AID> diggers = agent.getDiggerAgents();
-            int currentDigger = diggers.indexOf(msg.getSender());
-            List aux = agent.getBids();
-            aux.set(currentDigger, bids);
-            agent.setBids(aux);
-            
-            int receivedBids = agent.getReceivedBids()+1;
-            
-            if(receivedBids == agent.getNumDiggers()){
-                agent.setReceivedBids(0);
-                agent.log("Received all bids.");
-                
+        try {         
+            // If the received message is a map.
+            if(msg.getContentObject().getClass().equals(cat.urv.imas.onthology.InitialGameSettings.class)){
+                // sets the value of the agents map to the received map.
+                agent.setGame((GameSettings) msg.getContentObject());
+                agent.log("MAP Updated");
+                // Send map to below level
+                ACLMessage mapmsg = new ACLMessage(ACLMessage.INFORM);
+                mapmsg.clearAllReceiver();
+                for (int i = 1; i <= agent.getNumDiggers(); i++ ){
+                    mapmsg.addReceiver(agent.getDiggerAgents().get(i-1));
+                }
+                mapmsg.setContentObject(agent.getGame());
+                mapmsg.setLanguage(MessageContent.GET_MAP);
+                agent.log("Map sent to underlying level");
+                return mapmsg;
+            }
+            // If the received message is a MetalField List
+            else if(msg.getContentObject().getClass().equals(cat.urv.imas.onthology.MetalFieldList.class)){
+                // Sets the value of the current MFL to the received one.
+                agent.setCurrentMFL((MetalFieldList)msg.getContentObject());
+                // Sends the MetalField List to the diggers.
+                ACLMessage mflmsg = new ACLMessage(ACLMessage.INFORM);
+                mflmsg.setLanguage(MessageContent.SELECTIVITY);
+                mflmsg.clearAllReceiver();
+                for (int i = 1; i <= agent.getNumDiggers(); i++ ){
+                    mflmsg.addReceiver(agent.getDiggerAgents().get(i-1));
+                }
+                mflmsg.setContentObject(msg.getContentObject());
+                agent.log("New metal Fields sent to Diggers.");    
+                return mflmsg;
             }
             
-            
-
-                 
+            // If the received message is a String
+            else{
+                switch((String)msg.getContentObject()){
+                    // If it is a MAP_RECEIVED
+                    case MessageContent.MAP_RECEIVED:
+                        return null;     
+                }
+            }     
         } catch (UnreadableException ex) {
-            Logger.getLogger(SelectivityVoting.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MapHandlingDCA.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(MapHandlingDCA.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }

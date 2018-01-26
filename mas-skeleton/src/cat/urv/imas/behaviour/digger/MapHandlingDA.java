@@ -41,7 +41,7 @@ import java.util.logging.Logger;
 /**
  * This method handles the Map sent from above
  */
-public class MapHandling extends AchieveREResponder {
+public class MapHandlingDA extends AchieveREResponder {
 
     /**
      * Sets up the template of messages to catch.
@@ -49,7 +49,7 @@ public class MapHandling extends AchieveREResponder {
      * @param agent The agent owning this behaviour
      * @param mt Template to receive future responses in this conversation
      */
-    public MapHandling(DiggerAgent agent, MessageTemplate mt) {
+    public MapHandlingDA(DiggerAgent agent, MessageTemplate mt) {
         super(agent, mt);
         agent.log("Waiting for the updated map.");
     }
@@ -94,9 +94,9 @@ public class MapHandling extends AchieveREResponder {
                 return bidmsg;
             }  */
         } catch (UnreadableException ex) {
-            Logger.getLogger(MapHandling.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MapHandlingDA.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(MapHandling.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MapHandlingDA.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }
