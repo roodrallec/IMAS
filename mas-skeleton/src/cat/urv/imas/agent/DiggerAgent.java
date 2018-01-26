@@ -19,6 +19,7 @@ package cat.urv.imas.agent;
 
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.behaviour.digger.*;
+import cat.urv.imas.map.CellType;
 import cat.urv.imas.onthology.MessageContent;
 import cat.urv.imas.onthology.*;
 import jade.core.*;
@@ -126,7 +127,7 @@ public class DiggerAgent extends ImasAgent {
         this.metaltype = metaltype;
     }
        
-  
+    // Method to compute bids
     public double[] computeBids(MetalFieldList metalFields){
         
         double[] bids = new double[metalFields.getMetalFields().size()+1];
@@ -164,6 +165,40 @@ public class DiggerAgent extends ImasAgent {
         bids[bids.length-1] = this.game.getDiggersCapacity()-this.getUsedSlots();
         
         return bids;       
+    }
+    
+    
+    public int[] computeMovement(int[] distance){
+        GameSettings game = this.getGame();
+        int[] pos = this.getCurrentPosition();
+        int[] movement = new int[]{0,0};
+        
+        if(distance[0] < 0){ //&& comprovar que la casella de sobre sigui un pathcell)
+            if(game.getMap()[pos[0]-1][pos[1]].getCellType() == CellType.PATH){
+                movement = new int[]{-1,0};
+                this.log("Moving up.");
+            }    
+        }
+        if(distance[0] > 0){ //&& comprovar que la casella de sota sigui un pathcell)
+            if(game.getMap()[pos[0]+1][pos[1]].getCellType() == CellType.PATH){
+                movement = new int[]{1,0};
+                this.log("Moving down.");
+            }  
+        }
+        
+        if(distance[1] < 0){ //&& comprovar que la casella de la esquerra sigui un pathcell)
+            if(game.getMap()[pos[0]][pos[1]-1].getCellType() == CellType.PATH){
+                movement = new int[]{0,-1};
+                this.log("Moving left.");
+            }    
+        }
+        if(distance[1] > 0){ //&& comprovar que la casella de la dreta sigui un pathcell)
+            if(game.getMap()[pos[0]][pos[1]+1].getCellType() == CellType.PATH){
+                movement = new int[]{0,1};
+                this.log("Moving right.");
+            }  
+        }
+        return movement;
     }
     
 
@@ -217,9 +252,13 @@ public class DiggerAgent extends ImasAgent {
         MessageTemplate mt1 = MessageTemplate.MatchLanguage(MessageContent.SELECTIVITY);
         this.addBehaviour(new SelectivityVotingDA(this, mt1));
         
-        // It triggers when the received message is an INFORM.
+        // It triggers when the received message is a GET_MAP.
         MessageTemplate mt2 =MessageTemplate.MatchLanguage(MessageContent.GET_MAP);
         this.addBehaviour(new MapHandlingDA(this, mt2));
+        
+        // It triggers when the received message is a CHOOSE_ACTION.
+        MessageTemplate mt3 =MessageTemplate.MatchLanguage(MessageContent.CHOOSE_ACTION);
+        this.addBehaviour(new ChooseAction(this, mt3));
     }
     
     

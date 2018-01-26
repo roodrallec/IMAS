@@ -83,18 +83,6 @@ public class SelectivityVotingDA extends AchieveREResponder {
                 agent.setWaitingMapFlag(true);
                 return bidmsg;
             }
-            else if(msg.getContentObject().getClass().equals(Integer.class)){
-                int metalF = (int) msg.getContentObject();
-                if (metalF == -1){
-                    agent.log("No metal assigned. Follow Prospector.");
-                    // Contract Net
-                }
-                else{
-                    List mf = agent.getCurrentMFL().getMetalFields();
-                    agent.setCurrentMF((MetalField) mf.get(metalF));
-                    agent.log("Metal Field Assigned [x,y]: " + Arrays.toString(agent.getCurrentMF().getPosition()));
-                }
-        }
             
         } catch (UnreadableException ex) {
             Logger.getLogger(SelectivityVotingDA.class.getName()).log(Level.SEVERE, null, ex);

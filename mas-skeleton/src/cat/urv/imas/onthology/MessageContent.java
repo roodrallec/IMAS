@@ -30,5 +30,6 @@ public class MessageContent {
     public static final String MAP_RECEIVED = "Map received";
     public static final String OK = "OK";
     public static final String SELECTIVITY = "SelectivityVotingProtocol";
+    public static final String CHOOSE_ACTION = "ChooseAction";
     
 }

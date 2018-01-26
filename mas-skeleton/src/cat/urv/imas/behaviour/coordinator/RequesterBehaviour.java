@@ -83,7 +83,7 @@ public class RequesterBehaviour extends AchieveREInitiator {
             /************PROVES**************/
             
             MetalField mf = new MetalField(new int[]{1,2},"G",3);
-            MetalField mf2 = new MetalField(new int[]{1,3},"G",3);
+            MetalField mf2 = new MetalField(new int[]{5,3},"G",3);
             List<MetalField> metalFields = new ArrayList<MetalField>();
             metalFields.add(mf);
             metalFields.add(mf2);
