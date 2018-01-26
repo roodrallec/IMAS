@@ -27,6 +27,7 @@ import jade.domain.FIPAAgentManagement.*;
 import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -103,10 +104,47 @@ public class DiggerCoordinatorAgent extends ImasAgent {
     }
     
     
-    public void metalFieldAssignation(){
-        
-    }         
+    public int[] metalFieldAssignation(){
+        List mfl = this.currentMFL.getMetalFields();
+        List bidslist = new ArrayList<double[]>();
+        int[] matching = new int[this.getNumDiggers()];
+        Arrays.fill(matching,-1);
+        bidslist = this.bids;
+        double[] onesarray = new double[mfl.size()];
+        Arrays.fill(onesarray,-1.0);
+        int k = 0;
+        while (!mfl.isEmpty()|| k < this.numDiggers){
 
+            k = k+1;
+            double maxbid = -1.0;
+            int digger = -1;
+            int metal = -1;
+            for (int i = 0; i < this.numDiggers; i++ ){
+                for (int j = 0; j < this.currentMFL.getMetalFields().size(); j++){
+                    double[] array = (double[]) bidslist.get(i);
+                    if (maxbid < array[j]){
+                        maxbid = array[j];
+                        digger = i;
+                        metal = j;
+                    }
+                }
+            } 
+            bidslist.set(digger,onesarray);
+            for (int i = 0; i < this.numDiggers; i++ ){
+                double [] aux = (double []) bidslist.get(i);
+                aux[metal] = -1.0;
+                bidslist.set(i,aux);
+            }
+            if(mfl.size() == 1){
+                matching[digger] = metal;
+                break;
+            }
+            mfl.remove(0);
+            matching[digger] = metal;
+        }
+    return matching;  
+    }         
+    
     
     /**
      * Agent setup method - called when it first come on-line. Configuration of

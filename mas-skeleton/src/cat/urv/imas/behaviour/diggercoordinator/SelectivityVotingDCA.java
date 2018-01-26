@@ -75,7 +75,8 @@ public class SelectivityVotingDCA extends AchieveREResponder {
             if(receivedBids == agent.getNumDiggers()){
                 agent.setReceivedBids(0);
                 agent.log("Received all bids.");
-                
+                int[] matching = agent.metalFieldAssignation();
+                agent.log("MetalField Matching Done");
             }
             
             
