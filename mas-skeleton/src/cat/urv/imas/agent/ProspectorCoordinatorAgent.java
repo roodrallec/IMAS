@@ -107,10 +107,24 @@ public class ProspectorCoordinatorAgent extends ImasAgent {
         int a = 0;
         List<MetalFieldList> listoflist = this.MFLreceived;
         List<MetalField> aux = new ArrayList<MetalField>();
-        for(int i ; iterarenlista)
-            listoflist.get(i).getMetalFields()
-            for(each de i (iterar en MF)
-                aux.add(each)
+        //for(int i ; iterarenlista)
+        for (MetalFieldList listoflist1 : listoflist) {
+            List<MetalField> fromone = listoflist1.getMetalFields();
+            for (MetalField fromone1 : fromone) {
+                Boolean exists = false;
+                for (MetalField aux1 : aux) {
+                    if ((aux1.getPosition())[0] == (fromone1.getPosition())[0] && (aux1.getPosition())[1] == (fromone1.getPosition())[1]){
+                        exists = true;
+                    }                            
+                }
+                if (!(exists)) {
+                    aux.add(fromone1);
+                }
+            }               
+        }
+            //listoflist.get(i).getMetalFields()
+            //for(each de i (iterar en MF)
+                //aux.add(each)
         return aux;
     }
     /**

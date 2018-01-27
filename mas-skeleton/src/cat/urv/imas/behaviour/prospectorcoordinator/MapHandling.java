@@ -84,7 +84,7 @@ public class MapHandling extends AchieveREResponder {
                 return mapmsg;                
             }else if(msg.getContentObject().getClass() == cat.urv.imas.onthology.MetalFieldList.class){
                 agent.setMsgreceived(agent.getMsgreceived()+1);
-                agent.log("RECIVED");
+                agent.log("List of metals received");
                 List<MetalFieldList> nowMFL = agent.getMFLreceived();
                 //LLamar al metodo para que las MF sean unicas
                 //Unir nowMFL
@@ -93,12 +93,10 @@ public class MapHandling extends AchieveREResponder {
                 
                        
                 if(agent.getMsgreceived() == agent.getNumProspectors()){
-                    
-                    
+                    agent.log("All list of metals received");                    
                     List<MetalField> aux = agent.cleanDuplicatedMFL();
                     agent.setMsgreceived(0);
-                    //Metodo 
-                    
+                                         
                     ACLMessage MFLmsg = new ACLMessage(ACLMessage.INFORM);
                     MFLmsg.clearAllReceiver();
                     MFLmsg.addReceiver(agent.getCoordinatorAgent());
@@ -106,7 +104,8 @@ public class MapHandling extends AchieveREResponder {
                     //Para cada MFL sacar su lista de MF 
                     //metodo a implementar
                     //Cuando tenga la lista unica
-                    MetalFieldList currentMFL = new MetalFieldList(aux);    
+                    MetalFieldList currentMFL = new MetalFieldList(aux); 
+                    agent.log("Clean list of metals sent");
                     MFLmsg.setContentObject(currentMFL);
                 }
             }
