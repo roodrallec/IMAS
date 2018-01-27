@@ -20,6 +20,7 @@ package cat.urv.imas.agent;
 import cat.urv.imas.onthology.InitialGameSettings;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.InfoAgent;
+import cat.urv.imas.onthology.GamePerformanceIndicators;
 import cat.urv.imas.gui.GraphicInterface;
 import cat.urv.imas.behaviour.system.RequestResponseBehaviour;
 //import cat.urv.imas.map.Cell;
@@ -98,6 +99,10 @@ public class SystemAgent extends ImasAgent {
      * Path cell info.
      */
     private PathCell pathCell;
+    /**
+     * Path cell info.
+     */
+    private GamePerformanceIndicators gamePerformanceIndicators;
     /**
      * Builds the System agent.
      */
@@ -332,15 +337,11 @@ public class SystemAgent extends ImasAgent {
             // get agent name from it's AID
             AID diggerID = this.requestedDiggersToManufacture.getAgentIDByIndex(0);
             int[] manufacturingCenterPos = this.requestedDiggersToManufacture.getFieldPosByIndex(0);
-            //int[] diggerPos = this.requestedDiggersToManufacture.getAgentPosByIndex(0);
             
-            // Remove 1 metal unit from metal field
+            // Get the manufacturing reward
             ManufacturingCenterCell manufacturingCenterFieldCell = (ManufacturingCenterCell) nextTurnMap[manufacturingCenterPos[0]][manufacturingCenterPos[1]];
-            //manufacturingCenterFieldCell.;
-            
-            // Set digger agent working in the path cell
-            //PathCell diggerCell = (PathCell) nextTurnMap[diggerPos[0]][diggerPos[1]];
-            //diggerCell.setDiggerAgentWorking();
+            // Add the new reward to the accumulated reward
+            gamePerformanceIndicators.addNewReward(manufacturingCenterFieldCell.getPrice());
             
             this.requestedDiggersToManufacture.removeAgentByIndex(0);
         }
