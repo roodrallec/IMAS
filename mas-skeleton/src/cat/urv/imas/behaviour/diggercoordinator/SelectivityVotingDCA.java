@@ -32,6 +32,7 @@ import jade.core.AID;
 import jade.lang.acl.UnreadableException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -67,8 +68,11 @@ public class SelectivityVotingDCA extends AchieveREResponder {
             List<AID> diggers = agent.getDiggerAgents();
             int currentDigger = diggers.indexOf(msg.getSender());
             List digbids = agent.getBids();
-            digbids.set(currentDigger, bids);
+            digbids.set(currentDigger, Arrays.copyOfRange(bids,0,bids.length-1));
+            List slots = agent.getSlots();
+            slots.set(currentDigger,(int)bids[bids.length-1]);
             agent.setBids(digbids);
+            agent.setSlots(slots);
             
             int receivedBids = agent.getReceivedBids()+1;
             agent.setReceivedBids(receivedBids);
@@ -80,7 +84,7 @@ public class SelectivityVotingDCA extends AchieveREResponder {
                 for (int i = 0; i < agent.getNumDiggers(); i++){
                     ACLMessage metassigned = new ACLMessage(ACLMessage.INFORM);
                     metassigned.addReceiver(agent.getDiggerAgents().get(i));
-                    metassigned.setLanguage(MessageContent.SELECTIVITY);
+                    metassigned.setLanguage(MessageContent.CHOOSE_ACTION);
                     metassigned.setContentObject(matching[i]);
                     agent.send(metassigned);
                 }
