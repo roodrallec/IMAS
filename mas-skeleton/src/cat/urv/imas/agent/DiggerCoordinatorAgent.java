@@ -46,6 +46,7 @@ public class DiggerCoordinatorAgent extends ImasAgent {
     private GameSettings game;
     
     private int receivedBids = 0;
+    private int receivedActions = 0;
     
     private int numDiggers;
     
@@ -54,6 +55,9 @@ public class DiggerCoordinatorAgent extends ImasAgent {
     private List<double[]> bids ;
     
     private List<Integer> slots = new ArrayList<Integer>();
+    
+    private List<DiggingMessage>  currentDML = new ArrayList<DiggingMessage>();
+    private List<MovingMessage>  currentMML = new ArrayList<MovingMessage>();
     
     
     /*      METHODS     */
@@ -112,6 +116,32 @@ public class DiggerCoordinatorAgent extends ImasAgent {
     public void setSlots(List<Integer> slots) {
         this.slots = slots;
     }
+
+    public List<DiggingMessage> getCurrentDML() {
+        return currentDML;
+    }
+
+    public void setCurrentDML(List<DiggingMessage> currentDML) {
+        this.currentDML = currentDML;
+    }
+
+    public int getReceivedActions() {
+        return receivedActions;
+    }
+
+    public void setReceivedActions(int receivedActions) {
+        this.receivedActions = receivedActions;
+    }
+
+    public List<MovingMessage> getCurrentMML() {
+        return currentMML;
+    }
+
+    public void setCurrentMML(List<MovingMessage> currentMML) {
+        this.currentMML = currentMML;
+    }
+    
+    
     
     
     public int[] metalFieldAssignation(){

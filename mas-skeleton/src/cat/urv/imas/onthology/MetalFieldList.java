@@ -29,6 +29,10 @@ public class MetalFieldList implements Serializable{
         this.metalFields = metalFields;
     }
     
+    public void add(MetalField mf){
+        this.metalFields.add(mf);
+    }
+    
     
     
     

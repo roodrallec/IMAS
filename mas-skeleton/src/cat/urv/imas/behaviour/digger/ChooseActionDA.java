@@ -72,6 +72,7 @@ public class ChooseActionDA extends AchieveREResponder {
                 int metalF = (int) msg.getContentObject();
                 if (metalF == -1){
                     if (agent.getUsedSlots() > 0){
+                        //Aplicar el metode per anar al manufacture
                         agent.log("No metal assigned. Manufacture.");
                     }
                     else{

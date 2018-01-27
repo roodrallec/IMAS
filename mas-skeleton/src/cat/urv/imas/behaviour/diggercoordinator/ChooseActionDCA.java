@@ -69,10 +69,41 @@ public class ChooseActionDCA extends AchieveREResponder {
             // Declares the current agent so you can use its getters and setters (and other methods)
             DiggerCoordinatorAgent agent = (DiggerCoordinatorAgent)this.getAgent();
             if(msg.getContentObject().getClass().equals(MetalField.class)){
+                List<DiggingMessage> aux = agent.getCurrentDML();
+                DiggingMessage digmes = new DiggingMessage(msg.getSender(),(MetalField)msg.getContentObject());
+                aux.add(digmes);
+                agent.setCurrentDML(aux);
                 agent.log("Received digging petition.");
+
+            }
+            else if(msg.getContentObject().getClass().equals(int[].class)){
+                List<MovingMessage> aux = agent.getCurrentMML();
+                MovingMessage movmes = new MovingMessage(msg.getSender(),(int[])msg.getContentObject());
+                aux.add(movmes);
+                agent.setCurrentMML(aux);
+                agent.log("Received movement petition.");
+                
+            }
+            // Need to be done the same with manufacturing messages
+            
+            
+            int count = agent.getReceivedActions()+1;
+            if (count == agent.getNumDiggers()){
+                DiggingMessageList dml = new DiggingMessageList(agent.getCurrentDML());
+                ACLMessage dmlmsg = new ACLMessage(ACLMessage.INFORM);
+                dmlmsg.clearAllReceiver();
+                dmlmsg.addReceiver(agent.getCoordinatorAgent());
+                dmlmsg.setLanguage(MessageContent.DIG_ACTION);
+                dmlmsg.setContentObject(dml);
+            }
+            else{
+                agent.setReceivedActions(count);
             }
             
+            
         } catch (UnreadableException ex) {
+            Logger.getLogger(ChooseActionDCA.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
             Logger.getLogger(ChooseActionDCA.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;

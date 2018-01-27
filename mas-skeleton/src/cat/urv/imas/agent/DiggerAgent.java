@@ -305,9 +305,16 @@ public class DiggerAgent extends ImasAgent {
             
             if (flag == 0 && (previousmovement[0] != 0 || previousmovement[1]!=0) ) { // Go back if crashed.
                 this.setCrash(true);
-                movement[0] = (int) (-1.0*this.getPreviousMovement()[0]);
-                movement[1] = (int) (-1.0*this.getPreviousMovement()[1]);
-                this.log("Moving Backwards");
+                if(game.getMap()[pos[0]+previousmovement[0]][pos[1]+previousmovement[1]].getCellType() == CellType.PATH){
+                    movement = previousmovement;
+                    this.log("Keep direction.");
+                }
+                else{
+                    movement[0] = (int) (-1.0*this.getPreviousMovement()[0]);
+                    movement[1] = (int) (-1.0*this.getPreviousMovement()[1]);
+                    this.log("Moving Backwards");  
+                }
+
             }
             else if (flag == 0 && previousmovement[0] == 0 && previousmovement[1]==0 ) { //Any movement.
                 this.setCrash(true);

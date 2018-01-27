@@ -11,13 +11,13 @@ import jade.core.AID;
  *
  * @author usuario
  */
-public class DiggingMessage {
+public class MovingMessage {
     private AID digger;
-    private MetalField metalfield;
+    private int[] movement;
 
-    public DiggingMessage(AID digger, MetalField metalfield) {
+    public MovingMessage(AID digger, int[] movement) {
         this.digger = digger;
-        this.metalfield = metalfield;
+        this.movement = movement;
     }
 
     public AID getDigger() {
@@ -28,13 +28,15 @@ public class DiggingMessage {
         this.digger = digger;
     }
 
-    public MetalField getMetalfield() {
-        return metalfield;
+    public int[] getMovement() {
+        return movement;
     }
 
-    public void setMetalfield(MetalField metalfield) {
-        this.metalfield = metalfield;
+    public void setMovement(int[] movement) {
+        this.movement = movement;
     }
     
+    
+
     
 }
