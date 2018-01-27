@@ -13,14 +13,14 @@ import java.util.List;
  *
  * @author ALEIX
  */
-public class RequestedDiggersToWork {
+public class AgentsIdAssociatedWithFC {
     //AID of the digger requesting to work
     private List<AID> ids = new ArrayList<AID>();
     //position x,y of the field where the digger want to start working
     private ArrayList<int[]> fieldPositions = new ArrayList<int[]>();
     private int agentsInList = 0;
 
-    public RequestedDiggersToWork() {
+    public AgentsIdAssociatedWithFC() {
     }
     
     public int getNumberOfAgentsInList() {

@@ -63,9 +63,13 @@ public class SystemAgent extends ImasAgent {
      */
     private AgentsPositions agentsPos = new AgentsPositions();
     /**
-     * agentsPos will contain the positions of all mobile agents.
+     * requestedDiggersToWork will contain AID of diggers with the x,y location of the metal field that they want to dig.
      */
-    private RequestedDiggersToWork requestedDiggersToWork = new RequestedDiggersToWork();
+    private AgentsIdAssociatedWithFC requestedDiggersToWork = new AgentsIdAssociatedWithFC();
+    /**
+     * requestedDiggersToWork will contain AID of diggers with the x,y location of the manufacturing center where they would like to manufacture metal.
+     */
+    private AgentsIdAssociatedWithFC requestedDiggersToManufacture = new AgentsIdAssociatedWithFC();
 
     private AgentsPositions getAgentsPositions() {
         return agentsPos;
@@ -272,7 +276,6 @@ public class SystemAgent extends ImasAgent {
         
         //1. Set up diggers working
         while (this.requestedDiggersToWork.getNumberOfAgentsInList() > 0){
-        //for (int agentIndex = 0; agentIndex < this.requestedDiggersToWork.getNumberOfAgentsInList(); agentIndex++){
             // get agent name from it's AID
             AID diggerID = this.requestedDiggersToWork.getAgentIDByIndex(0);
             int[] metalFieldPos = this.requestedDiggersToWork.getFieldPosByIndex(0);
@@ -286,7 +289,7 @@ public class SystemAgent extends ImasAgent {
             PathCell diggerCell = (PathCell) nextTurnMap[diggerPos[0]][diggerPos[1]];
             diggerCell.setDiggerAgentWorking();
             
-            this.requestedDiggersToWork.
+            this.requestedDiggersToWork.removeAgentByIndex(0);
         }
         
         //2. Movements checking        
@@ -325,7 +328,22 @@ public class SystemAgent extends ImasAgent {
         //4. Set new metal fields detected to visible and update metal fields capacity
         
         //5. Update manufacturing centers (rewards)
-        
+        while (this.requestedDiggersToManufacture.getNumberOfAgentsInList() > 0){
+            // get agent name from it's AID
+            AID diggerID = this.requestedDiggersToManufacture.getAgentIDByIndex(0);
+            int[] manufacturingCenterPos = this.requestedDiggersToManufacture.getFieldPosByIndex(0);
+            //int[] diggerPos = this.requestedDiggersToManufacture.getAgentPosByIndex(0);
+            
+            // Remove 1 metal unit from metal field
+            ManufacturingCenterCell manufacturingCenterFieldCell = (ManufacturingCenterCell) nextTurnMap[manufacturingCenterPos[0]][manufacturingCenterPos[1]];
+            manufacturingCenterFieldCell.;
+            
+            // Set digger agent working in the path cell
+            PathCell diggerCell = (PathCell) nextTurnMap[diggerPos[0]][diggerPos[1]];
+            diggerCell.setDiggerAgentWorking();
+            
+            this.requestedDiggersToManufacture.removeAgentByIndex(0);
+        }
         
         
     }
