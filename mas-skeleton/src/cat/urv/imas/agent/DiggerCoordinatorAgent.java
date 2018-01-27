@@ -140,11 +140,17 @@ public class DiggerCoordinatorAgent extends ImasAgent {
                     }
                 }
             } 
-            bidslist.set(digger,onesarray);
-            for (int i = 0; i < this.numDiggers; i++ ){
-                double [] aux = (double []) bidslist.get(i);
-                aux[metal] = -1.0;
-                bidslist.set(i,aux);
+            if(digger>=0){ // Make sure there is a digger to which we can assign the metal field.
+                bidslist.set(digger,onesarray);
+            
+                for (int i = 0; i < this.numDiggers; i++ ){
+                    double [] aux = (double []) bidslist.get(i);
+                    aux[metal] = -1.0;
+                    bidslist.set(i,aux);
+                    }
+            }
+            else{
+                return matching;
             }
             if(((MetalField)mfl.get(metal)).getQuantity() > this.getSlots().get(digger)){
                 ((MetalField)mfl.get(metal)).setQuantity(((MetalField)mfl.get(metal)).getQuantity()-this.getSlots().get(digger));

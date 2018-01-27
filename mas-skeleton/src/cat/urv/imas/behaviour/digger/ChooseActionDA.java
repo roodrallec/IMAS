@@ -26,7 +26,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.AchieveREResponder;
 import cat.urv.imas.agent.DiggerAgent;
-import cat.urv.imas.map.Cell;
+import cat.urv.imas.map.*;
 import cat.urv.imas.map.PathCell;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.MessageContent;
@@ -43,7 +43,7 @@ import java.util.logging.Logger;
 /**
  * This method waits for the voting to end
  */
-public class ChooseAction extends AchieveREResponder {
+public class ChooseActionDA extends AchieveREResponder {
 
     /**
      * Sets up the template of messages to catch.
@@ -51,7 +51,7 @@ public class ChooseAction extends AchieveREResponder {
      * @param agent The agent owning this behaviour
      * @param mt Template to receive future responses in this conversation
      */
-    public ChooseAction(DiggerAgent agent, MessageTemplate mt) {
+    public ChooseActionDA(DiggerAgent agent, MessageTemplate mt) {
         super(agent, mt);
         agent.log("Waiting for the voting to finish.");
     }
@@ -71,8 +71,13 @@ public class ChooseAction extends AchieveREResponder {
             if(msg.getContentObject().getClass().equals(Integer.class)){
                 int metalF = (int) msg.getContentObject();
                 if (metalF == -1){
-                    agent.log("No metal assigned. Follow Prospector.");
-                    // Contract Net
+                    if (agent.getUsedSlots() > 0){
+                        agent.log("No metal assigned. Manufacture.");
+                    }
+                    else{
+                        agent.log("No metal assigned. Follow Prospector.");
+                                // contract net;
+                    }
                 }
                 else{
                     List mf = agent.getCurrentMFL().getMetalFields();
@@ -85,10 +90,22 @@ public class ChooseAction extends AchieveREResponder {
                     
                     if(abs(distance[0]) <= 1 && abs(distance[1]) <= 1){
                         agent.log("Mine.");
+                        ACLMessage digmsg = new ACLMessage(ACLMessage.INFORM);
+                        digmsg.clearAllReceiver();
+                        digmsg.addReceiver(agent.getDiggerCoordinatorAgent());
+                        digmsg.setContentObject(agent.getCurrentMF());
+                        digmsg.setLanguage(MessageContent.CHOOSE_ACTION);
+                        return digmsg;
                     }
                     else{
                         agent.log("Moving toward metal field.");
                         int[] movement = agent.computeMovement(distance);
+                        ACLMessage movemsg = new ACLMessage(ACLMessage.INFORM);
+                        movemsg.clearAllReceiver();
+                        movemsg.addReceiver(agent.getDiggerCoordinatorAgent());
+                        movemsg.setContentObject(movement);
+                        movemsg.setLanguage(MessageContent.CHOOSE_ACTION);
+                        return movemsg;
                     }
                     
                     
@@ -98,7 +115,9 @@ public class ChooseAction extends AchieveREResponder {
             
             
         } catch (UnreadableException ex) {
-            Logger.getLogger(ChooseAction.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ChooseActionDA.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(ChooseActionDA.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }

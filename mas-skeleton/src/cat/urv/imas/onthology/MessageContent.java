@@ -31,5 +31,9 @@ public class MessageContent {
     public static final String OK = "OK";
     public static final String SELECTIVITY = "SelectivityVotingProtocol";
     public static final String CHOOSE_ACTION = "ChooseAction";
+    public static final String DIG_ACTION = "DigAction";
+    public static final String MOVE_ACTION = "MoveAction";
+    public static final String MANUFACTURE_ACTION = "ManufactureAction";
+    
     
 }
