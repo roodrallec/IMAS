@@ -22,6 +22,8 @@ import cat.urv.imas.behaviour.prospectorcoordinator.*;
 import cat.urv.imas.map.Cell;
 import cat.urv.imas.onthology.InitialGameSettings;
 import cat.urv.imas.onthology.MessageContent;
+import cat.urv.imas.onthology.MetalField;
+import cat.urv.imas.onthology.MetalFieldList;
 import jade.core.*;
 import jade.domain.*;
 import jade.domain.FIPAAgentManagement.*;
@@ -35,6 +37,14 @@ public class ProspectorCoordinatorAgent extends ImasAgent {
 
     /*      ATTRIBUTES      */
     private AID coordinatorAgent;
+
+    public AID getCoordinatorAgent() {
+        return coordinatorAgent;
+    }
+
+    public void setCoordinatorAgent(AID coordinatorAgent) {
+        this.coordinatorAgent = coordinatorAgent;
+    }
     private List<AID> prospectorAgents = new ArrayList<AID>();
     
     private GameSettings game;
@@ -43,7 +53,29 @@ public class ProspectorCoordinatorAgent extends ImasAgent {
     
     private int[][] utilityMap;
     
+    private int msgreceived;
     
+    private List<MetalFieldList> MFLreceived = new ArrayList<MetalFieldList>();;
+
+    public List<MetalFieldList> getMFLreceived() {
+        return MFLreceived;
+    }
+
+    public void setMFLreceived(List<MetalFieldList> MFLreceived) {
+        this.MFLreceived = MFLreceived;
+    }
+
+    public int getMsgreceived() {
+        return msgreceived;
+    }
+
+    public void setMsgreceived(int msgreceived) {
+        this.msgreceived = msgreceived;
+    }
+    
+    
+    
+    //public 
     
     /*      METHODS     */  
     public ProspectorCoordinatorAgent() {
@@ -71,7 +103,16 @@ public class ProspectorCoordinatorAgent extends ImasAgent {
     }
     
     
-
+    public List<MetalField> cleanDuplicatedMFL(){
+        int a = 0;
+        List<MetalFieldList> listoflist = this.MFLreceived;
+        List<MetalField> aux = new ArrayList<MetalField>();
+        for(int i ; iterarenlista)
+            listoflist.get(i).getMetalFields()
+            for(each de i (iterar en MF)
+                aux.add(each)
+        return aux;
+    }
     /**
      * Agent setup method - called when it first come on-line. Configuration of
      * language to use, ontology and initialization of behaviours.
@@ -122,6 +163,8 @@ public class ProspectorCoordinatorAgent extends ImasAgent {
         // It triggers when the received message is an INFORM.
         MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
         this.addBehaviour(new MapHandling(this, mt));
+        
+        
         
     }
 }

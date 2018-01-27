@@ -18,17 +18,18 @@
 package cat.urv.imas.agent;
 
 import java.util.ArrayList;
-import cat.urv.imas.onthology.GameSettings;
+//import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.map.*;
 import cat.urv.imas.behaviour.prospector.*;
-import cat.urv.imas.onthology.MessageContent;
-import cat.urv.imas.onthology.MetalType;
+//import cat.urv.imas.onthology.MessageContent;
+import cat.urv.imas.onthology.*;
 import jade.core.*;
 import jade.domain.*;
 import jade.domain.FIPAAgentManagement.*;
 import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.*;
 import java.util.Map;
+
 
 
 public class ProspectorAgent extends ImasAgent {
@@ -39,26 +40,47 @@ public class ProspectorAgent extends ImasAgent {
     private Cell[] mapView = new Cell[8];
         
     private int[] currentPosition; //This has to be initializaed (TODO Aleix)
+    
+    private ArrayList<MetalField> currentMetalFields = new ArrayList<MetalField>();
  
     /*      METHODS     */
     public ProspectorAgent() {
         super(AgentType.PROSPECTOR);
     }
 /* Takes a whole map and stores just the agents view */
-    public void setMapView(Cell[][] map) {         
-        this.currentPosition = new int[] {1,3};
+    public MetalFieldList setMapView(Cell[][] map) {         
+        this.currentPosition = new int[] {1,5};
         int row = this.currentPosition[0];
-        int column = this.currentPosition[1];
-        
+        int column = this.currentPosition[1];      
         int idx = 0;
+        //MetalField current = new MetalField();
+        //Cell submapita;
+        //int a;
         for(int r=row-1; r <= row+1; r++) {
             for(int c=column-1; c <= column+1; c++) {
-                if (!(r == row && c == column)) {                  
+                if (!(r == row && c == column)){                  
                     mapView[idx] = map[r][c];
+                    //After all, change to correct values -> r and c
+                    if (mapView[idx] instanceof SettableFieldCell){
+                        if ((((SettableFieldCell) (map[r][c])).detectMetal()).size() == 1){
+                            //Size
+                            int quantity = (int) ((((SettableFieldCell) (map[r][c])).detectMetal().values().toArray())[0]);
+                            //MetalType
+                            String metal = ((((SettableFieldCell) (map[r][c])).detectMetal().keySet().toArray())[0]).toString();
+                            //Location R and C
+                            int[] metalLocation = {r, c};
+                            //MetalField
+                            MetalField currentMetal = new MetalField(metalLocation, metal, quantity);
+                            currentMetalFields.add(currentMetal);
+                        }
+                       
+                    }  
                     idx++;
                 }
             }
         } 
+        MetalFieldList currentMFL = new MetalFieldList(currentMetalFields);
+        return currentMFL;
     }
 
     public void searchForMetal() {

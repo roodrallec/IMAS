@@ -29,6 +29,7 @@ import cat.urv.imas.map.Cell;
 import cat.urv.imas.map.PathCell;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.MessageContent;
+import cat.urv.imas.onthology.MetalFieldList;
 import jade.lang.acl.UnreadableException;
 import java.io.IOException;
 import java.util.List;
@@ -70,11 +71,11 @@ public class MapHandling extends AchieveREResponder {
             if(msg.getContentObject().getClass() == cat.urv.imas.onthology.InitialGameSettings.class){
                 // sets the value of the agents map to the received map.
                 GameSettings game = (GameSettings) msg.getContentObject();
-                agent.setMapView(game.getMap());
-                agent.log("MAP Updated; Searching for Metals...");  
-                agent.searchForMetal();
-                agent.log("MetalSearched");             
-                reply.setContentObject(agent.getMapView());
+                MetalFieldList currentMFL = agent.setMapView(game.getMap());
+                agent.log("MAP Updated; Metals found");  
+                //agent.searchForMetal();
+                //agent.log("MetalSearched");             
+                reply.setContentObject(currentMFL);
             }           
             
         } catch (UnreadableException ex) {

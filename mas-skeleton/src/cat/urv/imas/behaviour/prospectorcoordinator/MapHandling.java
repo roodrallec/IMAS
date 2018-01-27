@@ -29,6 +29,8 @@ import cat.urv.imas.map.Cell;
 import cat.urv.imas.map.PathCell;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.MessageContent;
+import cat.urv.imas.onthology.MetalField;
+import cat.urv.imas.onthology.MetalFieldList;
 import jade.lang.acl.UnreadableException;
 import java.io.IOException;
 import java.util.List;
@@ -80,11 +82,36 @@ public class MapHandling extends AchieveREResponder {
                 mapmsg.setContentObject(agent.getGame());
                 agent.log("Map sent to underlying level");
                 return mapmsg;                
+            }else if(msg.getContentObject().getClass() == cat.urv.imas.onthology.MetalFieldList.class){
+                agent.setMsgreceived(agent.getMsgreceived()+1);
+                agent.log("RECIVED");
+                List<MetalFieldList> nowMFL = agent.getMFLreceived();
+                //LLamar al metodo para que las MF sean unicas
+                //Unir nowMFL
+                nowMFL.add((MetalFieldList) msg.getContentObject());
+                agent.setMFLreceived(nowMFL);
+                
+                       
+                if(agent.getMsgreceived() == agent.getNumProspectors()){
+                    
+                    
+                    List<MetalField> aux = agent.cleanDuplicatedMFL();
+                    agent.setMsgreceived(0);
+                    //Metodo 
+                    
+                    ACLMessage MFLmsg = new ACLMessage(ACLMessage.INFORM);
+                    MFLmsg.clearAllReceiver();
+                    MFLmsg.addReceiver(agent.getCoordinatorAgent());
+                    
+                    //Para cada MFL sacar su lista de MF 
+                    //metodo a implementar
+                    //Cuando tenga la lista unica
+                    MetalFieldList currentMFL = new MetalFieldList(aux);    
+                    MFLmsg.setContentObject(currentMFL);
+                }
             }
             
-            if(msg.getContentObject().getClass() == cat.urv.imas.map.Cell.class) { 
-                int a = 1;
-            }
+            
         } catch (UnreadableException ex) {
             Logger.getLogger(MapHandling.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
