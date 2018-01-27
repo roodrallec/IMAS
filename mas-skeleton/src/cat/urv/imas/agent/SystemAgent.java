@@ -226,16 +226,16 @@ public class SystemAgent extends ImasAgent {
                     this.agentsPos.setNewAgent(agentPos, agentID);
                     diggersCount++;
                     
-                } //else if (initialMap[i][j] == -2) {
-//                    agentPos = new int[] {i,j};
-//                    UtilsAgents.createAgent(container,"ProspectorAgent"+prospectorsCount,"cat.urv.imas.agent.ProspectorAgent" , null);
-//                    //Search the new created agent AID
-//                    searchCriterion.setName("ProspectorAgent"+i);
-//                    agentID = UtilsAgents.searchAgent(this, searchCriterion);  
-//                    //Add the new agent to agents positions list
-//                    this.agentsPos.setNewAgent(agentPos, agentID);
-//                    prospectorsCount++;
-//                }
+                } else if (initialMap[i][j] == -2) {
+                    agentPos = new int[] {i,j};
+                    UtilsAgents.createAgent(container,"ProspectorAgent"+prospectorsCount,"cat.urv.imas.agent.ProspectorAgent" , null);
+                    //Search the new created agent AID
+                    searchCriterion.setName("ProspectorAgent"+i);
+                    agentID = UtilsAgents.searchAgent(this, searchCriterion);  
+                    //Add the new agent to agents positions list
+                    this.agentsPos.setNewAgent(agentPos, agentID);
+                    prospectorsCount++;
+                }
             }
         }
 
@@ -336,11 +336,11 @@ public class SystemAgent extends ImasAgent {
             
             // Remove 1 metal unit from metal field
             ManufacturingCenterCell manufacturingCenterFieldCell = (ManufacturingCenterCell) nextTurnMap[manufacturingCenterPos[0]][manufacturingCenterPos[1]];
-            manufacturingCenterFieldCell.;
+            //manufacturingCenterFieldCell.;
             
             // Set digger agent working in the path cell
-            PathCell diggerCell = (PathCell) nextTurnMap[diggerPos[0]][diggerPos[1]];
-            diggerCell.setDiggerAgentWorking();
+            //PathCell diggerCell = (PathCell) nextTurnMap[diggerPos[0]][diggerPos[1]];
+            //diggerCell.setDiggerAgentWorking();
             
             this.requestedDiggersToManufacture.removeAgentByIndex(0);
         }

@@ -165,10 +165,7 @@ public class DiggerAgent extends ImasAgent {
         
         return bids;       
     }
-    
-
-    
-    
+      
     /**
      * Agent setup method - called when it first come on-line. Configuration of
      * language to use, ontology and initialization of behaviours.
@@ -214,8 +211,8 @@ public class DiggerAgent extends ImasAgent {
         /*      BEHAVIOURS        */
         
         // It triggers ONLY for the voting protocol (Selectivity)
-//        MessageTemplate mt1 = MessageTemplate.MatchLanguage(MessageContent.SELECTIVITY);
-//        this.addBehaviour(new SelectivityVotingDA(this, mt1));
+        MessageTemplate mt1 = MessageTemplate.MatchLanguage(MessageContent.SELECTIVITY);
+        this.addBehaviour(new SelectivityVotingDA(this, mt1));
         
         // It triggers when the received message is an INFORM.
         MessageTemplate mt2 =MessageTemplate.MatchLanguage(MessageContent.GET_MAP);
