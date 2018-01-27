@@ -46,6 +46,7 @@ public class DiggerCoordinatorAgent extends ImasAgent {
     private GameSettings game;
     
     private int receivedBids = 0;
+    private int receivedActions = 0;
     
     private int numDiggers;
     
@@ -54,6 +55,11 @@ public class DiggerCoordinatorAgent extends ImasAgent {
     private List<double[]> bids ;
     
     private List<Integer> slots = new ArrayList<Integer>();
+    
+    private List<DiggingMessage>  currentDML = new ArrayList<DiggingMessage>();
+    private List<MovingMessage>  currentMML = new ArrayList<MovingMessage>();
+    private List<ManufacturingMessage>  currentManML = new ArrayList<ManufacturingMessage>();
+    
     
     
     /*      METHODS     */
@@ -112,6 +118,42 @@ public class DiggerCoordinatorAgent extends ImasAgent {
     public void setSlots(List<Integer> slots) {
         this.slots = slots;
     }
+
+    public List<DiggingMessage> getCurrentDML() {
+        return currentDML;
+    }
+
+    public void setCurrentDML(List<DiggingMessage> currentDML) {
+        this.currentDML = currentDML;
+    }
+
+    public int getReceivedActions() {
+        return receivedActions;
+    }
+
+    public void setReceivedActions(int receivedActions) {
+        this.receivedActions = receivedActions;
+    }
+
+    public List<MovingMessage> getCurrentMML() {
+        return currentMML;
+    }
+
+    public void setCurrentMML(List<MovingMessage> currentMML) {
+        this.currentMML = currentMML;
+    }
+
+    public List<ManufacturingMessage> getCurrentManML() {
+        return currentManML;
+    }
+
+    public void setCurrentManML(List<ManufacturingMessage> currentManML) {
+        this.currentManML = currentManML;
+    }
+    
+    
+    
+    
     
     
     public int[] metalFieldAssignation(){
@@ -140,11 +182,17 @@ public class DiggerCoordinatorAgent extends ImasAgent {
                     }
                 }
             } 
-            bidslist.set(digger,onesarray);
-            for (int i = 0; i < this.numDiggers; i++ ){
-                double [] aux = (double []) bidslist.get(i);
-                aux[metal] = -1.0;
-                bidslist.set(i,aux);
+            if(digger>=0){ // Make sure there is a digger to which we can assign the metal field.
+                bidslist.set(digger,onesarray);
+            
+                for (int i = 0; i < this.numDiggers; i++ ){
+                    double [] aux = (double []) bidslist.get(i);
+                    aux[metal] = -1.0;
+                    bidslist.set(i,aux);
+                    }
+            }
+            else{
+                return matching;
             }
             if(((MetalField)mfl.get(metal)).getQuantity() > this.getSlots().get(digger)){
                 ((MetalField)mfl.get(metal)).setQuantity(((MetalField)mfl.get(metal)).getQuantity()-this.getSlots().get(digger));
@@ -217,9 +265,13 @@ public class DiggerCoordinatorAgent extends ImasAgent {
         MessageTemplate mt1 = MessageTemplate.MatchLanguage(MessageContent.SELECTIVITY);
         this.addBehaviour(new SelectivityVotingDCA(this, mt1));
         
-        // It triggers when the received message is an INFORM.
+        // It triggers when the received message is an GET_MAP.
         MessageTemplate mt2 = MessageTemplate.MatchLanguage(MessageContent.GET_MAP);
         this.addBehaviour(new MapHandlingDCA(this, mt2));
+        
+                // It triggers when the received message is an INFORM.
+        MessageTemplate mt3 = MessageTemplate.MatchLanguage(MessageContent.CHOOSE_ACTION);
+        this.addBehaviour(new ChooseActionDCA(this, mt3));
 
         
         

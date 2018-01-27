@@ -63,6 +63,12 @@ public class SystemAgent extends ImasAgent {
      * agentsPos will contain the current positions of all mobile agents.
      */
     private AgentsPositions agentsPos = new AgentsPositions();
+    private AgentsPositions getAgentsPositions() {
+        return agentsPos;
+    }
+    private void setAgentsPositions(AgentsPositions agentsPositions) {
+        this.agentsPos = agentsPositions;
+    }
     /**
      * requestedDiggersToWork will contain AID of diggers with the x,y location of the metal field that they want to dig.
      */
@@ -71,13 +77,12 @@ public class SystemAgent extends ImasAgent {
      * requestedDiggersToWork will contain AID of diggers with the x,y location of the manufacturing center where they would like to manufacture metal.
      */
     private AgentsIdAssociatedWithFC requestedDiggersToManufacture = new AgentsIdAssociatedWithFC();
+    /**
+     * diggersFinishDigging will contain AID of diggers that have finished digging in a metal field. It will be used to free the path cell.
+     */
+    private AgentsIdAssociatedWithFC diggersFinishDigging = new AgentsIdAssociatedWithFC();
 
-    private AgentsPositions getAgentsPositions() {
-        return agentsPos;
-    }
-    private void setAgentsPositions(AgentsPositions agentsPositions) {
-        this.agentsPos = agentsPositions;
-    }
+    
     /**
      * requestedAgentsPos will contain the requested positions of next turn for
      * all mobile agents.
@@ -329,6 +334,22 @@ public class SystemAgent extends ImasAgent {
         }
         
         //3. Free cells where digger have finished working
+        while (this.diggersFinishDigging.getNumberOfAgentsInList() > 0){
+            // get agent name from it's AID
+            AID diggerID = this.requestedDiggersToWork.getAgentIDByIndex(0);
+            int[] metalFieldPos = this.requestedDiggersToWork.getFieldPosByIndex(0);
+            int[] diggerPos = this.agentsPos.getAgentPosByIndex(0);
+            
+            // Remove 1 metal unit from metal field
+            FieldCell metalFieldCell = (FieldCell) nextTurnMap[metalFieldPos[0]][metalFieldPos[1]];
+            metalFieldCell.removeMetal();
+            
+            // Set digger agent working in the path cell
+            PathCell diggerCell = (PathCell) nextTurnMap[diggerPos[0]][diggerPos[1]];
+            diggerCell.setDiggerAgentWorking();
+            
+            this.requestedDiggersToWork.removeAgentByIndex(0);
+        }
         
         //4. Set new metal fields detected to visible and update metal fields capacity
         

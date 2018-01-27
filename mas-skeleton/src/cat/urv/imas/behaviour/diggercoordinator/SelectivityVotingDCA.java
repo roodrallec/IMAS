@@ -84,7 +84,7 @@ public class SelectivityVotingDCA extends AchieveREResponder {
                 for (int i = 0; i < agent.getNumDiggers(); i++){
                     ACLMessage metassigned = new ACLMessage(ACLMessage.INFORM);
                     metassigned.addReceiver(agent.getDiggerAgents().get(i));
-                    metassigned.setLanguage(MessageContent.SELECTIVITY);
+                    metassigned.setLanguage(MessageContent.CHOOSE_ACTION);
                     metassigned.setContentObject(matching[i]);
                     agent.send(metassigned);
                 }
