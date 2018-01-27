@@ -5,6 +5,7 @@
  */
 package cat.urv.imas.onthology;
 
+import cat.urv.imas.map.ManufacturingCenterCell;
 import jade.core.AID;
 import java.io.Serializable;
 
@@ -12,13 +13,13 @@ import java.io.Serializable;
  *
  * @author usuario
  */
-public class MovingMessage implements Serializable{
+public class ManufacturingMessage implements Serializable{
     private AID digger;
-    private int[] movement;
+    private ManufacturingCenterCell mancell;
 
-    public MovingMessage(AID digger, int[] movement) {
+    public ManufacturingMessage(AID digger, ManufacturingCenterCell mancell) {
         this.digger = digger;
-        this.movement = movement;
+        this.mancell = mancell;
     }
 
     public AID getDigger() {
@@ -29,13 +30,16 @@ public class MovingMessage implements Serializable{
         this.digger = digger;
     }
 
-    public int[] getMovement() {
-        return movement;
+    public ManufacturingCenterCell getMancell() {
+        return mancell;
     }
 
-    public void setMovement(int[] movement) {
-        this.movement = movement;
+    public void setMancell(ManufacturingCenterCell mancell) {
+        this.mancell = mancell;
     }
+    
+    
+
     
     
 

@@ -85,18 +85,46 @@ public class ChooseActionDCA extends AchieveREResponder {
                 agent.log("Received movement petition.");
                 
             }
-            // Need to be done the same with manufacturing messages
-            
+            else if(msg.getContentObject().getClass().equals(ManufacturingCenterCell.class)){
+                List<ManufacturingMessage> aux = agent.getCurrentManML();
+                ManufacturingMessage manmes = new ManufacturingMessage(msg.getSender(), (ManufacturingCenterCell) msg.getContentObject());
+                aux.add(manmes);
+                agent.setCurrentManML(aux);
+                
+                agent.log("Received petition to manufacture.");   
+            }
             
             int count = agent.getReceivedActions()+1;
             if (count == agent.getNumDiggers()){
+                agent.setReceivedActions(0);
+                //Send the Digging Message list
                 DiggingMessageList dml = new DiggingMessageList(agent.getCurrentDML());
                 ACLMessage dmlmsg = new ACLMessage(ACLMessage.INFORM);
                 dmlmsg.clearAllReceiver();
                 dmlmsg.addReceiver(agent.getCoordinatorAgent());
                 dmlmsg.setLanguage(MessageContent.DIG_ACTION);
                 dmlmsg.setContentObject(dml);
-                agent.setReceivedActions(0);
+                agent.send(dmlmsg);
+                
+                //Send the Moving Message list
+                MovingMessageList mml = new MovingMessageList(agent.getCurrentMML());
+                ACLMessage mmlmsg = new ACLMessage(ACLMessage.INFORM);
+                mmlmsg.clearAllReceiver();
+                mmlmsg.addReceiver(agent.getCoordinatorAgent());
+                mmlmsg.setLanguage(MessageContent.DIG_ACTION);
+                mmlmsg.setContentObject(mml);
+                agent.send(mmlmsg);
+                
+                //Send the Manufacturing Message list
+                ManufacturingMessageList manml = new ManufacturingMessageList(agent.getCurrentManML());
+                ACLMessage manmlmsg = new ACLMessage(ACLMessage.INFORM);
+                manmlmsg.clearAllReceiver();
+                manmlmsg.addReceiver(agent.getCoordinatorAgent());
+                manmlmsg.setLanguage(MessageContent.DIG_ACTION);
+                manmlmsg.setContentObject(manml);
+                agent.send(manmlmsg);
+                
+                agent.log("ALL messages sent to DCA.");
             }
             else{
                 agent.setReceivedActions(count);

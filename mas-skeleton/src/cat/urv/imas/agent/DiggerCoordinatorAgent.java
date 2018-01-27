@@ -58,6 +58,8 @@ public class DiggerCoordinatorAgent extends ImasAgent {
     
     private List<DiggingMessage>  currentDML = new ArrayList<DiggingMessage>();
     private List<MovingMessage>  currentMML = new ArrayList<MovingMessage>();
+    private List<ManufacturingMessage>  currentManML = new ArrayList<ManufacturingMessage>();
+    
     
     
     /*      METHODS     */
@@ -140,6 +142,16 @@ public class DiggerCoordinatorAgent extends ImasAgent {
     public void setCurrentMML(List<MovingMessage> currentMML) {
         this.currentMML = currentMML;
     }
+
+    public List<ManufacturingMessage> getCurrentManML() {
+        return currentManML;
+    }
+
+    public void setCurrentManML(List<ManufacturingMessage> currentManML) {
+        this.currentManML = currentManML;
+    }
+    
+    
     
     
     
