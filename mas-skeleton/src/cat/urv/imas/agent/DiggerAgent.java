@@ -341,27 +341,27 @@ public class DiggerAgent extends ImasAgent {
         return movement;
     }
     
-    public int[] chooseManufacturingCenter(){
+    public ManufacturingCenterCell chooseManufacturingCenter(){
         double eval = 0;
-        int[] coords = new int[]{0,0};
+        ManufacturingCenterCell mcf = (ManufacturingCenterCell) this.game.getCellsOfType().get(CellType.MANUFACTURING_CENTER).get(0);
         
         List mancells = this.game.getCellsOfType().get(CellType.MANUFACTURING_CENTER);
         for (int i = 0; i < mancells.size(); i++){
             ManufacturingCenterCell mancell = (ManufacturingCenterCell) mancells.get(i);
             if(mancell.getMetal().getShortString() == this.metaltype){
-                double distbid = 1.0*abs(this.currentPosition[0]-mancell.getRow()) + 1.0*abs(this.currentPosition[0]-mancell.getRow());
+                double distbid = 1.0*abs(this.currentPosition[0]-mancell.getRow()) + 1.0*abs(this.currentPosition[1]-mancell.getCol());
                 if (distbid == 0){
-                    return new int[]{this.currentPosition[0]-mancell.getRow(),this.currentPosition[0]-mancell.getRow()};  
+                    
+                    return mancell;  
                 }
                 double bid = 1.0/distbid + this.parameters[3]*mancell.getPrice();
                 if(bid > eval){
                     eval = bid;
-                    coords = new int[] {this.currentPosition[0]-mancell.getRow(),this.currentPosition[0]-mancell.getRow()};
+                    mcf = mancell;
                 }   
             }
         }
-        
-        return coords;
+        return mcf;
     }
     
 
