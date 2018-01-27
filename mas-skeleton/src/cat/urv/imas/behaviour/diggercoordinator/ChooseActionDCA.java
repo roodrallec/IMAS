@@ -33,6 +33,7 @@ import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.MessageContent;
 import jade.lang.acl.UnreadableException;
 import java.io.IOException;
+import java.io.Serializable;
 import static java.lang.Math.abs;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -95,6 +96,7 @@ public class ChooseActionDCA extends AchieveREResponder {
                 dmlmsg.addReceiver(agent.getCoordinatorAgent());
                 dmlmsg.setLanguage(MessageContent.DIG_ACTION);
                 dmlmsg.setContentObject(dml);
+                agent.setReceivedActions(0);
             }
             else{
                 agent.setReceivedActions(count);

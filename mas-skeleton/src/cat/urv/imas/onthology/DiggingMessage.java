@@ -6,12 +6,13 @@
 package cat.urv.imas.onthology;
 
 import jade.core.AID;
+import java.io.Serializable;
 
 /**
  *
  * @author usuario
  */
-public class DiggingMessage {
+public class DiggingMessage implements Serializable{
     private AID digger;
     private MetalField metalfield;
 

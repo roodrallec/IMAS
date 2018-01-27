@@ -73,7 +73,21 @@ public class ChooseActionDA extends AchieveREResponder {
                 if (metalF == -1){
                     if (agent.getUsedSlots() > 0){
                         //Aplicar el metode per anar al manufacture
-                        agent.log("No metal assigned. Manufacture.");
+                        
+                        int[] manCenDist = agent.chooseManufacturingCenter();
+                        if(abs(manCenDist[0]) <= 1 && abs(manCenDist[1]) <= 1){
+                            agent.log("No metal assigned. Manufacture.");
+                        }
+                        else{
+                            agent.log("No metal assigned. Moving towards manufacturing center.");
+                            int[] movement = agent.computeMovement(manCenDist);
+                            ACLMessage movemsg = new ACLMessage(ACLMessage.INFORM);
+                            movemsg.clearAllReceiver();
+                            movemsg.addReceiver(agent.getDiggerCoordinatorAgent());
+                            movemsg.setContentObject(movement);
+                            movemsg.setLanguage(MessageContent.CHOOSE_ACTION);
+                            return movemsg;   
+                        }
                     }
                     else{
                         agent.log("No metal assigned. Follow Prospector.");

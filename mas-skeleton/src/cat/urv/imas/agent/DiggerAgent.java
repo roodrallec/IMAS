@@ -20,6 +20,7 @@ package cat.urv.imas.agent;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.behaviour.digger.*;
 import cat.urv.imas.map.CellType;
+import cat.urv.imas.map.ManufacturingCenterCell;
 import cat.urv.imas.onthology.MessageContent;
 import cat.urv.imas.onthology.*;
 import jade.core.*;
@@ -48,7 +49,7 @@ public class DiggerAgent extends ImasAgent {
     
     private MetalField currentMF;
     
-    private double [] parameters; //{gamma,beta,mu}
+    private double [] parameters; //{gamma,beta,mu,psi}
     
     private int usedSlots;
     
@@ -164,7 +165,7 @@ public class DiggerAgent extends ImasAgent {
         //TODO: itera cada metalfield i per cada un computa la bid
         for (int i = 0; i < bids.length-1; i++ ){
             MetalField mf = (MetalField) mfl.get(i);
-            if (mf.getType() != this.metaltype && this.metaltype!= "N"){
+            if (!mf.getType().equals(this.metaltype) && this.metaltype!= "N"){
              bids[i] = -1.0;
             }
             else{
@@ -340,6 +341,29 @@ public class DiggerAgent extends ImasAgent {
         return movement;
     }
     
+    public int[] chooseManufacturingCenter(){
+        double eval = 0;
+        int[] coords = new int[]{0,0};
+        
+        List mancells = this.game.getCellsOfType().get(CellType.MANUFACTURING_CENTER);
+        for (int i = 0; i < mancells.size(); i++){
+            ManufacturingCenterCell mancell = (ManufacturingCenterCell) mancells.get(i);
+            if(mancell.getMetal().getShortString() == this.metaltype){
+                double distbid = 1.0*abs(this.currentPosition[0]-mancell.getRow()) + 1.0*abs(this.currentPosition[0]-mancell.getRow());
+                if (distbid == 0){
+                    return new int[]{this.currentPosition[0]-mancell.getRow(),this.currentPosition[0]-mancell.getRow()};  
+                }
+                double bid = 1.0/distbid + this.parameters[3]*mancell.getPrice();
+                if(bid > eval){
+                    eval = bid;
+                    coords = new int[] {this.currentPosition[0]-mancell.getRow(),this.currentPosition[0]-mancell.getRow()};
+                }   
+            }
+        }
+        
+        return coords;
+    }
+    
 
     
     
@@ -359,13 +383,13 @@ public class DiggerAgent extends ImasAgent {
         sd1.setType(AgentType.DIGGER.toString());
         sd1.setName(getLocalName());
         sd1.setOwnership(OWNER);
-        this.setMetaltype("N");
+        this.setMetaltype("G");
         this.setCrash(true);
         this.setPreviousMovement(new int[] {0,1});
         // PROVES! //
-        this.currentPosition = new int[] {5,3};
-        this.parameters = new double [] {0.5,0.5,0.5};
-        this.usedSlots = 0;
+        this.currentPosition = new int[] {5,2};
+        this.parameters = new double [] {0.5,0.5,0.5,0.1};
+        this.usedSlots = 1;
                 
         
         DFAgentDescription dfd = new DFAgentDescription();
