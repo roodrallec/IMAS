@@ -81,6 +81,41 @@ public class UtilsAgents {
         }
         return searchedAgent;
     }
+    
+    /**
+     * To search an agent of a certain type
+     *
+     * @param parent Agent
+     * @param sd ServiceDescription search criterion
+     * @return the agent if it is found, it is a *blocking* method
+     */
+    public static DFAgentDescription searchAgentClass(Agent parent, ServiceDescription sd) {
+        /**
+         * Searching an agent of the specified type
+         */
+        AID searchedAgent = new AID();
+        DFAgentDescription dfd = new DFAgentDescription();
+        dfd.addServices(sd);
+        try {
+            while (true) {
+                SearchConstraints c = new SearchConstraints();
+                c.setMaxResults(new Long(-1));
+                DFAgentDescription[] result = DFService.search(parent, dfd, c);
+                if (result.length > 0) {
+                    dfd = result[0];
+                    //searchedAgent = dfd.getName();
+                    break;
+                }
+                Thread.sleep(DELAY);
+
+            }
+        } catch (Exception fe) {
+            System.err.println("ERROR: Cannot search the expected agent from parent " + parent.getLocalName());
+            fe.printStackTrace();
+            parent.doDelete();
+        }
+        return dfd;
+    }
 
     /**
      * To create an agent in a given container
