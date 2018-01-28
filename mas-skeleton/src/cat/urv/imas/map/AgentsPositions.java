@@ -31,7 +31,7 @@ public class AgentsPositions {
         agentsInList++;
     }
     
-    public int[] getAgentById(String agentId) {
+    public int[] getAgentById(AID agentId) {
         int[] agentPos; // = new int[2];
         int agentIndex = ids.indexOf(agentId);
         
@@ -45,6 +45,21 @@ public class AgentsPositions {
        
         return agentPos;
     } 
+    
+    public int[] getAgentByName(String agentId) {
+        int[] agentPos; // = new int[2];
+        int agentIndex = ids.indexOf(agentId);
+        
+        if (agentIndex == -1){
+            //log("GUI loaded");
+            //throw new Exception("There is no agent in cell");
+            agentPos = new int[] {-1,-1};
+        } else {
+            agentPos = positions.get(agentIndex);
+        }
+       
+        return agentPos;
+    }
     
     public int[] getAgentPosByIndex(int agentIndex) {            
         return positions.get(agentIndex);

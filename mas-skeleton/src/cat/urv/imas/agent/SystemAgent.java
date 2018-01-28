@@ -17,6 +17,7 @@
  */
 package cat.urv.imas.agent;
 
+import cat.urv.imas.behaviour.diggercoordinator.ChooseActionDCA;
 import cat.urv.imas.onthology.InitialGameSettings;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.InfoAgent;
@@ -25,6 +26,7 @@ import cat.urv.imas.gui.GraphicInterface;
 import cat.urv.imas.behaviour.system.RequestResponseBehaviour;
 //import cat.urv.imas.map.Cell;
 import cat.urv.imas.map.*;
+import cat.urv.imas.onthology.MessageContent;
 //import jade.Boot;
 import jade.core.*;
 import jade.domain.*;
@@ -55,6 +57,14 @@ public class SystemAgent extends ImasAgent {
      */
     private InitialGameSettings game;
     /**
+     * Current turn map.
+     */
+    Cell[][] currentMap = (Cell[][]) this.game.getMap();
+    /**
+     * Requested map. The map that coordinator agent retrieve to System Agent. System Agent has to check if it is possible.
+     */
+    Cell[][] requestedMap = (Cell[][]) this.game.getMap();
+    /**
      * The Coordinator agent with which interacts sharing game settings every
      * round.
      */
@@ -63,10 +73,10 @@ public class SystemAgent extends ImasAgent {
      * agentsPos will contain the current positions of all mobile agents.
      */
     private AgentsPositions agentsPos = new AgentsPositions();
-    private AgentsPositions getAgentsPositions() {
+    public AgentsPositions getAgentsPositions() {
         return agentsPos;
     }
-    private void setAgentsPositions(AgentsPositions agentsPositions) {
+    public void setAgentsPositions(AgentsPositions agentsPositions) {
         this.agentsPos = agentsPositions;
     }
     /**
@@ -218,7 +228,14 @@ public class SystemAgent extends ImasAgent {
         
         ServiceDescription searchCriterion = new ServiceDescription(); 
         
+               
         int[][] initialMap = this.game.getInitialMap();
+        
+        Cell[][] auxMap = (Cell[][]) this.game.getMap();
+        
+        PathCell auxCell = (PathCell) auxMap[2][2];
+                
+                
         int diggersCount = 1;
         int prospectorsCount = 1;
         int[] agentPos = new int[2];
@@ -265,8 +282,15 @@ public class SystemAgent extends ImasAgent {
         // add behaviours
         // we wait for the initialization of the game
         MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_REQUEST), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
-
         this.addBehaviour(new RequestResponseBehaviour(this, mt));
+        
+        // this behaviour will wait until coordinator agent send the requested map
+        MessageTemplate mt2 = MessageTemplate.MatchLanguage(MessageContent.GET_MAP);
+        this.addBehaviour(new RequestResponseBehaviour(this, mt2));
+        
+        // It triggers when the received message is an INFORM.
+        //MessageTemplate mt3 = MessageTemplate.MatchLanguage(MessageContent.CHOOSE_ACTION);
+        //this.addBehaviour(new ChooseActionDCA(this, mt3));
 
         // Setup finished. When the last inform is received, the agent itself will add
         // a behaviour to send/receive actions
@@ -278,9 +302,9 @@ public class SystemAgent extends ImasAgent {
     
     public void checkTurnChanges() throws Exception {
         // Current turn map
-        Cell[][] currentMap = this.game.getMap();
+        Cell[][] currentMap = this.currentMap;
         // Map where allowed changes will be reflected, at the end of this function, it will be the next turn map to pass to Coordinator Agent
-        Cell[][] nextTurnMap = currentMap.clone();
+        Cell[][] nextTurnMap = this.requestedMap;
         
         //ServiceDescription searchCriterion = new ServiceDescription();
         
