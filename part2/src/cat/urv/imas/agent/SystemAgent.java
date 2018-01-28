@@ -163,6 +163,8 @@ public class SystemAgent extends ImasAgent {
         jade.wrapper.AgentContainer container = this.getContainerController();
         
         UtilsAgents.createAgent(container,"DiggerCoordinatorAgent","cat.urv.imas.agent.DiggerCoordinatorAgent" , null);
+        UtilsAgents.createAgent(container,"DiggerCoordinatorGoldAgent","cat.urv.imas.agent.DiggerCoordinatorGoldAgent" , null);
+        UtilsAgents.createAgent(container,"DiggerCoordinatorSilverAgent","cat.urv.imas.agent.DiggerCoordinatorSilverAgent" , null);
         UtilsAgents.createAgent(container,"ProspectorCoordinatorAgent","cat.urv.imas.agent.ProspectorCoordinatorAgent" , null);
         
         for (int i = 1; i <= numDiggers; i++ ){

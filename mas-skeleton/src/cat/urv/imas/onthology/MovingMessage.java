@@ -13,20 +13,20 @@ import java.io.Serializable;
  * @author usuario
  */
 public class MovingMessage implements Serializable{
-    private AID agent;
+    private AID digger;
     private int[] movement;
 
-    public MovingMessage(AID agentID, int[] movement) {
-        this.agent = agentID;
+    public MovingMessage(AID digger, int[] movement) {
+        this.digger = digger;
         this.movement = movement;
     }
 
-    public AID getAgentID() {
-        return agent;
+    public AID getDigger() {
+        return digger;
     }
 
-    public void setAgentID(AID agentID) {
-        this.agent = agentID;
+    public void setDigger(AID digger) {
+        this.digger = digger;
     }
 
     public int[] getMovement() {

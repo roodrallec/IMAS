@@ -269,7 +269,7 @@ public class DiggerCoordinatorAgent extends ImasAgent {
         MessageTemplate mt2 = MessageTemplate.MatchLanguage(MessageContent.GET_MAP);
         this.addBehaviour(new MapHandlingDCA(this, mt2));
         
-        // It triggers when the received message is an INFORM.
+                // It triggers when the received message is an INFORM.
         MessageTemplate mt3 = MessageTemplate.MatchLanguage(MessageContent.CHOOSE_ACTION);
         this.addBehaviour(new ChooseActionDCA(this, mt3));
 

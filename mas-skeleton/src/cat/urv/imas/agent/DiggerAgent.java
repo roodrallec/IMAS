@@ -33,9 +33,6 @@ import static java.lang.Math.abs;
 import java.util.Arrays;
 import java.util.List;
 
-import cat.urv.imas.agent.SystemAgent;
-import cat.urv.imas.map.AgentsPositions;
-
 
 public class DiggerAgent extends ImasAgent {
 
@@ -43,8 +40,6 @@ public class DiggerAgent extends ImasAgent {
     private AID diggerCoordinatorAgent;
     
     private GameSettings game;
-    
-    private SystemAgent systemAgent;
     
     private int[] currentPosition; //This has to be initializaed (TODO Aleix)
     
@@ -198,7 +193,8 @@ public class DiggerAgent extends ImasAgent {
         bids[bids.length-1] = this.game.getDiggersCapacity()-this.getUsedSlots();
         
         return bids;       
-    }    
+    }
+    
     
     public int[] computeMovement(int[] distance){
         GameSettings game = this.getGame();
@@ -368,6 +364,9 @@ public class DiggerAgent extends ImasAgent {
         return mcf;
     }
     
+
+    
+    
     /**
      * Agent setup method - called when it first come on-line. Configuration of
      * language to use, ontology and initialization of behaviours.
@@ -386,9 +385,7 @@ public class DiggerAgent extends ImasAgent {
         sd1.setOwnership(OWNER);
         this.setCrash(true);
         // PROVES! //
-        AgentsPositions auxVar = (AgentsPositions) systemAgent.getAgentsPositions();
-        this.currentPosition = (int[]) auxVar.getAgentById(this.getAID());
-        
+        this.currentPosition = new int[] {5,2};
         this.parameters = new double [] {0.5,0.5,0.5,0.1};
         this.usedSlots = 1;
                 
