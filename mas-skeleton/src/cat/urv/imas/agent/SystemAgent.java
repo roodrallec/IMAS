@@ -17,7 +17,7 @@
  */
 package cat.urv.imas.agent;
 
-import cat.urv.imas.behaviour.diggercoordinator.ChooseActionDCA;
+//import cat.urv.imas.behaviour.diggercoordinator.ChooseActionDCA;
 import cat.urv.imas.onthology.InitialGameSettings;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.InfoAgent;
@@ -59,11 +59,11 @@ public class SystemAgent extends ImasAgent {
     /**
      * Current turn map.
      */
-    Cell[][] currentMap = (Cell[][]) this.game.getMap();
+    private Cell[][] currentMap; // = (Cell[][]) this.game.getMap();
     /**
      * Requested map. The map that coordinator agent retrieve to System Agent. System Agent has to check if it is possible.
      */
-    Cell[][] requestedMap = (Cell[][]) this.game.getMap();
+    private Cell[][] requestedMap; // = (Cell[][]) this.game.getMap();
     /**
      * The Coordinator agent with which interacts sharing game settings every
      * round.
@@ -303,8 +303,9 @@ public class SystemAgent extends ImasAgent {
     public void checkTurnChanges() throws Exception {
         // Current turn map
         Cell[][] currentMap = this.currentMap;
+        //Cell[][] currentMap;// = this.currentMap;
         // Map where allowed changes will be reflected, at the end of this function, it will be the next turn map to pass to Coordinator Agent
-        Cell[][] nextTurnMap = this.requestedMap;
+        Cell[][] nextTurnMap = this.requestedMap;// = this.requestedMap;
         
         //ServiceDescription searchCriterion = new ServiceDescription();
         
@@ -388,8 +389,11 @@ public class SystemAgent extends ImasAgent {
             // Add the new reward to the accumulated reward
             gamePerformanceIndicators.addNewReward(manufacturingCenterFieldCell.getPrice());
             
-            this.requestedDiggersToManufacture.removeAgentByIndex(0);
+            this.requestedDiggersToManufacture.removeAgentByIndex(0);            
         }
+        
+        // 6.Generate new metal fields randomly
+        
         
         
     }
