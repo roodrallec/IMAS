@@ -33,7 +33,7 @@ public class ProspectorAgent extends ImasAgent {
     
     private Cell[] mapView = new Cell[9];
         
-    private int[] currentPosition = {2,2}; 
+    private int[] currentPosition; 
     
     private ArrayList<MetalField> currentMetalFields = new ArrayList<MetalField>();
  
@@ -114,6 +114,16 @@ public class ProspectorAgent extends ImasAgent {
     public void setProspectorCoordinatorAgent(AID prospectorCoordinatorAgent) {
         this.prospectorCoordinatorAgent = prospectorCoordinatorAgent;
     }
+
+    public int[] getCurrentPosition() {
+        return currentPosition;
+    }
+
+    public void setCurrentPosition(int[] currentPosition) {
+        this.currentPosition = currentPosition;
+    }
+    
+    
     
     /**
      * Agent setup method - called when it first come on-line. Configuration of

@@ -26,10 +26,12 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.AchieveREResponder;
 import cat.urv.imas.agent.DiggerAgent;
+import cat.urv.imas.map.Agents;
 import cat.urv.imas.map.Cell;
 import cat.urv.imas.map.PathCell;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.MessageContent;
+import jade.core.AID;
 import jade.lang.acl.UnreadableException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -66,7 +68,7 @@ public class MapHandlingDA extends AchieveREResponder {
         DiggerAgent agent = (DiggerAgent)this.getAgent();
         try {
             // If the received message is a map.
-            if(msg.getContentObject().getClass() == cat.urv.imas.onthology.InitialGameSettings.class){
+            if(msg.getContentObject().getClass() == cat.urv.imas.onthology.InitialGameSettings.class || msg.getContentObject().getClass() == cat.urv.imas.onthology.GameSettings.class){
                 // sets the value of the agents map to the received map.
                 agent.setGame((GameSettings) msg.getContentObject());
                 agent.log("MAP Updated");
@@ -74,6 +76,22 @@ public class MapHandlingDA extends AchieveREResponder {
                 ACLMessage reply = new ACLMessage(ACLMessage.INFORM);
                 reply.addReceiver(agent.getDiggerCoordinatorAgent());
                 reply.setContentObject(MessageContent.MAP_RECEIVED);
+                List cells = agent.getGame().getAgentList().get(AgentType.DIGGER);
+                boolean found = false;
+                for (Object cell : cells) {
+                    List celldiggers = ((PathCell)cell).getAgents().get(AgentType.DIGGER);
+                    for (Object digger : celldiggers){
+                        if (agent.getAID().equals(((DiggerInfoAgent)digger).getAID())){
+                            agent.setCurrentPosition(new int[]{((PathCell)cell).getRow(),((PathCell)cell).getCol()});
+                            found = true;
+                            break;
+                        }   
+                    }
+                    if(found){
+                        break;
+                    }
+                }
+                
                 agent.setWaitingMapFlag(false);
                 return reply;
             }

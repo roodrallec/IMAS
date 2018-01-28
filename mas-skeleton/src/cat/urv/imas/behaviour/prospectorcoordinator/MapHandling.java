@@ -27,6 +27,7 @@ import jade.proto.AchieveREResponder;
 import cat.urv.imas.agent.ProspectorCoordinatorAgent;
 import cat.urv.imas.map.Cell;
 import cat.urv.imas.map.PathCell;
+import cat.urv.imas.onthology.GameMapUtility;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.MessageContent;
 import static cat.urv.imas.onthology.MessageContent.DIG_ACTION;
@@ -84,7 +85,8 @@ public class MapHandling extends AchieveREResponder {
                 }
                 Cell[][] map = agent.getGame().getMap();
                 map = agent.applyUtility(map);
-                mapmsg.setContentObject(map);
+                GameMapUtility gmu = new GameMapUtility(agent.getGame(),map);
+                mapmsg.setContentObject(gmu);
                 agent.log("Map sent to underlying level");
                 return mapmsg;                
             }else if(msg.getContentObject().getClass() == cat.urv.imas.onthology.MetalFieldList.class){

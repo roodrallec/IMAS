@@ -27,7 +27,10 @@ import jade.proto.AchieveREResponder;
 import cat.urv.imas.agent.ProspectorAgent;
 import cat.urv.imas.map.Cell;
 import cat.urv.imas.map.PathCell;
+import cat.urv.imas.onthology.GameMapUtility;
 import cat.urv.imas.onthology.GameSettings;
+import cat.urv.imas.onthology.InfoAgent;
+import cat.urv.imas.onthology.InitialGameSettings;
 import cat.urv.imas.onthology.MessageContent;
 import cat.urv.imas.onthology.MetalFieldList;
 import cat.urv.imas.onthology.MovingMessage;
@@ -69,9 +72,30 @@ public class MapHandling extends AchieveREResponder {
         
         try {
             // If the received message is a map.
-            if(msg.getContentObject().getClass() == Cell[][].class){
-                // sets the value of the agents map to the received map.                
-                Cell[][] map = (Cell[][]) msg.getContentObject();                
+            if(msg.getContentObject().getClass() == GameMapUtility.class){
+                // sets the value of the agents map to the received map.
+                GameSettings game = ((GameMapUtility)msg.getContentObject()).getGame();
+                
+                
+                List cells = game.getAgentList().get(AgentType.PROSPECTOR);
+                boolean found = false;
+                for (Object cell : cells) {
+                    List cellprospectors = ((PathCell)cell).getAgents().get(AgentType.PROSPECTOR);
+                    for (Object prospector : cellprospectors){
+                        if (agent.getAID().equals(((InfoAgent)prospector).getAID())){
+                            agent.setCurrentPosition(new int[]{((PathCell)cell).getRow(),((PathCell)cell).getCol()});
+                            found = true;
+                            break;
+                        }   
+                    }
+                    if(found){
+                        break;
+                    }
+                }
+                
+                
+                
+                Cell[][] map = ((GameMapUtility)msg.getContentObject()).getUtilitymap();
                 agent.setMapView(map);
                 agent.log("MAP Updated");  
                 MetalFieldList currentMFL = agent.searchForMetal();
