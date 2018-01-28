@@ -29,6 +29,7 @@ import cat.urv.imas.map.Cell;
 import cat.urv.imas.map.PathCell;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.MessageContent;
+import cat.urv.imas.onthology.MetalFieldList;
 import jade.lang.acl.UnreadableException;
 import java.io.IOException;
 import java.util.List;
@@ -51,9 +52,6 @@ public class MapHandling extends AchieveREResponder {
         super(agent, mt);
         agent.log("Waiting for the updated map.");
     }
-
-    
-    
     
     // PARTE 1 DE LA RESPUESTA
     /**
@@ -65,32 +63,31 @@ public class MapHandling extends AchieveREResponder {
     protected ACLMessage handleRequest(ACLMessage msg) {
         // Declares the current agent so you can use its getters and setters (and other methods)
         ProspectorAgent agent = (ProspectorAgent)this.getAgent();
+        ACLMessage reply = msg.createReply();
+        reply.setPerformative(ACLMessage.INFORM);
+        
         try {
             // If the received message is a map.
-            if(msg.getContentObject().getClass() == cat.urv.imas.onthology.InitialGameSettings.class){
-                // sets the value of the agents map to the received map.
-                agent.setGame((GameSettings) msg.getContentObject());
-                agent.log("MAP Updated");            
-            }
+            if(msg.getContentObject().getClass() == Cell[][].class){
+                // sets the value of the agents map to the received map.                
+                Cell[][] map = (Cell[][]) msg.getContentObject();                
+                agent.setMapView(map);
+                agent.log("MAP Updated");  
+                MetalFieldList currentMFL = agent.searchForMetal();
+                agent.log("MetalSearched");
+                int[] newPosition = agent.move();
+                agent.log("MetalSearched");
+                reply.setContentObject(agent);
+            }           
+            
         } catch (UnreadableException ex) {
             Logger.getLogger(MapHandling.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(MapHandling.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return null;
+        
+        return reply;
     }
-
-    
-    // PARTE 2 DE LA RESPUESTA (SOLO SE EJECUTA SI LA 1 DEVUELVE NULL O AGREE)
-    /*
-     * @param msg ACLMessage the received message
-     * @param response ACLMessage the previously sent response message
-     * @return ACLMessage to be sent as a result notification, of type INFORM
-     * when all was ok, or FAILURE otherwise.
-     */
-    @Override
-    protected ACLMessage prepareResultNotification(ACLMessage msg, ACLMessage response) { //Useless method
-        return null;
-    }
-
     
     @Override
     public void reset() {

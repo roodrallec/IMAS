@@ -19,12 +19,16 @@ package cat.urv.imas.agent;
 
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.behaviour.prospectorcoordinator.*;
+import cat.urv.imas.map.Agents;
+import cat.urv.imas.map.Cell;
+import cat.urv.imas.map.PathCell;
+import cat.urv.imas.onthology.InfoAgent;
 import cat.urv.imas.onthology.InitialGameSettings;
-import cat.urv.imas.onthology.MessageContent;
+import cat.urv.imas.onthology.MetalField;
+import cat.urv.imas.onthology.MetalFieldList;
 import jade.core.*;
 import jade.domain.*;
 import jade.domain.FIPAAgentManagement.*;
-import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +38,14 @@ public class ProspectorCoordinatorAgent extends ImasAgent {
 
     /*      ATTRIBUTES      */
     private AID coordinatorAgent;
+
+    public AID getCoordinatorAgent() {
+        return coordinatorAgent;
+    }
+
+    public void setCoordinatorAgent(AID coordinatorAgent) {
+        this.coordinatorAgent = coordinatorAgent;
+    }
     private List<AID> prospectorAgents = new ArrayList<AID>();
     
     private GameSettings game;
@@ -42,13 +54,52 @@ public class ProspectorCoordinatorAgent extends ImasAgent {
     
     private int[][] utilityMap;
     
+    private int msgreceived;
     
+    private List<MetalFieldList> MFLreceived = new ArrayList<MetalFieldList>();;
+
+    public List<MetalFieldList> getMFLreceived() {
+        return MFLreceived;
+    }
+
+    public void setMFLreceived(List<MetalFieldList> MFLreceived) {
+        this.MFLreceived = MFLreceived;
+    }
+
+    public int getMsgreceived() {
+        return msgreceived;
+    }
+
+    public void setMsgreceived(int msgreceived) {
+        this.msgreceived = msgreceived;
+    }
+    
+    
+    
+    //public 
     
     /*      METHODS     */  
     public ProspectorCoordinatorAgent() {
         super(AgentType.PROSPECTOR_COORDINATOR);
     }
-
+    
+    public Cell[][] applyUtility(Cell[][] map) {        
+        for(Cell[] row: map) {            
+            for(Cell col: row) {                
+                if (col instanceof PathCell) {
+                    PathCell pc = (PathCell)(col);                            
+                    Agents agents = pc.getAgents();
+                    if (agents.get(AgentType.PROSPECTOR).size() > 0) {
+                        pc.resetUtility();
+                    } else {
+                        pc.incUtility();
+                    }                   
+                }
+            }           
+        }
+        return map;
+    }
+            
     public GameSettings getGame() {
         return game;
     }
@@ -65,8 +116,30 @@ public class ProspectorCoordinatorAgent extends ImasAgent {
         return prospectorAgents;
     }
     
-    
-
+    public List<MetalField> cleanDuplicatedMFL(){
+        int a = 0;
+        List<MetalFieldList> listoflist = this.MFLreceived;
+        List<MetalField> aux = new ArrayList<MetalField>();
+        //for(int i ; iterarenlista)
+        for (MetalFieldList listoflist1 : listoflist) {
+            List<MetalField> fromone = listoflist1.getMetalFields();
+            for (MetalField fromone1 : fromone) {
+                Boolean exists = false;
+                for (MetalField aux1 : aux) {
+                    if ((aux1.getPosition())[0] == (fromone1.getPosition())[0] && (aux1.getPosition())[1] == (fromone1.getPosition())[1]){
+                        exists = true;
+                    }                            
+                }
+                if (!(exists)) {
+                    aux.add(fromone1);
+                }
+            }               
+        }
+            //listoflist.get(i).getMetalFields()
+            //for(each de i (iterar en MF)
+                //aux.add(each)
+        return aux;
+    }
     /**
      * Agent setup method - called when it first come on-line. Configuration of
      * language to use, ontology and initialization of behaviours.
@@ -117,6 +190,8 @@ public class ProspectorCoordinatorAgent extends ImasAgent {
         // It triggers when the received message is an INFORM.
         MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
         this.addBehaviour(new MapHandling(this, mt));
+        
+        
         
     }
 }

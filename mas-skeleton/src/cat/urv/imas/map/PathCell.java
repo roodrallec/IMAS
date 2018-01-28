@@ -34,7 +34,8 @@ public class PathCell extends Cell {
      * Notifies if digger Agent is working there. By default any digger is working.
      */
     private boolean diggerWorking = false;
-
+    
+    private int utility = 0;
     /**
      * Builds a cell with a given type.
      *
@@ -98,7 +99,18 @@ public class PathCell extends Cell {
     public Agents getAgents() {
         return this.agents;
     }
-
+    
+    public void resetUtility() {
+        this.utility = 0;
+    }
+    
+    public void incUtility() {
+        this.utility ++;
+    }
+    
+    public int getUtility() {
+        return this.utility;
+    }
     /* ********************************************************************** */
     /**
      * Gets the string specialization for a street cell.

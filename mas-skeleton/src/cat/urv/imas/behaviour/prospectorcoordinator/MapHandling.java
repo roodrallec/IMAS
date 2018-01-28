@@ -29,6 +29,8 @@ import cat.urv.imas.map.Cell;
 import cat.urv.imas.map.PathCell;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.MessageContent;
+import cat.urv.imas.onthology.MetalField;
+import cat.urv.imas.onthology.MetalFieldList;
 import jade.lang.acl.UnreadableException;
 import java.io.IOException;
 import java.util.List;
@@ -77,11 +79,40 @@ public class MapHandling extends AchieveREResponder {
                 for (int i = 1; i <= agent.getNumProspectors(); i++ ){
                     mapmsg.addReceiver(agent.getProspectorAgents().get(i-1));
                 }
-                mapmsg.setContentObject(agent.getGame());
+                Cell[][] map = agent.getGame().getMap();
+                map = agent.applyUtility(map);
+                mapmsg.setContentObject(map);
                 agent.log("Map sent to underlying level");
-                return mapmsg;
+                return mapmsg;                
+            }else if(msg.getContentObject().getClass() == cat.urv.imas.onthology.MetalFieldList.class){
+                agent.setMsgreceived(agent.getMsgreceived()+1);
+                agent.log("List of metals received");
+                List<MetalFieldList> nowMFL = agent.getMFLreceived();
+                //LLamar al metodo para que las MF sean unicas
+                //Unir nowMFL
+                nowMFL.add((MetalFieldList) msg.getContentObject());
+                agent.setMFLreceived(nowMFL);
                 
+                       
+                if(agent.getMsgreceived() == agent.getNumProspectors()){
+                    agent.log("All list of metals received");                    
+                    List<MetalField> aux = agent.cleanDuplicatedMFL();
+                    agent.setMsgreceived(0);
+                                         
+                    ACLMessage MFLmsg = new ACLMessage(ACLMessage.INFORM);
+                    MFLmsg.clearAllReceiver();
+                    MFLmsg.addReceiver(agent.getCoordinatorAgent());
+                    
+                    //Para cada MFL sacar su lista de MF 
+                    //metodo a implementar
+                    //Cuando tenga la lista unica
+                    MetalFieldList currentMFL = new MetalFieldList(aux); 
+                    agent.log("Clean list of metals sent");
+                    MFLmsg.setContentObject(currentMFL);
+                }
             }
+            
+            
         } catch (UnreadableException ex) {
             Logger.getLogger(MapHandling.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {

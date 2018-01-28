@@ -202,7 +202,7 @@ public class DiggerCoordinatorAgent extends ImasAgent {
             }
             matching[digger] = metal;
         }
-    return matching;  
+    return matching;
     }         
     
     

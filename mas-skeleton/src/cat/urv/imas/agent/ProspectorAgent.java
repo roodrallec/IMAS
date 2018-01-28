@@ -16,42 +16,96 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package cat.urv.imas.agent;
-
-import cat.urv.imas.onthology.GameSettings;
+import java.util.ArrayList;
+import cat.urv.imas.map.*;
 import cat.urv.imas.behaviour.prospector.*;
-import cat.urv.imas.onthology.MessageContent;
+import cat.urv.imas.onthology.*;
 import jade.core.*;
 import jade.domain.*;
 import jade.domain.FIPAAgentManagement.*;
-import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.*;
-
+import java.util.Random;
 
 public class ProspectorAgent extends ImasAgent {
 
     /*      ATTRIBUTES      */
     private AID prospectorCoordinatorAgent;
     
-    private GameSettings game;
+    private Cell[] mapView = new Cell[9];
+        
+    private int[] currentPosition = {2,2}; 
     
-    private int[] currentPosition; //This has to be initializaed (TODO Aleix)
-    
-    
-    
-   
+    private ArrayList<MetalField> currentMetalFields = new ArrayList<MetalField>();
+ 
     /*      METHODS     */
     public ProspectorAgent() {
         super(AgentType.PROSPECTOR);
     }
-
-    public GameSettings getGame() {
-        return game;
+/* Takes a whole map and stores just the agents view */
+    public void setMapView(Cell[][] map) {       
+        int row = this.currentPosition[0];
+        int column = this.currentPosition[1];    
+        int idx = 0;
+        for(int r=row-1; r <= row+1; r++) {
+            for(int c=column-1; c <= column+1; c++) {                               
+                mapView[idx] = map[r][c];                
+                idx++;
+            }
+        }         
     }
+    
+    public Cell[] getMapView() {
+        return this.mapView;
+    }            
 
-    public void setGame(GameSettings game) {
-        this.game = game;
+    public MetalFieldList searchForMetal() {
+        int[] metalLocation = {};
+        int quantity = 0;
+        String metal = "";
+        for(Cell c: this.mapView) {
+            if (c instanceof SettableFieldCell){
+                SettableFieldCell fc = (SettableFieldCell)(c);
+                if (fc.detectMetal().size() == 1) {                    
+                    quantity = (int) (fc.detectMetal().values().toArray()[0]);                    
+                    metal = (fc.detectMetal().keySet().toArray())[0].toString();
+                    metalLocation[0] = c.getRow();                   
+                    metalLocation[1] = c.getCol();
+                    MetalField currentMetal = new MetalField(metalLocation, metal, quantity);
+                    currentMetalFields.add(currentMetal);
+                }
+            }         
+        }        
+        return new MetalFieldList(currentMetalFields);
+    }   
+    
+    public void shuffleView() {
+        int n = this.mapView.length;
+        Random random = new Random();
+        random.nextInt();
+        for (int i = 0; i < n; i++) {
+            int change = i + random.nextInt(n - i);
+            Cell helper = this.mapView[i];
+            this.mapView[i] = this.mapView[change];
+            this.mapView[change] = helper;
+        }
     }
-
+    
+    public int[] move() {                  
+        this.shuffleView(); // Randomizes movement when there's equal utility
+        int maxCellUtility = -1;
+        for(Cell c: this.mapView) {
+            if (c instanceof PathCell) {
+                PathCell pc = (PathCell)(c);                            
+                if (pc.getUtility() > maxCellUtility) {
+                    maxCellUtility = pc.getUtility();
+                    this.currentPosition[0] = c.getRow();
+                    this.currentPosition[1] = c.getCol();
+                }
+            }
+        }
+        return this.currentPosition;
+    }
+    
     public AID getProspectorCoordinatorAgent() {
         return prospectorCoordinatorAgent;
     }
@@ -59,17 +113,7 @@ public class ProspectorAgent extends ImasAgent {
     public void setProspectorCoordinatorAgent(AID prospectorCoordinatorAgent) {
         this.prospectorCoordinatorAgent = prospectorCoordinatorAgent;
     }
-
-    public int[] getCurrentPosition() {
-        return currentPosition;
-    }
-
-    public void setCurrentPosition(int[] currentPosition) {
-        this.currentPosition = currentPosition;
-    }
     
-    
-
     /**
      * Agent setup method - called when it first come on-line. Configuration of
      * language to use, ontology and initialization of behaviours.
@@ -97,7 +141,6 @@ public class ProspectorAgent extends ImasAgent {
             System.err.println(getLocalName() + " registration with DF unsucceeded. Reason: " + e.getMessage());
             doDelete();
         }
-        
         /*      SEARCHS     */        
         // search ProspectorCoordinatorAgent
         ServiceDescription searchCriterion = new ServiceDescription();
