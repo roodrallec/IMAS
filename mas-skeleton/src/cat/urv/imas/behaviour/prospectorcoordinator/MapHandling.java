@@ -29,8 +29,11 @@ import cat.urv.imas.map.Cell;
 import cat.urv.imas.map.PathCell;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.MessageContent;
+import static cat.urv.imas.onthology.MessageContent.DIG_ACTION;
 import cat.urv.imas.onthology.MetalField;
 import cat.urv.imas.onthology.MetalFieldList;
+import cat.urv.imas.onthology.MovingMessage;
+import cat.urv.imas.onthology.MovingMessageList;
 import jade.lang.acl.UnreadableException;
 import java.io.IOException;
 import java.util.List;
@@ -68,7 +71,7 @@ public class MapHandling extends AchieveREResponder {
         ProspectorCoordinatorAgent agent = (ProspectorCoordinatorAgent)this.getAgent(); 
         try {
             // If the received message is a map.
-            if(msg.getContentObject().getClass() == cat.urv.imas.onthology.InitialGameSettings.class){
+            if(msg.getContentObject().getClass() == cat.urv.imas.onthology.InitialGameSettings.class || msg.getContentObject().getClass() == cat.urv.imas.onthology.GameSettings.class){
                 // sets the value of the agents map to the received map.
                 agent.setGame((GameSettings) msg.getContentObject());
                 agent.log("MAP Updated");
@@ -109,6 +112,35 @@ public class MapHandling extends AchieveREResponder {
                     MetalFieldList currentMFL = new MetalFieldList(aux); 
                     agent.log("Clean list of metals sent");
                     MFLmsg.setContentObject(currentMFL);
+                    MFLmsg.setLanguage(DIG_ACTION);
+                    return MFLmsg;
+                }
+            }
+            else if(msg.getContentObject().getClass() == cat.urv.imas.onthology.MovingMessage.class){
+                agent.setMovereceived(agent.getMovereceived()+1);
+                agent.log("Prospector Movement Received.");
+                List<MovingMessage> nowMML = agent.getMMreceived();
+                //LLamar al metodo para que las MF sean unicas
+                //Unir nowMFL
+                nowMML.add((MovingMessage) msg.getContentObject());
+                agent.setMMreceived(nowMML);
+                
+                       
+                if(agent.getMovereceived() == agent.getNumProspectors()){
+                                   
+                    MovingMessageList aux = new MovingMessageList(agent.getMMreceived());
+                    agent.setMovereceived(0);
+                                         
+                    ACLMessage MMLmsg = new ACLMessage(ACLMessage.INFORM);
+                    MMLmsg.clearAllReceiver();
+                    MMLmsg.addReceiver(agent.getCoordinatorAgent());
+                    MMLmsg.setLanguage(MessageContent.DIG_ACTION);
+                    //Para cada MFL sacar su lista de MF 
+                    //metodo a implementar
+                    //Cuando tenga la lista unica
+                    MMLmsg.setContentObject(aux);
+                    agent.log("All Prospector Movements received");  
+                    return MMLmsg;
                 }
             }
             

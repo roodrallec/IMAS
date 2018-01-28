@@ -26,6 +26,7 @@ import cat.urv.imas.onthology.InfoAgent;
 import cat.urv.imas.onthology.InitialGameSettings;
 import cat.urv.imas.onthology.MetalField;
 import cat.urv.imas.onthology.MetalFieldList;
+import cat.urv.imas.onthology.MovingMessage;
 import jade.core.*;
 import jade.domain.*;
 import jade.domain.FIPAAgentManagement.*;
@@ -56,7 +57,11 @@ public class ProspectorCoordinatorAgent extends ImasAgent {
     
     private int msgreceived;
     
-    private List<MetalFieldList> MFLreceived = new ArrayList<MetalFieldList>();;
+    private int movereceived;
+    
+    private List<MetalFieldList> MFLreceived = new ArrayList<MetalFieldList>();
+    
+    private List <MovingMessage> MMreceived = new ArrayList<MovingMessage>();
 
     public List<MetalFieldList> getMFLreceived() {
         return MFLreceived;
@@ -72,6 +77,22 @@ public class ProspectorCoordinatorAgent extends ImasAgent {
 
     public void setMsgreceived(int msgreceived) {
         this.msgreceived = msgreceived;
+    }
+
+    public int getMovereceived() {
+        return movereceived;
+    }
+
+    public void setMovereceived(int movereceived) {
+        this.movereceived = movereceived;
+    }
+
+    public List<MovingMessage> getMMreceived() {
+        return MMreceived;
+    }
+
+    public void setMMreceived(List<MovingMessage> MMreceived) {
+        this.MMreceived = MMreceived;
     }
     
     
@@ -156,7 +177,8 @@ public class ProspectorCoordinatorAgent extends ImasAgent {
         sd1.setType(AgentType.PROSPECTOR_COORDINATOR.toString());
         sd1.setName(getLocalName());
         sd1.setOwnership(OWNER);
-        
+        this.msgreceived = 0;
+        this.movereceived = 0;
         DFAgentDescription dfd = new DFAgentDescription();
         dfd.addServices(sd1);
         dfd.setName(getAID());

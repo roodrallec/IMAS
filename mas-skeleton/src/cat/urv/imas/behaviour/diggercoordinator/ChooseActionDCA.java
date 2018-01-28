@@ -124,7 +124,7 @@ public class ChooseActionDCA extends AchieveREResponder {
                 manmlmsg.setContentObject(manml);
                 agent.send(manmlmsg);
                 
-                agent.log("ALL messages sent to DCA.");
+                agent.log("ALL messages sent to CA.");
             }
             else{
                 agent.setReceivedActions(count);

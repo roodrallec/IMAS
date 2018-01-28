@@ -45,6 +45,10 @@ public class CoordinatorAgent extends ImasAgent {
     private AID prospectorCoordinatorAgent;
     
     private MetalFieldList currentMFL;
+    private DiggingMessageList DMList;
+    private MovingMessageList MMList = new MovingMessageList();
+    private ManufacturingMessageList MFMList;
+    private int flag;
 
     /**
      * Builds the coordinator agent.
@@ -84,6 +88,38 @@ public class CoordinatorAgent extends ImasAgent {
     public void setCurrentMFL(MetalFieldList currentMFL) {
         this.currentMFL = currentMFL;
     }
+
+    public DiggingMessageList getDMList() {
+        return DMList;
+    }
+
+    public void setDMList(DiggingMessageList DMList) {
+        this.DMList = DMList;
+    }
+
+    public MovingMessageList getMMList() {
+        return MMList;
+    }
+
+    public void setMMList(MovingMessageList MMList) {
+        this.MMList = MMList;
+    }
+
+    public ManufacturingMessageList getMFMList() {
+        return MFMList;
+    }
+
+    public void setMFMList(ManufacturingMessageList MFMList) {
+        this.MFMList = MFMList;
+    }
+
+    public int getFlag() {
+        return flag;
+    }
+
+    public void setFlag(int flag) {
+        this.flag = flag;
+    }
     
     
     
@@ -105,7 +141,7 @@ public class CoordinatorAgent extends ImasAgent {
         sd1.setType(AgentType.COORDINATOR.toString());
         sd1.setName(getLocalName());
         sd1.setOwnership(OWNER);
-        
+        this.flag = 0;
         DFAgentDescription dfd = new DFAgentDescription();
         dfd.addServices(sd1);
         dfd.setName(getAID());
@@ -154,6 +190,9 @@ public class CoordinatorAgent extends ImasAgent {
             e.printStackTrace();
         }
         this.addBehaviour(new RequesterBehaviour(this, initialRequest));
+        
+        MessageTemplate mt =MessageTemplate.MatchLanguage(MessageContent.DIG_ACTION);
+        this.addBehaviour(new ActionHandlingCA(this, mt));
        
         
         

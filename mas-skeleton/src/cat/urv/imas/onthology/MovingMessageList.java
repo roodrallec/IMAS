@@ -20,7 +20,9 @@ public class MovingMessageList implements Serializable{
     public MovingMessageList(List<MovingMessage> movingMessages) {
         this.movingMessages = movingMessages;
     }
-
+    public MovingMessageList() {
+       this.movingMessages = new ArrayList<MovingMessage>();
+    }
     public List<MovingMessage> getMovingMessages() {
         return movingMessages;
     }

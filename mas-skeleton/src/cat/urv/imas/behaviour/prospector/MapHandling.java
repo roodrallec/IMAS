@@ -30,6 +30,7 @@ import cat.urv.imas.map.PathCell;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.MessageContent;
 import cat.urv.imas.onthology.MetalFieldList;
+import cat.urv.imas.onthology.MovingMessage;
 import jade.lang.acl.UnreadableException;
 import java.io.IOException;
 import java.util.List;
@@ -75,9 +76,16 @@ public class MapHandling extends AchieveREResponder {
                 agent.log("MAP Updated");  
                 MetalFieldList currentMFL = agent.searchForMetal();
                 agent.log("MetalSearched");
-                int[] newPosition = agent.move();
+                MovingMessage movobj = new MovingMessage(agent.getAID(),agent.move());
                 agent.log("MetalSearched");
-                reply.setContentObject(agent);
+                reply.setContentObject(currentMFL);
+                ACLMessage movemsg = new ACLMessage(ACLMessage.INFORM);
+                movemsg.clearAllReceiver();
+                movemsg.addReceiver(agent.getProspectorCoordinatorAgent());
+                movemsg.setContentObject(movobj);
+                agent.send(movemsg);
+                agent.log("Movement Sent.");
+                
             }           
             
         } catch (UnreadableException ex) {

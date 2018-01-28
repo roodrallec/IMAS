@@ -80,7 +80,7 @@ public class RequesterBehaviour extends AchieveREInitiator {
             agent.send(mapmsg);
             
             
-            /************PROVES**************/
+            /*
             
             MetalField mf = new MetalField(new int[]{2,2},"G",1);
             MetalField mf2 = new MetalField(new int[]{5,3},"G",1);
@@ -97,7 +97,7 @@ public class RequesterBehaviour extends AchieveREInitiator {
             mflmsg.setLanguage(MessageContent.GET_MAP);
             agent.send(mflmsg);
             
-            /***********END PROVES***********/
+           */
         } catch (Exception e) {
             agent.errorLog("Incorrect content: " + e.toString());
         }
