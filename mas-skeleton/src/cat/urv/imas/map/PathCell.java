@@ -30,6 +30,10 @@ public class PathCell extends Cell {
      * Information about the agent the cell contains.
      */
     private Agents agents = new Agents();
+    /**
+     * Notifies if digger Agent is working there. By default any digger is working.
+     */
+    private boolean diggerWorking = false;
     
     private int utility = 0;
     /**
@@ -47,7 +51,19 @@ public class PathCell extends Cell {
         return agents.isEmpty();
     }
 
-    
+    /**
+     * Set this cell to have a digger agent digging up some metal.
+     */
+    public void setDiggerAgentWorking() {
+        diggerWorking = true;
+    }
+    /**
+     * Set this cell to be free of having a digger agent digging up some metal.
+     */
+    public void removeDiggerAgentWorking() {
+        diggerWorking = false;
+    }
+
     /* ********************************************************************** */
     /**
      * Checks whether this cell contains a digger agent digging up some metal.
@@ -55,10 +71,7 @@ public class PathCell extends Cell {
      * @return boolean
      */
     public boolean isThereADiggerAgentWorking() {
-        // TODO: update condition to fit the restriction of
-        //       allowing just a single digger working or
-        //       any amount of agents moving through.
-        return false;
+        return diggerWorking;
     }
 
     /**

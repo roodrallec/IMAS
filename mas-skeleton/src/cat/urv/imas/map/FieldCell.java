@@ -31,7 +31,9 @@ public class FieldCell extends Cell {
      * When this metal is not found yet, an empty list of metal is returned.
      */
     protected static Map<MetalType, Integer> empty = new HashMap();
-
+    
+    //private int notVisitedTurns = 0;   
+    
     /**
      * Metal of the field: it can only be of one type at a time.
      * But, once generated, it can be of any type and amount.
