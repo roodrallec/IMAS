@@ -388,11 +388,11 @@ public class DiggerAgent extends ImasAgent {
         this.setCrash(true);
         this.setPreviousMovement(new int[] {0,1});
         // PROVES! //
-        AgentsPositions auxVar = (AgentsPositions) systemAgent.getAgentsPositions();
-        this.currentPosition = (int[]) auxVar.getAgentById(this.getAID());
-        
-        this.parameters = new double [] {0.5,0.5,0.5,0.1};
-        this.usedSlots = 1;
+//        AgentsPositions auxVar = (AgentsPositions) systemAgent.getAgentsPositions();
+//        this.currentPosition = (int[]) auxVar.getAgentById(this.getAID());
+//        
+//        this.parameters = new double [] {0.5,0.5,0.5,0.1};
+//        this.usedSlots = 1;
                 
         
         DFAgentDescription dfd = new DFAgentDescription();
@@ -409,24 +409,24 @@ public class DiggerAgent extends ImasAgent {
         
         /*      SEARCHS     */
         // search CoordinatorAgent
-        ServiceDescription searchCriterion = new ServiceDescription();
-        searchCriterion.setType(AgentType.DIGGER_COORDINATOR.toString());
-        this.diggerCoordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);        
+//        ServiceDescription searchCriterion = new ServiceDescription();
+//        searchCriterion.setType(AgentType.DIGGER_COORDINATOR.toString());
+//        this.diggerCoordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);        
         
         
         /*      BEHAVIOURS        */
         
-        // It triggers ONLY for the voting protocol (Selectivity)
-        MessageTemplate mt1 = MessageTemplate.MatchLanguage(MessageContent.SELECTIVITY);
-        this.addBehaviour(new SelectivityVotingDA(this, mt1));
-        
-        // It triggers when the received message is a GET_MAP.
-        MessageTemplate mt2 =MessageTemplate.MatchLanguage(MessageContent.GET_MAP);
-        this.addBehaviour(new MapHandlingDA(this, mt2));
-        
-        // It triggers when the received message is a CHOOSE_ACTION.
-        MessageTemplate mt3 =MessageTemplate.MatchLanguage(MessageContent.CHOOSE_ACTION);
-        this.addBehaviour(new ChooseActionDA(this, mt3));
+//        // It triggers ONLY for the voting protocol (Selectivity)
+//        MessageTemplate mt1 = MessageTemplate.MatchLanguage(MessageContent.SELECTIVITY);
+//        this.addBehaviour(new SelectivityVotingDA(this, mt1));
+//        
+//        // It triggers when the received message is a GET_MAP.
+//        MessageTemplate mt2 =MessageTemplate.MatchLanguage(MessageContent.GET_MAP);
+//        this.addBehaviour(new MapHandlingDA(this, mt2));
+//        
+//        // It triggers when the received message is a CHOOSE_ACTION.
+//        MessageTemplate mt3 =MessageTemplate.MatchLanguage(MessageContent.CHOOSE_ACTION);
+//        this.addBehaviour(new ChooseActionDA(this, mt3));
     }
     
     
