@@ -82,8 +82,8 @@ public class ProspectorCoordinatorAgent extends ImasAgent {
         super(AgentType.PROSPECTOR_COORDINATOR);
     }
     
-    public void updateMap(Cell[][] subMap) {
-        
+    public Cell[][] applyUtility(Cell[][] map) {
+        return map;
     }
             
     public GameSettings getGame() {
@@ -101,7 +101,6 @@ public class ProspectorCoordinatorAgent extends ImasAgent {
     public List<AID> getProspectorAgents() {
         return prospectorAgents;
     }
-    
     
     public List<MetalField> cleanDuplicatedMFL(){
         int a = 0;

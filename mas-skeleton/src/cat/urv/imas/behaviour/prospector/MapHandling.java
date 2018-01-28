@@ -68,14 +68,16 @@ public class MapHandling extends AchieveREResponder {
         
         try {
             // If the received message is a map.
-            if(msg.getContentObject().getClass() == cat.urv.imas.onthology.InitialGameSettings.class){
-                // sets the value of the agents map to the received map.
-                GameSettings game = (GameSettings) msg.getContentObject();
-                MetalFieldList currentMFL = agent.setMapView(game.getMap());
-                agent.log("MAP Updated; Metals found");  
-                //agent.searchForMetal();
-                //agent.log("MetalSearched");             
-                reply.setContentObject(currentMFL);
+            if(msg.getContentObject().getClass() == Cell[][].class){
+                // sets the value of the agents map to the received map.                
+                Cell[][] map = (Cell[][]) msg.getContentObject();                
+                agent.setMapView(map);
+                agent.log("MAP Updated");  
+                MetalFieldList currentMFL = agent.searchForMetal();
+                agent.log("MetalSearched");
+                int[] newPosition = agent.move();
+                agent.log("MetalSearched");
+                reply.setContentObject(agent);
             }           
             
         } catch (UnreadableException ex) {

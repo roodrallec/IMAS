@@ -28,6 +28,7 @@ import jade.domain.*;
 import jade.domain.FIPAAgentManagement.*;
 import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.*;
+import static java.lang.Math.abs;
 import java.util.Map;
 
 
@@ -37,9 +38,9 @@ public class ProspectorAgent extends ImasAgent {
     /*      ATTRIBUTES      */
     private AID prospectorCoordinatorAgent;
     
-    private Cell[] mapView = new Cell[8];
+    private Cell[] mapView = new Cell[9];
         
-    private int[] currentPosition; //This has to be initializaed (TODO Aleix)
+    private int[] currentPosition = {2,2}; 
     
     private ArrayList<MetalField> currentMetalFields = new ArrayList<MetalField>();
  
@@ -48,51 +49,59 @@ public class ProspectorAgent extends ImasAgent {
         super(AgentType.PROSPECTOR);
     }
 /* Takes a whole map and stores just the agents view */
-    public MetalFieldList setMapView(Cell[][] map) {         
-        this.currentPosition = new int[] {1,5};
+    public void setMapView(Cell[][] map) {       
         int row = this.currentPosition[0];
-        int column = this.currentPosition[1];      
+        int column = this.currentPosition[1];    
         int idx = 0;
-        //MetalField current = new MetalField();
-        //Cell submapita;
-        //int a;
         for(int r=row-1; r <= row+1; r++) {
-            for(int c=column-1; c <= column+1; c++) {
-                if (!(r == row && c == column)){                  
-                    mapView[idx] = map[r][c];
-                    //After all, change to correct values -> r and c
-                    if (mapView[idx] instanceof SettableFieldCell){
-                        if ((((SettableFieldCell) (map[r][c])).detectMetal()).size() == 1){
-                            //Size
-                            int quantity = (int) ((((SettableFieldCell) (map[r][c])).detectMetal().values().toArray())[0]);
-                            //MetalType
-                            String metal = ((((SettableFieldCell) (map[r][c])).detectMetal().keySet().toArray())[0]).toString();
-                            //Location R and C
-                            int[] metalLocation = {r, c};
-                            //MetalField
-                            MetalField currentMetal = new MetalField(metalLocation, metal, quantity);
-                            currentMetalFields.add(currentMetal);
-                        }
-                       
-                    }  
-                    idx++;
-                }
+            for(int c=column-1; c <= column+1; c++) {                               
+                mapView[idx] = map[r][c];                
+                idx++;
             }
-        } 
-        MetalFieldList currentMFL = new MetalFieldList(currentMetalFields);
-        return currentMFL;
+        }         
     }
-
-    public void searchForMetal() {
-        for(Cell c: this.mapView) {
-            if (c instanceof SettableFieldCell) {
-                ((SettableFieldCell) c).detectMetal();
-            }            
-        }
-    }   
     
     public Cell[] getMapView() {
-        return mapView;
+        return this.mapView;
+    }            
+
+    public MetalFieldList searchForMetal() {
+        int[] metalLocation = {};
+        int quantity = 0;
+        String metal = "";
+        for(Cell c: this.mapView) {
+            if (c instanceof SettableFieldCell){
+                SettableFieldCell fc = (SettableFieldCell)(c);
+                if (fc.detectMetal().size() == 1) {                    
+                    quantity = (int) (fc.detectMetal().values().toArray()[0]);                    
+                    metal = (fc.detectMetal().keySet().toArray())[0].toString();
+                    metalLocation[0] = c.getRow();                   
+                    metalLocation[1] = c.getCol();
+                    MetalField currentMetal = new MetalField(metalLocation, metal, quantity);
+                    currentMetalFields.add(currentMetal);
+                }
+            }         
+        }        
+        return new MetalFieldList(currentMetalFields);
+    }   
+    
+    public int[] move() {
+        int maxCellUtility = -1;         
+        for(Cell c: this.mapView) {
+            if (c instanceof PathCell) {
+                PathCell pc = (PathCell)(c);                            
+                if (this.utility(pc) > maxCellUtility) {
+                    maxCellUtility = this.utility(pc);
+                    this.currentPosition[0] = c.getRow();
+                    this.currentPosition[1] = c.getCol();
+                }
+            }
+        }
+        return this.currentPosition;
+    }
+    
+    public int utility(Cell cell) {
+        return 1;
     }
     
     public AID getProspectorCoordinatorAgent() {
@@ -102,17 +111,7 @@ public class ProspectorAgent extends ImasAgent {
     public void setProspectorCoordinatorAgent(AID prospectorCoordinatorAgent) {
         this.prospectorCoordinatorAgent = prospectorCoordinatorAgent;
     }
-
-    public int[] getCurrentPosition() {
-        return currentPosition;
-    }
-
-    public void setCurrentPosition(int[] currentPosition) {
-        this.currentPosition = currentPosition;
-    }
     
-    
-
     /**
      * Agent setup method - called when it first come on-line. Configuration of
      * language to use, ontology and initialization of behaviours.
@@ -140,7 +139,6 @@ public class ProspectorAgent extends ImasAgent {
             System.err.println(getLocalName() + " registration with DF unsucceeded. Reason: " + e.getMessage());
             doDelete();
         }
-        
         /*      SEARCHS     */        
         // search ProspectorCoordinatorAgent
         ServiceDescription searchCriterion = new ServiceDescription();

@@ -79,7 +79,9 @@ public class MapHandling extends AchieveREResponder {
                 for (int i = 1; i <= agent.getNumProspectors(); i++ ){
                     mapmsg.addReceiver(agent.getProspectorAgents().get(i-1));
                 }
-                mapmsg.setContentObject(agent.getGame());
+                Cell[][] map = agent.getGame().getMap();
+                map = agent.applyUtility(map);
+                mapmsg.setContentObject(map);
                 agent.log("Map sent to underlying level");
                 return mapmsg;                
             }else if(msg.getContentObject().getClass() == cat.urv.imas.onthology.MetalFieldList.class){
