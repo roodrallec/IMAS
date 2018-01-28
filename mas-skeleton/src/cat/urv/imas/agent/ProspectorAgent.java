@@ -16,22 +16,15 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package cat.urv.imas.agent;
-
 import java.util.ArrayList;
-//import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.map.*;
 import cat.urv.imas.behaviour.prospector.*;
-//import cat.urv.imas.onthology.MessageContent;
 import cat.urv.imas.onthology.*;
 import jade.core.*;
 import jade.domain.*;
 import jade.domain.FIPAAgentManagement.*;
-import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.*;
-import static java.lang.Math.abs;
-import java.util.Map;
-
-
+import java.util.Random;
 
 public class ProspectorAgent extends ImasAgent {
 
@@ -85,8 +78,21 @@ public class ProspectorAgent extends ImasAgent {
         return new MetalFieldList(currentMetalFields);
     }   
     
-    public int[] move() {
-        int maxCellUtility = -1;         
+    public void shuffleView() {
+        int n = this.mapView.length;
+        Random random = new Random();
+        random.nextInt();
+        for (int i = 0; i < n; i++) {
+            int change = i + random.nextInt(n - i);
+            Cell helper = this.mapView[i];
+            this.mapView[i] = this.mapView[change];
+            this.mapView[change] = helper;
+        }
+    }
+    
+    public int[] move() {                  
+        this.shuffleView(); // Randomizes movement when there's equal utility
+        int maxCellUtility = -1;
         for(Cell c: this.mapView) {
             if (c instanceof PathCell) {
                 PathCell pc = (PathCell)(c);                            
