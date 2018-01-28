@@ -30,7 +30,8 @@ public class PathCell extends Cell {
      * Information about the agent the cell contains.
      */
     private Agents agents = new Agents();
-
+    
+    private int utility = 0;
     /**
      * Builds a cell with a given type.
      *
@@ -46,7 +47,7 @@ public class PathCell extends Cell {
         return agents.isEmpty();
     }
 
-
+    
     /* ********************************************************************** */
     /**
      * Checks whether this cell contains a digger agent digging up some metal.
@@ -85,7 +86,18 @@ public class PathCell extends Cell {
     public Agents getAgents() {
         return this.agents;
     }
-
+    
+    public void resetUtility() {
+        this.utility = 0;
+    }
+    
+    public void incUtility() {
+        this.utility ++;
+    }
+    
+    public int getUtility() {
+        return this.utility;
+    }
     /* ********************************************************************** */
     /**
      * Gets the string specialization for a street cell.

@@ -19,15 +19,16 @@ package cat.urv.imas.agent;
 
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.behaviour.prospectorcoordinator.*;
+import cat.urv.imas.map.Agents;
 import cat.urv.imas.map.Cell;
+import cat.urv.imas.map.PathCell;
+import cat.urv.imas.onthology.InfoAgent;
 import cat.urv.imas.onthology.InitialGameSettings;
-import cat.urv.imas.onthology.MessageContent;
 import cat.urv.imas.onthology.MetalField;
 import cat.urv.imas.onthology.MetalFieldList;
 import jade.core.*;
 import jade.domain.*;
 import jade.domain.FIPAAgentManagement.*;
-import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -82,7 +83,20 @@ public class ProspectorCoordinatorAgent extends ImasAgent {
         super(AgentType.PROSPECTOR_COORDINATOR);
     }
     
-    public Cell[][] applyUtility(Cell[][] map) {
+    public Cell[][] applyUtility(Cell[][] map) {        
+        for(Cell[] row: map) {            
+            for(Cell col: row) {                
+                if (col instanceof PathCell) {
+                    PathCell pc = (PathCell)(col);                            
+                    Agents agents = pc.getAgents();
+                    if (agents.get(AgentType.PROSPECTOR).size() > 0) {
+                        pc.resetUtility();
+                    } else {
+                        pc.incUtility();
+                    }                   
+                }
+            }           
+        }
         return map;
     }
             

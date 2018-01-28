@@ -90,18 +90,14 @@ public class ProspectorAgent extends ImasAgent {
         for(Cell c: this.mapView) {
             if (c instanceof PathCell) {
                 PathCell pc = (PathCell)(c);                            
-                if (this.utility(pc) > maxCellUtility) {
-                    maxCellUtility = this.utility(pc);
+                if (pc.getUtility() > maxCellUtility) {
+                    maxCellUtility = pc.getUtility();
                     this.currentPosition[0] = c.getRow();
                     this.currentPosition[1] = c.getCol();
                 }
             }
         }
         return this.currentPosition;
-    }
-    
-    public int utility(Cell cell) {
-        return 1;
     }
     
     public AID getProspectorCoordinatorAgent() {
