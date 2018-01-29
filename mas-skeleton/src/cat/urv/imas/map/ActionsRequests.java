@@ -67,5 +67,8 @@ public class ActionsRequests {
     public AID getAgentAIDByIndex(int agentIndex) {            
         return ids.get(agentIndex);
     }
+    public List<AID> getAllAgentsAID() {            
+        return ids;
+    }
         
 }
