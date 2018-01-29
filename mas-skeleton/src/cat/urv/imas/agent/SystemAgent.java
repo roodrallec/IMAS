@@ -28,7 +28,11 @@ import cat.urv.imas.behaviour.system.*;
 //import cat.urv.imas.map.Cell;
 import cat.urv.imas.map.*;
 import cat.urv.imas.onthology.DiggerInfoAgent;
+import cat.urv.imas.onthology.DiggingMessage;
+import cat.urv.imas.onthology.ManufacturingMessage;
 import cat.urv.imas.onthology.MessageContent;
+import cat.urv.imas.onthology.MetalField;
+import cat.urv.imas.onthology.MovingMessage;
 //import jade.Boot;
 import jade.core.*;
 import jade.domain.*;
@@ -37,6 +41,7 @@ import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.*;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -108,37 +113,55 @@ public class SystemAgent extends ImasAgent {
      * that it is needed to free the cell where the digger was working.
      */
     private ActionsRequests currentWorkingDiggers = new ActionsRequests();
-
     /**
      * diggingRequests will contain the requesting diggers AID and current positions of metal fields to dig.
      */
-    private AgentsIdAssociatedWithFC diggingRequests = new AgentsIdAssociatedWithFC();
-    public AgentsIdAssociatedWithFC getDiggingRequests() {
+    private List<DiggingMessage> diggingRequests = new ArrayList<DiggingMessage>();
+
+    public List<DiggingMessage> getDiggingRequests() {
         return diggingRequests;
     }
-    public void setDiggingRequests(AgentsIdAssociatedWithFC movementsRequestsitions) {
-        this.diggingRequests = movementsRequestsitions;
+
+    public void setDiggingRequests(List<DiggingMessage> diggingRequests) {
+        this.diggingRequests = diggingRequests;
     }
+
     /**
      * requestedAgentsPos will contain the requested positions of next turn for all mobile agents.
      */
-    private ActionsRequests requestedAgentsPos = new ActionsRequests();
-    public ActionsRequests getRequestedAgentsPos() {
+    private List<MovingMessage> requestedAgentsPos = new ArrayList<MovingMessage>();
+
+    public List<MovingMessage> getRequestedAgentsPos() {
         return requestedAgentsPos;
     }
-    public void setRequestedAgentsPos(ActionsRequests requestedAgentsPos) {
+
+    public void setRequestedAgentsPos(List<MovingMessage> requestedAgentsPos) {
         this.requestedAgentsPos = requestedAgentsPos;
     }
+
     /**
      * manufactureRequests will contain the requesting diggers AID and current positions of manufacturing centers to manufacture.
      */
-    private AgentsIdAssociatedWithFC manufactureRequests = new AgentsIdAssociatedWithFC();
-    public AgentsIdAssociatedWithFC getManufactureRequests() {
+    private List<ManufacturingMessage> manufactureRequests = new ArrayList<ManufacturingMessage>();
+
+    public List<ManufacturingMessage> getManufactureRequests() {
         return manufactureRequests;
     }
-    public void setManufactureRequests(AgentsIdAssociatedWithFC requestedAgentsPos) {
-        this.manufactureRequests = requestedAgentsPos;
-    } 
+
+    public void setManufactureRequests(List<ManufacturingMessage> manufactureRequests) {
+        this.manufactureRequests = manufactureRequests;
+    }
+
+    private List<MetalField> metalFieldList = new ArrayList<MetalField>();
+
+    public List<MetalField> getMetalFieldList() {
+        return metalFieldList;
+    }
+
+    public void setMetalFieldList(List<MetalField> metalFieldList) {
+        this.metalFieldList = metalFieldList;
+    }
+    
     /**
      * Game settings. The game with the updated changes that the system agent
      * is constructing while checking that all changes are allowed.
