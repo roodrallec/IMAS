@@ -106,6 +106,7 @@ public class ActionHandlingCA extends AchieveREResponder {
                 completemsg.clearAllReceiver();
                 completemsg.addReceiver(agent.getSystemAgent());
                 completemsg.setLanguage(MessageContent.CHOOSE_ACTION);
+                completemsg.setContentObject(commsg);
                 agent.log("Turn information sent.");
                 return completemsg;
             }

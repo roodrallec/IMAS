@@ -387,7 +387,8 @@ public class DiggerAgent extends ImasAgent {
         // PROVES! //
         this.currentPosition = new int[] {5,2};
         this.parameters = new double [] {0.5,0.5,0.5,0.1};
-        this.usedSlots = 1;
+        this.usedSlots = 0;
+        this.previousMovement = new int[]{0,0};
                 
         
         DFAgentDescription dfd = new DFAgentDescription();

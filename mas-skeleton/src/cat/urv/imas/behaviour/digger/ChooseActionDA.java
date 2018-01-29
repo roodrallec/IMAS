@@ -98,6 +98,7 @@ public class ChooseActionDA extends AchieveREResponder {
                     }
                     else{
                         agent.log("No metal assigned. Follow Prospector.");
+                        agent.log("Current Position:" + Arrays.toString(agent.getCurrentPosition()));
                                 // contract net;
                     }
                 }

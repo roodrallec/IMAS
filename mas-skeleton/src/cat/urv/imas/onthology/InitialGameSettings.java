@@ -366,4 +366,9 @@ public class InitialGameSettings extends GameSettings {
         }
         list.add(cell);
     }
+    
+    public void removeAgentFromList(AgentType type, Cell cell) {
+        List<Cell> list = this.agentList.get(type);
+        list.remove(cell);
+    }
 }
