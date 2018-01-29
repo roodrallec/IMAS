@@ -101,7 +101,7 @@ public class ActionHandlingCA extends AchieveREResponder {
             }
             if(agent.getFlag() == 4){
                 agent.setFlag(0);
-                CompleteMessage commsg = new CompleteMessage(agent.getDMList(),agent.getMMList(), agent.getMFMList());
+                CompleteMessage commsg = new CompleteMessage(agent.getDMList(),agent.getMMList(), agent.getMFMList(), agent.getCurrentMFL());
                 ACLMessage completemsg = new ACLMessage(ACLMessage.INFORM);
                 completemsg.clearAllReceiver();
                 completemsg.addReceiver(agent.getSystemAgent());

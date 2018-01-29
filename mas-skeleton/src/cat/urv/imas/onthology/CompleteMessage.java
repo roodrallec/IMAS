@@ -18,11 +18,13 @@ public class CompleteMessage implements Serializable{
     private DiggingMessageList DML;
     private MovingMessageList MML;
     private ManufacturingMessageList MFML;
-
-    public CompleteMessage(DiggingMessageList DML, MovingMessageList MML, ManufacturingMessageList MFML) {
+    private MetalFieldList turnMFL;
+    
+    public CompleteMessage(DiggingMessageList DML, MovingMessageList MML, ManufacturingMessageList MFML, MetalFieldList turnMFL) {
         this.DML = DML;
         this.MML = MML;
         this.MFML = MFML;
+        this.turnMFL = turnMFL;
     }
 
     public DiggingMessageList getDML() {
@@ -47,6 +49,14 @@ public class CompleteMessage implements Serializable{
 
     public void setMFML(ManufacturingMessageList MFML) {
         this.MFML = MFML;
+    }
+
+    public MetalFieldList getTurnMFL() {
+        return turnMFL;
+    }
+
+    public void setTurnMFL(MetalFieldList turnMFL) {
+        this.turnMFL = turnMFL;
     }
 
 

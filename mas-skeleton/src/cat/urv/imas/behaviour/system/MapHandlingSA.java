@@ -65,10 +65,10 @@ public class MapHandlingSA extends AchieveREResponder {
         SystemAgent agent = (SystemAgent)this.getAgent();
         try {         
             // If the received message is a map.
-            if(msg.getContentObject().getClass().equals(cat.urv.imas.onthology.GameSettings.class)){
+            if(msg.getContentObject().getClass().equals(cat.urv.imas.onthology.CompleteMessage.class)){
                 // sets the value of the agents map to the received map.
-                agent.setRequestedMap(Cell[][]) msg.getContentObject());
-                agent.log("MAP Updated");
+                //agent.setRequestedMap(Cell[][]) msg.getContentObject());
+                //agent.log("MAP Updated");
                 // Send map to below level
 //                ACLMessage mapmsg = new ACLMessage(ACLMessage.INFORM);
 //                mapmsg.clearAllReceiver();
@@ -78,7 +78,7 @@ public class MapHandlingSA extends AchieveREResponder {
 //                mapmsg.setContentObject(agent.getGame());
 //                mapmsg.setLanguage(MessageContent.GET_MAP);
 //                agent.log("Map sent to underlying level");
-                return mapmsg;
+                //return mapmsg;
             }
             
             // If the received message is a String
@@ -90,8 +90,6 @@ public class MapHandlingSA extends AchieveREResponder {
                 }
             }     
         } catch (UnreadableException ex) {
-            Logger.getLogger(MapHandlingSA.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
             Logger.getLogger(MapHandlingSA.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
