@@ -83,7 +83,7 @@ public class ChooseActionSA extends AchieveREResponder {
                 agent.setMetalFieldList(MFList);
                 agent.log("System Agent has received metal fields discovered.");
                 
-                boolean flag = agent.checkTurnChanges();
+                agent.checkTurnChanges();
                 agent.incrementStep();
                 ACLMessage newmap = new ACLMessage(ACLMessage.INFORM);
                 newmap.clearAllReceiver();

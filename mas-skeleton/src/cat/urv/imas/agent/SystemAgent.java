@@ -388,7 +388,7 @@ public class SystemAgent extends ImasAgent {
         }
     }
     
-    public boolean checkTurnChanges() throws Exception {
+    public void checkTurnChanges() throws Exception {
         boolean result = false;
         AID agentID = new AID();
         int[] agentPos = null;
@@ -507,7 +507,7 @@ public class SystemAgent extends ImasAgent {
             Logger.getLogger(SystemAgent.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        return result;
+        
     }
 
 }
