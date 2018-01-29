@@ -82,9 +82,10 @@ public class ContractNetDA extends ContractNetInitiator {
             // Sends the move message to the digger coordinator
             int[] movement = agent.computeMovement(bestdistvec);
             ACLMessage movemsg = new ACLMessage(ACLMessage.INFORM);
+            MovingMessage MMsg = new MovingMessage(agent.getAID(),movement,agent.getCurrentPosition());
             movemsg.clearAllReceiver();
             movemsg.addReceiver(agent.getDiggerCoordinatorAgent());
-            movemsg.setContentObject(movement);
+            movemsg.setContentObject(MMsg);
             movemsg.setLanguage(MessageContent.CHOOSE_ACTION);
             agent.send(movemsg);
             

@@ -69,26 +69,23 @@ public class ChooseActionDCA extends AchieveREResponder {
         try {
             // Declares the current agent so you can use its getters and setters (and other methods)
             DiggerCoordinatorAgent agent = (DiggerCoordinatorAgent)this.getAgent();
-            if(msg.getContentObject().getClass().equals(MetalField.class)){
+            if(msg.getContentObject().getClass().equals(DiggingMessage.class)){
                 List<DiggingMessage> aux = agent.getCurrentDML();
-                DiggingMessage digmes = new DiggingMessage(msg.getSender(),(MetalField)msg.getContentObject());
-                aux.add(digmes);
+                aux.add((DiggingMessage) msg.getContentObject());
                 agent.setCurrentDML(aux);
                 agent.log("Received digging petition.");
 
             }
-            else if(msg.getContentObject().getClass().equals(int[].class)){
+            else if(msg.getContentObject().getClass().equals(MovingMessage.class)){
                 List<MovingMessage> aux = agent.getCurrentMML();
-                MovingMessage movmes = new MovingMessage(msg.getSender(),(int[])msg.getContentObject());
-                aux.add(movmes);
+                aux.add((MovingMessage) msg.getContentObject());
                 agent.setCurrentMML(aux);
                 agent.log("Received movement petition.");
                 
             }
-            else if(msg.getContentObject().getClass().equals(ManufacturingCenterCell.class)){
+            else if(msg.getContentObject().getClass().equals(ManufacturingMessage.class)){
                 List<ManufacturingMessage> aux = agent.getCurrentManML();
-                ManufacturingMessage manmes = new ManufacturingMessage(msg.getSender(), (ManufacturingCenterCell) msg.getContentObject());
-                aux.add(manmes);
+                aux.add((ManufacturingMessage) msg.getContentObject());
                 agent.setCurrentManML(aux);
                 
                 agent.log("Received petition to manufacture.");   

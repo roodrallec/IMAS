@@ -81,19 +81,21 @@ public class ChooseActionDA extends AchieveREResponder {
                         
                         if(abs(manCenDist[0]) <= 1 && abs(manCenDist[1]) <= 1){
                             agent.log("No metal assigned. Manufacture.");
-                            ACLMessage movemsg = new ACLMessage(ACLMessage.INFORM);
-                            movemsg.clearAllReceiver();
-                            movemsg.addReceiver(agent.getDiggerCoordinatorAgent());
-                            movemsg.setContentObject(mancencell);
-                            movemsg.setLanguage(MessageContent.CHOOSE_ACTION);
+                            ACLMessage mfmsg = new ACLMessage(ACLMessage.INFORM);
+                            ManufacturingMessage MFMsg = new ManufacturingMessage(agent.getAID(),mancencell,agent.getCurrentPosition());
+                            mfmsg.clearAllReceiver();
+                            mfmsg.addReceiver(agent.getDiggerCoordinatorAgent());
+                            mfmsg.setContentObject(MFMsg);
+                            mfmsg.setLanguage(MessageContent.CHOOSE_ACTION);
                         }
                         else{
                             agent.log("No metal assigned. Moving towards manufacturing center.");
                             int[] movement = agent.computeMovement(manCenDist);
+                            MovingMessage MMsg = new MovingMessage(agent.getAID(),movement,agent.getCurrentPosition());
                             ACLMessage movemsg = new ACLMessage(ACLMessage.INFORM);
                             movemsg.clearAllReceiver();
                             movemsg.addReceiver(agent.getDiggerCoordinatorAgent());
-                            movemsg.setContentObject(movement);
+                            movemsg.setContentObject(MMsg);
                             movemsg.setLanguage(MessageContent.CHOOSE_ACTION);
                             return movemsg;   
                         }
@@ -126,19 +128,21 @@ public class ChooseActionDA extends AchieveREResponder {
                     if(abs(distance[0]) <= 1 && abs(distance[1]) <= 1){
                         agent.log("Mine.");
                         ACLMessage digmsg = new ACLMessage(ACLMessage.INFORM);
+                        DiggingMessage DMsg = new DiggingMessage(agent.getAID(),agent.getCurrentMF(),agent.getCurrentPosition());
                         digmsg.clearAllReceiver();
                         digmsg.addReceiver(agent.getDiggerCoordinatorAgent());
-                        digmsg.setContentObject(agent.getCurrentMF());
+                        digmsg.setContentObject(DMsg);
                         digmsg.setLanguage(MessageContent.CHOOSE_ACTION);
                         return digmsg;
                     }
                     else{
                         agent.log("Moving toward metal field.");
                         int[] movement = agent.computeMovement(distance);
+                        MovingMessage MMsg = new MovingMessage(agent.getAID(),movement,agent.getCurrentPosition());
                         ACLMessage movemsg = new ACLMessage(ACLMessage.INFORM);
                         movemsg.clearAllReceiver();
                         movemsg.addReceiver(agent.getDiggerCoordinatorAgent());
-                        movemsg.setContentObject(movement);
+                        movemsg.setContentObject(MMsg);
                         movemsg.setLanguage(MessageContent.CHOOSE_ACTION);
                         return movemsg;
                     }

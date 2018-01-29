@@ -100,7 +100,7 @@ public class MapHandling extends AchieveREResponder {
                 agent.log("MAP Updated");  
                 MetalFieldList currentMFL = agent.searchForMetal();
                 agent.log("MetalSearched");
-                MovingMessage movobj = new MovingMessage(agent.getAID(),agent.move());
+                MovingMessage movobj = new MovingMessage(agent.getAID(),agent.move(),agent.getCurrentPosition());
                 agent.log("MetalSearched");
                 reply.setContentObject(currentMFL);
                 ACLMessage movemsg = new ACLMessage(ACLMessage.INFORM);

@@ -389,12 +389,11 @@ public class SystemAgent extends ImasAgent {
             Cell[][] nextTurnMap = this.requestedMap;// = this.requestedMap;
 
             //1. Set up diggers working
-            while (this.diggingRequests.getNumberOfAgentsInList() > 0){
+            while (this.diggingRequests.size() > 0){
                 // get agent name from it's AID
-                AID diggerID = this.diggingRequests.getAgentIDByIndex(0);
-                int[] metalFieldPos = this.diggingRequests.getFieldPosByIndex(0);
-                //int[] diggerPos = this.requestedAgentsPos.getAgentPosByIndex(0);
-                int[] diggerPos = this.diggingRequests.getFieldPosByIndex(0);
+                AID diggerID = this.diggingRequests.get(0).getDigger();
+                int[] metalFieldPos = this.diggingRequests.get(0).getMetalfield().getPosition();
+                int[] diggerPos = this.diggingRequests.get(0).getPosition();
 
                 // Remove 1 metal unit from metal field
                 FieldCell metalFieldCell = (FieldCell) nextTurnMap[metalFieldPos[0]][metalFieldPos[1]];
@@ -407,7 +406,7 @@ public class SystemAgent extends ImasAgent {
                 // Add digger to the current working diggers
                 this.currentWorkingDiggers.setNewAgent(diggerPos, diggerID);
 
-                this.diggingRequests.removeAgentByIndex(0);
+                this.diggingRequests.remove(0);
             }
 
             //2. Movements checking        

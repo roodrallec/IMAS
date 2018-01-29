@@ -16,10 +16,12 @@ import java.io.Serializable;
 public class ManufacturingMessage implements Serializable{
     private AID digger;
     private ManufacturingCenterCell mancell;
+    private int[] position;
 
-    public ManufacturingMessage(AID digger, ManufacturingCenterCell mancell) {
+    public ManufacturingMessage(AID digger, ManufacturingCenterCell mancell,int[] currentPosition) {
         this.digger = digger;
         this.mancell = mancell;
+        this.position = currentPosition;
     }
 
     public AID getDigger() {
@@ -37,9 +39,14 @@ public class ManufacturingMessage implements Serializable{
     public void setMancell(ManufacturingCenterCell mancell) {
         this.mancell = mancell;
     }
-    
-    
 
+    public int[] getPosition() {
+        return position;
+    }
+
+    public void setPosition(int[] position) {
+        this.position = position;
+    }
     
     
 

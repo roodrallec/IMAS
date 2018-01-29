@@ -82,6 +82,7 @@ public class ChooseActionSA extends AchieveREResponder {
                 List<MetalField> MFList = ((MetalFieldList)msg.getContentObject()).getMetalFields();
                 agent.setMetalFieldList(MFList);
                 agent.log("System Agent has received metal fields discovered.");
+                
             }
          
             
