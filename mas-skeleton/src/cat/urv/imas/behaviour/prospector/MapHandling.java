@@ -36,6 +36,7 @@ import cat.urv.imas.onthology.MetalFieldList;
 import cat.urv.imas.onthology.MovingMessage;
 import jade.lang.acl.UnreadableException;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -84,6 +85,7 @@ public class MapHandling extends AchieveREResponder {
                     for (Object prospector : cellprospectors){
                         if (agent.getAID().equals(((InfoAgent)prospector).getAID())){
                             agent.setCurrentPosition(new int[]{((PathCell)cell).getRow(),((PathCell)cell).getCol()});
+                            agent.log(Arrays.toString(agent.getCurrentPosition()));
                             found = true;
                             break;
                         }   
@@ -101,7 +103,7 @@ public class MapHandling extends AchieveREResponder {
                 MetalFieldList currentMFL = agent.searchForMetal();
                 agent.log("MetalSearched");
                 MovingMessage movobj = new MovingMessage(agent.getAID(),agent.move(),agent.getCurrentPosition());
-                agent.log("MetalSearched");
+                //agent.log("MetalSearched");
                 reply.setContentObject(currentMFL);
                 ACLMessage movemsg = new ACLMessage(ACLMessage.INFORM);
                 movemsg.clearAllReceiver();

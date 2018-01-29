@@ -37,6 +37,7 @@ import cat.urv.imas.onthology.MovingMessage;
 import cat.urv.imas.onthology.MovingMessageList;
 import jade.lang.acl.UnreadableException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -132,6 +133,7 @@ public class MapHandling extends AchieveREResponder {
                                    
                     MovingMessageList aux = new MovingMessageList(agent.getMMreceived());
                     agent.setMovereceived(0);
+                    agent.setMMreceived(new ArrayList<MovingMessage>());
                                          
                     ACLMessage MMLmsg = new ACLMessage(ACLMessage.INFORM);
                     MMLmsg.clearAllReceiver();

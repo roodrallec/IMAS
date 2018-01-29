@@ -34,7 +34,7 @@ public class ProspectorAgent extends ImasAgent {
     
     private Cell[] mapView = new Cell[9];
         
-    private int[] currentPosition = new int[]{1,1}; 
+    private int[] currentPosition; 
     
     private ArrayList<MetalField> currentMetalFields = new ArrayList<MetalField>();
  

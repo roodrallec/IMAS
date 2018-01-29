@@ -41,6 +41,7 @@ import jade.domain.FIPAAgentManagement.*;
 import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -399,6 +400,9 @@ public class SystemAgent extends ImasAgent {
             Cell[][] currentMap = this.currentMap;
             // Map where allowed changes will be reflected, at the end of this function, it will be the next turn map to pass to Coordinator Agent
             Cell[][] nextTurnMap = currentMap.clone();
+            
+            Map currentAgentList = this.game.getAgentList();
+            
 
 
             //1. Set up diggers working
@@ -435,7 +439,13 @@ public class SystemAgent extends ImasAgent {
                 }
             }
             
-            //3. Movements checking        
+            //3. Movements checking  
+            //List diggerlist = (ArrayList) currentAgentList.get(AgentType.DIGGER);
+            //List prospectorlist = (ArrayList) currentAgentList.get(AgentType.PROSPECTOR);
+            List<Cell> digglist = new ArrayList<Cell>();
+            List<Cell> prosplist = new ArrayList<Cell>();
+            
+            
             for (int agentIndex = 0; agentIndex < this.requestedAgentsPos.size(); agentIndex++){
 
                 int [] requestedAgentPos = new int[2];
@@ -454,25 +464,47 @@ public class SystemAgent extends ImasAgent {
                             agType = AgentType.DIGGER;
                             DiggerInfoAgent infoAg = new DiggerInfoAgent(agType ,agentID);
                             currentCell.addAgent(infoAg);
+                            digglist.add((Cell)currentCell);
                             int [] currentAgentPos = this.requestedAgentsPos.get(agentIndex).getPosition();
                             currentCell = (PathCell) nextTurnMap[currentAgentPos[0]][currentAgentPos[1]];
                             Thread.yield();
                             currentCell.removeAgent(infoAg); 
+                            
                         } else if (agentID.getName().contains("Prospector")) {
                             agType = AgentType.PROSPECTOR;
                             InfoAgent infoAg2 = new InfoAgent(agType ,agentID);
                             currentCell.addAgent(infoAg2);
+                            prosplist.add((Cell)currentCell);
                             int [] currentAgentPos = this.requestedAgentsPos.get(agentIndex).getPosition();
                             currentCell = (PathCell) nextTurnMap[currentAgentPos[0]][currentAgentPos[1]];
                             Thread.yield();
+                            if(currentCell.getAgents().size()==0){
+                                int a = 0;
+                            }
                             currentCell.removeAgent(infoAg2); 
                         }
 
                        
                     }
+                    else{
+                        if (this.requestedAgentsPos.get(agentIndex).getAgentID().getName().contains("Digger")){
+                            digglist.add((Cell)currentCell);
+                        }
+                        else{
+                            prosplist.add((Cell)currentCell);
+                        }
+                    }
 
                 }
             }
+            
+         
+            Map<AgentType, List<Cell>> newlist = new HashMap<AgentType, List<Cell>>();
+            newlist.put(AgentType.DIGGER, digglist);
+            newlist.put(AgentType.PROSPECTOR, prosplist);
+            
+            this.game.setAgentList(newlist);
+            
 
             //4. Set new metal fields detected to visible
             int[] metalPos = new int[2]; 
