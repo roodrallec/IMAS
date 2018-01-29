@@ -101,17 +101,25 @@ public class ProspectorAgent extends ImasAgent {
         this.shuffleView(); // Randomizes movement when there's equal utility
         int maxCellUtility = -1;
         int[] movement = new int[2];
+        int dx;
+        int dy;
         for(Cell c: this.mapView) {
             if (c instanceof PathCell) {
-                PathCell pc = (PathCell)(c);                            
-                if (pc.getUtility() > maxCellUtility) {
+                PathCell pc = (PathCell)(c);
+                dx = pc.getCol()- this.currentPosition[1];
+                dy = pc.getRow()- this.currentPosition[0];                
+                if (pc.getUtility() > maxCellUtility && !this.diagonalMove(dx, dy)) {
                     maxCellUtility = pc.getUtility();
-                    movement[0] = c.getRow()- this.currentPosition[0];
-                    movement[1] = c.getCol()- this.currentPosition[1];
+                    movement[0] = dy;
+                    movement[1] = dx;
                 }
             }
         }
         return movement;
+    }
+    
+    public boolean diagonalMove(int dx, int dy) {        
+        return (dx != 0 && dy != 0);
     }
     
     public AID getProspectorCoordinatorAgent() {
