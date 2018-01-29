@@ -87,6 +87,7 @@ public class ChooseActionDA extends AchieveREResponder {
                             mfmsg.addReceiver(agent.getDiggerCoordinatorAgent());
                             mfmsg.setContentObject(MFMsg);
                             mfmsg.setLanguage(MessageContent.CHOOSE_ACTION);
+                            agent.setUsedSlots(agent.getUsedSlots()-1);
                         }
                         else{
                             agent.log("No metal assigned. Moving towards manufacturing center.");

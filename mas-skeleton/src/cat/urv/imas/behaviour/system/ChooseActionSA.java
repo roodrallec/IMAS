@@ -70,23 +70,33 @@ public class ChooseActionSA extends AchieveREResponder {
             // Declares the current agent so you can use its getters and setters (and other methods)
             SystemAgent agent = (SystemAgent)this.getAgent();
             if(msg.getContentObject().getClass().equals(CompleteMessage.class)){
-                List<DiggingMessage> DMList= ((DiggingMessageList)msg.getContentObject()).getDiggingMessages();
+                List<DiggingMessage> DMList= ((DiggingMessageList)((CompleteMessage) msg.getContentObject()).getDML()).getDiggingMessages();
                 agent.setDiggingRequests(DMList);
                 agent.log("System Agent has received digging requests.");
-                List<MovingMessage> MMList= ((MovingMessageList)msg.getContentObject()).getMovingMessages();
+                List<MovingMessage> MMList= ((MovingMessageList)((CompleteMessage) msg.getContentObject()).getMML()).getMovingMessages();
                 agent.setRequestedAgentsPos(MMList);
                 agent.log("System Agent has received movements requests.");
-                List<ManufacturingMessage> MFMList= ((ManufacturingMessageList)msg.getContentObject()).getManufacturingMessage();
+                List<ManufacturingMessage> MFMList= ((ManufacturingMessageList)((CompleteMessage) msg.getContentObject()).getMFML()).getManufacturingMessage();
                 agent.setManufactureRequests(MFMList);
                 agent.log("System Agent has received manufacturing requests.");
-                List<MetalField> MFList = ((MetalFieldList)msg.getContentObject()).getMetalFields();
+                List<MetalField> MFList = ((MetalFieldList)((CompleteMessage) msg.getContentObject()).getTurnMFL()).getMetalFields();
                 agent.setMetalFieldList(MFList);
                 agent.log("System Agent has received metal fields discovered.");
+                
+                boolean flag = agent.checkTurnChanges();
+                agent.incrementStep();
+                ACLMessage newmap = new ACLMessage(ACLMessage.INFORM);
+                newmap.clearAllReceiver();
+                newmap.addReceiver(agent.getCoordinatorAgent());
+                newmap.setContentObject(agent.getGame());
+                agent.send(newmap);
                 
             }
          
             
         } catch (UnreadableException ex) {
+            Logger.getLogger(ChooseActionSA.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
             Logger.getLogger(ChooseActionSA.class.getName()).log(Level.SEVERE, null, ex);
         } //catch (IOException ex) {
 //            Logger.getLogger(ChooseActionSA.class.getName()).log(Level.SEVERE, null, ex);

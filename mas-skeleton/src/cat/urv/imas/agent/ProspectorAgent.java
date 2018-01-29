@@ -40,7 +40,7 @@ public class ProspectorAgent extends ImasAgent {
  
     private List<AID> diggerAgents = new ArrayList<AID>();
     
-    private int numDiggers = InitialGameSettings.load("game.settings").getAgentList().get(AgentType.DIGGER).size();
+    private int numDiggers = MessageContent.IGS.getAgentList().get(AgentType.DIGGER).size();
     
     
     

@@ -35,6 +35,7 @@ public class MessageContent {
     public static final String MOVE_ACTION = "MoveAction";
     public static final String MANUFACTURE_ACTION = "ManufactureAction";
     public static final String COALITION = "CoalitionFormation";
+    public static final InitialGameSettings IGS = InitialGameSettings.load("game.settings");
     
     
 }
