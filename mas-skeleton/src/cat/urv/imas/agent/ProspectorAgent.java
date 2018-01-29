@@ -24,6 +24,7 @@ import jade.core.*;
 import jade.domain.*;
 import jade.domain.FIPAAgentManagement.*;
 import jade.lang.acl.*;
+import java.util.List;
 import java.util.Random;
 
 public class ProspectorAgent extends ImasAgent {
@@ -37,6 +38,12 @@ public class ProspectorAgent extends ImasAgent {
     
     private ArrayList<MetalField> currentMetalFields = new ArrayList<MetalField>();
  
+    private List<AID> diggerAgents = new ArrayList<AID>();
+    
+    private int numDiggers = InitialGameSettings.load("game.settings").getAgentList().get(AgentType.DIGGER).size();
+    
+    
+    
     /*      METHODS     */
     public ProspectorAgent() {
         super(AgentType.PROSPECTOR);
@@ -158,11 +165,26 @@ public class ProspectorAgent extends ImasAgent {
         searchCriterion.setType(AgentType.PROSPECTOR_COORDINATOR.toString());
         this.prospectorCoordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);
         
+        // search DiggerAgent
+        searchCriterion.setType(AgentType.DIGGER.toString());
+        for (int i = 1; i <= this.numDiggers; i++ ){
+            searchCriterion.setName("DiggerAgent"+i);
+            this.diggerAgents.add(UtilsAgents.searchAgent(this, searchCriterion));
+        }
+        
+        
         
         
         /*      BEHAVIOURS        */        
         // It triggers when the received message is an INFORM.
         MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
         this.addBehaviour(new MapHandling(this, mt));
+        
+        for (int i = 0; i < diggerAgents.size(); i++){
+        MessageTemplate mt2 = MessageTemplate.and(MessageTemplate.and(MessageTemplate.MatchProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET),
+                MessageTemplate.MatchPerformative(ACLMessage.CFP)),MessageTemplate.MatchSender(diggerAgents.get(i)));
+        
+        this.addBehaviour(new ContractNetPA(this,mt2));
+        }
     }
 }

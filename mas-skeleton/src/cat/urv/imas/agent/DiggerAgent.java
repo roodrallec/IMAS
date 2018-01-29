@@ -59,6 +59,10 @@ public class DiggerAgent extends ImasAgent {
     
     private int[] previousMovement;
     
+    private List<AID> prospectorAgents = new ArrayList<AID>();
+    
+    private int numProspectors = InitialGameSettings.load("game.settings").getAgentList().get(AgentType.PROSPECTOR).size();
+    
     
     /*      METHODS     */
     public DiggerAgent() {
@@ -147,6 +151,22 @@ public class DiggerAgent extends ImasAgent {
 
     public void setPreviousMovement(int[] previousMovement) {
         this.previousMovement = previousMovement;
+    }
+
+    public List<AID> getProspectorAgents() {
+        return prospectorAgents;
+    }
+
+    public void setProspectorAgents(List<AID> prospectorAgents) {
+        this.prospectorAgents = prospectorAgents;
+    }
+
+    public int getNumProspectors() {
+        return numProspectors;
+    }
+
+    public void setNumProspectors(int numProspectors) {
+        this.numProspectors = numProspectors;
     }
        
     
@@ -407,7 +427,14 @@ public class DiggerAgent extends ImasAgent {
         // search CoordinatorAgent
         ServiceDescription searchCriterion = new ServiceDescription();
         searchCriterion.setType(AgentType.DIGGER_COORDINATOR.toString());
-        this.diggerCoordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);        
+        this.diggerCoordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);     
+        
+        // search ProspectorAgents
+        searchCriterion.setType(AgentType.PROSPECTOR.toString());
+        for (int i = 1; i <= this.numProspectors; i++ ){
+            searchCriterion.setName("ProspectorAgent"+i);
+            this.prospectorAgents.add(UtilsAgents.searchAgent(this, searchCriterion));
+        }
         
         
         /*      BEHAVIOURS        */

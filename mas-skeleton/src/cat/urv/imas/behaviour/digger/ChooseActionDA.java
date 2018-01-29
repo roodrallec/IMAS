@@ -30,6 +30,8 @@ import cat.urv.imas.map.*;
 import cat.urv.imas.map.PathCell;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.MessageContent;
+import jade.core.AID;
+import jade.domain.FIPANames;
 import jade.lang.acl.UnreadableException;
 import java.io.IOException;
 import static java.lang.Math.abs;
@@ -99,6 +101,16 @@ public class ChooseActionDA extends AchieveREResponder {
                     else{
                         agent.log("No metal assigned. Follow Prospector.");
                         agent.log("Current Position:" + Arrays.toString(agent.getCurrentPosition()));
+                        
+                        List<AID> candidates = agent.getProspectorAgents();
+                        ACLMessage cnmsg = new ACLMessage(ACLMessage.CFP);
+                        for (int i = 0; i < candidates.size(); i++){
+                            cnmsg.addReceiver(candidates.get(i));
+                        }
+                        cnmsg.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
+                        cnmsg.setContent(MessageContent.COALITION);
+                        
+                        agent.addBehaviour(new ContractNetDA(agent,cnmsg));
                                 // contract net;
                     }
                 }

@@ -300,6 +300,8 @@ public class SystemAgent extends ImasAgent {
 
         UtilsAgents.createAgent(container,"DiggerCoordinatorAgent","cat.urv.imas.agent.DiggerCoordinatorAgent" , null);
         UtilsAgents.createAgent(container,"ProspectorCoordinatorAgent","cat.urv.imas.agent.ProspectorCoordinatorAgent" , null);
+        
+        UtilsAgents.createAgent(container,"CoordinatorAgent","cat.urv.imas.agent.CoordinatorAgent" , null);
                 
         // search CoordinatorAgent
         searchCriterion.setType(AgentType.COORDINATOR.toString());
