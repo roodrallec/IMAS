@@ -24,7 +24,7 @@ import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.InfoAgent;
 import cat.urv.imas.onthology.GamePerformanceIndicators;
 import cat.urv.imas.gui.GraphicInterface;
-import cat.urv.imas.behaviour.system.RequestResponseBehaviour;
+import cat.urv.imas.behaviour.system.*;
 //import cat.urv.imas.map.Cell;
 import cat.urv.imas.map.*;
 import cat.urv.imas.onthology.DiggerInfoAgent;
@@ -85,46 +85,60 @@ public class SystemAgent extends ImasAgent {
         this.requestedMap = requestedMap;
     }
     /**
-     * The Coordinator agent with which interacts sharing game settings every
-     * round.
+     * The Coordinator agent with which interacts sharing game settings every round.
      */
     private AID coordinatorAgent;
-    /**
-     * agentsPos will contain the current positions of all mobile agents.
-     */
-    private AgentsPositions agentsPos = new AgentsPositions();
-    public AgentsPositions getAgentsPositions() {
-        return agentsPos;
-    }
-    public void setAgentsPositions(AgentsPositions agentsPositions) {
-        this.agentsPos = agentsPositions;
-    }
-    /**
-     * requestedDiggersToWork will contain AID of diggers with the x,y location of the metal field that they want to dig.
-     */
-    private AgentsIdAssociatedWithFC requestedDiggersToWork = new AgentsIdAssociatedWithFC();
-    /**
-     * requestedDiggersToWork will contain AID of diggers with the x,y location of the manufacturing center where they would like to manufacture metal.
-     */
-    private AgentsIdAssociatedWithFC requestedDiggersToManufacture = new AgentsIdAssociatedWithFC();
-    /**
-     * diggersFinishDigging will contain AID of diggers that have finished digging in a metal field. It will be used to free the path cell.
-     */
-    private AgentsIdAssociatedWithFC diggersFinishDigging = new AgentsIdAssociatedWithFC();
-
+    
+//    /**
+//     * requestedDiggersToWork will contain AID of diggers with the x,y location of the metal field that they want to dig.
+//     */
+//    private AgentsIdAssociatedWithFC requestedDiggersToWork = new AgentsIdAssociatedWithFC();
+//    /**
+//     * requestedDiggersToWork will contain AID of diggers with the x,y location of the manufacturing center where they would like to manufacture metal.
+//     */
+//    private AgentsIdAssociatedWithFC requestedDiggersToManufacture = new AgentsIdAssociatedWithFC();
+//    /**
+//     * diggersFinishDigging will contain AID of diggers that have finished digging in a metal field. It will be used to free the path cell.
+//     */
+//    private AgentsIdAssociatedWithFC diggersFinishDigging = new AgentsIdAssociatedWithFC();
     
     /**
-     * requestedAgentsPos will contain the requested positions of next turn for
-     * all mobile agents.
+     * currentWorkingDiggers will contain the AID and position of all diggers that are currently digging, this will
+     * be used in order to detect when a digger in this list request a new position and then System Agent will know
+     * that it is needed to free the cell where the digger was working.
      */
-    private AgentsPositions requestedAgentsPos = new AgentsPositions();
+    private ActionsRequests currentWorkingDiggers = new ActionsRequests();
 
-    public AgentsPositions getRequestedAgentsPos() {
+    /**
+     * diggingRequests will contain the requesting diggers AID and current positions of metal fields to dig.
+     */
+    private AgentsIdAssociatedWithFC diggingRequests = new AgentsIdAssociatedWithFC();
+    public AgentsIdAssociatedWithFC getDiggingRequests() {
+        return diggingRequests;
+    }
+    public void setDiggingRequests(AgentsIdAssociatedWithFC movementsRequestsitions) {
+        this.diggingRequests = movementsRequestsitions;
+    }
+    /**
+     * requestedAgentsPos will contain the requested positions of next turn for all mobile agents.
+     */
+    private ActionsRequests requestedAgentsPos = new ActionsRequests();
+    public ActionsRequests getRequestedAgentsPos() {
         return requestedAgentsPos;
     }
-    public void setRequestedAgentsPos(AgentsPositions requestedAgentsPos) {
+    public void setRequestedAgentsPos(ActionsRequests requestedAgentsPos) {
         this.requestedAgentsPos = requestedAgentsPos;
-    }       
+    }
+    /**
+     * manufactureRequests will contain the requesting diggers AID and current positions of manufacturing centers to manufacture.
+     */
+    private AgentsIdAssociatedWithFC manufactureRequests = new AgentsIdAssociatedWithFC();
+    public AgentsIdAssociatedWithFC getManufactureRequests() {
+        return manufactureRequests;
+    }
+    public void setManufactureRequests(AgentsIdAssociatedWithFC requestedAgentsPos) {
+        this.manufactureRequests = requestedAgentsPos;
+    } 
     /**
      * Game settings. The game with the updated changes that the system agent
      * is constructing while checking that all changes are allowed.
@@ -313,9 +327,9 @@ public class SystemAgent extends ImasAgent {
         MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_REQUEST), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
         this.addBehaviour(new RequestResponseBehaviour(this, mt));
         
-        // this behaviour will wait until coordinator agent send the requested map
-        //MessageTemplate mt2 = MessageTemplate.MatchLanguage(MessageContent.GET_MAP);
-        //this.addBehaviour(new RequestResponseBehaviour(this, mt2));
+        // this behaviour will wait until coordinator agent send the requested actions
+        MessageTemplate mt2 = MessageTemplate.MatchLanguage(MessageContent.CHOOSE_ACTION);
+        this.addBehaviour(new ChooseActionSA(this, mt2));
         
         // It triggers when the received message is an INFORM.
         //MessageTemplate mt3 = MessageTemplate.MatchLanguage(MessageContent.CHOOSE_ACTION);
@@ -325,119 +339,138 @@ public class SystemAgent extends ImasAgent {
         // a behaviour to send/receive actions
     }
 
+//    public void updateGUI() {
+//        this.gui.updateGame();
+//    }
+    
+    // Function to update map and game variables
     public void updateGUI() {
+        this.gui.showGameMap(currentMap);
         this.gui.updateGame();
     }
     
-    public void checkTurnChanges() throws Exception {
-        // Current turn map
-        Cell[][] currentMap = this.currentMap;
-        //Cell[][] currentMap;// = this.currentMap;
-        // Map where allowed changes will be reflected, at the end of this function, it will be the next turn map to pass to Coordinator Agent
-        Cell[][] nextTurnMap = this.requestedMap;// = this.requestedMap;
-        
-        //ServiceDescription searchCriterion = new ServiceDescription();
-        
-        //1. Set up diggers working
-        while (this.requestedDiggersToWork.getNumberOfAgentsInList() > 0){
-            // get agent name from it's AID
-            AID diggerID = this.requestedDiggersToWork.getAgentIDByIndex(0);
-            int[] metalFieldPos = this.requestedDiggersToWork.getFieldPosByIndex(0);
-            int[] diggerPos = this.agentsPos.getAgentPosByIndex(0);
-            
-            // Remove 1 metal unit from metal field
-            FieldCell metalFieldCell = (FieldCell) nextTurnMap[metalFieldPos[0]][metalFieldPos[1]];
-            metalFieldCell.removeMetal();
-            
-            // Set digger agent working in the path cell
-            PathCell diggerCell = (PathCell) nextTurnMap[diggerPos[0]][diggerPos[1]];
-            diggerCell.setDiggerAgentWorking();
-            
-            this.requestedDiggersToWork.removeAgentByIndex(0);
-        }
-        
-        //2. Movements checking        
-        for (int agentIndex = 0; agentIndex < this.requestedAgentsPos.getNumberOfAgentsInList(); agentIndex++){
-            
-            int [] requestedAgentPos = this.requestedAgentsPos.getAgentPosByIndex(agentIndex);
-            if (nextTurnMap[requestedAgentPos[0]][requestedAgentPos[1]].getCellType() == CellType.PATH){
-                
-                PathCell currentCell = (PathCell) nextTurnMap[requestedAgentPos[0]][requestedAgentPos[1]];                
-                if (!currentCell.isThereADiggerAgentWorking()) {                    
-                    // Movement allowed
-                    // Obtain all necessary agent info
-                    AID agentID = this.requestedAgentsPos.getAgentAIDByIndex(agentIndex);
-                    
-                    AgentType agType = null;
-                    if (agentID.getName().contains("Digger")){
-                        agType = AgentType.DIGGER;
-                    } else if (agentID.getName().contains("Prospector")) {
-                        agType = AgentType.PROSPECTOR;
-                    }
-                            
-                    InfoAgent infoAg = new InfoAgent(agType ,agentID);
-                    // Add agent to it's new cell
-                    currentCell.addAgent(infoAg);
-                    // Remove agent from it's old cell
-                    int [] currentAgentPos = this.agentsPos.getAgentPosByIndex(agentIndex);
-                    currentCell = (PathCell) nextTurnMap[currentAgentPos[0]][currentAgentPos[1]];
-                    currentCell.removeAgent(infoAg);                    
-                }
-                
-            }
-        }
-        
-        //3. Free cells where digger have finished working
-        while (this.diggersFinishDigging.getNumberOfAgentsInList() > 0){
-            // get agent name from it's AID
-            AID diggerID = this.requestedDiggersToWork.getAgentIDByIndex(0);
-            int[] metalFieldPos = this.requestedDiggersToWork.getFieldPosByIndex(0);
-            int[] diggerPos = this.agentsPos.getAgentPosByIndex(0);
-            
-            // Remove 1 metal unit from metal field
-            FieldCell metalFieldCell = (FieldCell) nextTurnMap[metalFieldPos[0]][metalFieldPos[1]];
-            metalFieldCell.removeMetal();
-            
-            // Set digger agent working in the path cell
-            PathCell diggerCell = (PathCell) nextTurnMap[diggerPos[0]][diggerPos[1]];
-            diggerCell.setDiggerAgentWorking();
-            
-            this.requestedDiggersToWork.removeAgentByIndex(0);
-        }
-        
-        //4. Set new metal fields detected to visible and update metal fields capacity
-        
-        //5. Update manufacturing centers (rewards)
-        while (this.requestedDiggersToManufacture.getNumberOfAgentsInList() > 0){
-            // get agent name from it's AID
-            //AID diggerID = this.requestedDiggersToManufacture.getAgentIDByIndex(0);
-            int[] manufacturingCenterPos = this.requestedDiggersToManufacture.getFieldPosByIndex(0);
-            
-            // Get the manufacturing reward
-            ManufacturingCenterCell manufacturingCenterFieldCell = (ManufacturingCenterCell) nextTurnMap[manufacturingCenterPos[0]][manufacturingCenterPos[1]];
-            // Add the new reward to the accumulated reward
-            gamePerformanceIndicators.addNewReward(manufacturingCenterFieldCell.getPrice());
-            
-            this.requestedDiggersToManufacture.removeAgentByIndex(0);            
-        }
-        
-        // 6.Generate new metal fields randomly
-        // I think that this is done in 
-        // agent.addElementsForThisSimulationStep(); 
-        // in the prepareResultNotification in the RequestResponseBehaviour  
-        
-        //7. Substitute the old map with the new checked map
-        currentMap = nextTurnMap.clone();
-        
-        //8. Now we could update the GUI
-        this.gui.showGameMap(currentMap);
-        this.updateGUI();
-        
-        //9. Decrement one remaining simulation step        
+    public void incrementStep() {
         this.game.setSimulationSteps(this.game.getSimulationSteps() - 1);
         if (this.game.getSimulationSteps() == 0){
             // END GAME
         }
+    }
+    
+    public boolean checkTurnChanges() throws Exception {
+        boolean result = false;
+        
+        try {
+            // Current turn map
+            Cell[][] currentMap = this.currentMap;
+            // Map where allowed changes will be reflected, at the end of this function, it will be the next turn map to pass to Coordinator Agent
+            Cell[][] nextTurnMap = this.requestedMap;// = this.requestedMap;
+
+            //1. Set up diggers working
+            while (this.diggingRequests.getNumberOfAgentsInList() > 0){
+                // get agent name from it's AID
+                AID diggerID = this.diggingRequests.getAgentIDByIndex(0);
+                int[] metalFieldPos = this.diggingRequests.getFieldPosByIndex(0);
+                //int[] diggerPos = this.requestedAgentsPos.getAgentPosByIndex(0);
+                int[] diggerPos = this.diggingRequests.getFieldPosByIndex(0);
+
+                // Remove 1 metal unit from metal field
+                FieldCell metalFieldCell = (FieldCell) nextTurnMap[metalFieldPos[0]][metalFieldPos[1]];
+                metalFieldCell.removeMetal();
+
+                // Set digger agent working in the path cell
+                PathCell diggerCell = (PathCell) nextTurnMap[diggerPos[0]][diggerPos[1]];
+                diggerCell.setDiggerAgentWorking();
+                
+                // Add digger to the current working diggers
+                this.currentWorkingDiggers.setNewAgent(diggerPos, diggerID);
+
+                this.diggingRequests.removeAgentByIndex(0);
+            }
+
+            //2. Movements checking        
+            for (int agentIndex = 0; agentIndex < this.requestedAgentsPos.getNumberOfAgentsInList(); agentIndex++){
+                
+                if (){
+                    
+                }
+
+                int [] requestedAgentPos = this.requestedAgentsPos.getAgentPosByIndex(agentIndex);
+                if (nextTurnMap[requestedAgentPos[0]][requestedAgentPos[1]].getCellType() == CellType.PATH){
+
+                    PathCell currentCell = (PathCell) nextTurnMap[requestedAgentPos[0]][requestedAgentPos[1]];                
+                    if (!currentCell.isThereADiggerAgentWorking()) {                    
+                        // Movement allowed
+                        // Obtain all necessary agent info
+                        AID agentID = this.requestedAgentsPos.getAgentAIDByIndex(agentIndex);
+
+                        AgentType agType = null;
+                        if (agentID.getName().contains("Digger")){
+                            agType = AgentType.DIGGER;
+                        } else if (agentID.getName().contains("Prospector")) {
+                            agType = AgentType.PROSPECTOR;
+                        }
+
+                        InfoAgent infoAg = new InfoAgent(agType ,agentID);
+                        // Add agent to it's new cell
+                        currentCell.addAgent(infoAg);
+                        // Remove agent from it's old cell
+                        int [] currentAgentPos = this.requestedAgentsPos.getAgentPosByIndex(agentIndex);
+                        currentCell = (PathCell) nextTurnMap[currentAgentPos[0]][currentAgentPos[1]];
+                        currentCell.removeAgent(infoAg);                    
+                    }
+
+                }
+            }
+
+            //3. Free cells where digger have finished working
+//            while (this.diggersFinishDigging.getNumberOfAgentsInList() > 0){
+//                // get agent name from it's AID
+//                AID diggerID = this.requestedDiggersToWork.getAgentIDByIndex(0);
+//                int[] metalFieldPos = this.requestedDiggersToWork.getFieldPosByIndex(0);
+//                int[] diggerPos = this.requestedAgentsPos.getAgentPosByIndex(0);
+//
+//                // Remove 1 metal unit from metal field
+//                FieldCell metalFieldCell = (FieldCell) nextTurnMap[metalFieldPos[0]][metalFieldPos[1]];
+//                metalFieldCell.removeMetal();
+//
+//                // Set digger agent working in the path cell
+//                PathCell diggerCell = (PathCell) nextTurnMap[diggerPos[0]][diggerPos[1]];
+//                diggerCell.setDiggerAgentWorking();
+//
+//                this.requestedDiggersToWork.removeAgentByIndex(0);
+//            }
+
+            //4. Set new metal fields detected to visible and update metal fields capacity
+
+            //5. Update manufacturing centers (rewards)
+            while (this.manufactureRequests.getNumberOfAgentsInList() > 0){
+                // get agent name from it's AID
+                //AID diggerID = this.requestedDiggersToManufacture.getAgentIDByIndex(0);
+                int[] manufacturingCenterPos = this.manufactureRequests.getFieldPosByIndex(0);
+
+                // Get the manufacturing reward
+                ManufacturingCenterCell manufacturingCenterFieldCell = (ManufacturingCenterCell) nextTurnMap[manufacturingCenterPos[0]][manufacturingCenterPos[1]];
+                // Add the new reward to the accumulated reward
+                gamePerformanceIndicators.addNewReward(manufacturingCenterFieldCell.getPrice());
+
+                this.manufactureRequests.removeAgentByIndex(0);            
+            }
+
+            // 6.Generate new metal fields randomly
+            // I think that this is done in 
+            // agent.addElementsForThisSimulationStep(); 
+            // in the prepareResultNotification in the RequestResponseBehaviour  
+
+            //7. Substitute the old map with the new checked map
+            currentMap = nextTurnMap.clone();            
+            
+            result = true;
+        
+        } catch (Exception ex) {
+            Logger.getLogger(SystemAgent.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return result;
     }
 
 }

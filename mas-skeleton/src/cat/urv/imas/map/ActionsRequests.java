@@ -13,12 +13,12 @@ import java.util.List;
  *
  * @author ALEIX
  */
-public class AgentsPositions {
+public class ActionsRequests {
     private List<AID> ids = new ArrayList<>();
     private ArrayList<int[]> positions = new ArrayList<>();
     private int agentsInList = 0;
 
-    public AgentsPositions() {
+    public ActionsRequests() {
     }
     
     public int getNumberOfAgentsInList() {
