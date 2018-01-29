@@ -18,7 +18,10 @@
 package cat.urv.imas.onthology;
 
 import cat.urv.imas.agent.AgentType;
+import cat.urv.imas.agent.UtilsAgents;
 import cat.urv.imas.map.*;
+import jade.core.AID;
+import jade.core.Agent;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +35,9 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+
+//import cat.urv.imas.agent.SystemAgent;
+//import jade.domain.FIPAAgentManagement.ServiceDescription;
 
 /**
  * Initial game settings and automatic loading from file.
@@ -166,12 +172,12 @@ public class InitialGameSettings extends GameSettings {
         int cell;
         PathCell c;
         Map<CellType, List<Cell>> cells = new HashMap();
-
+        
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
                 cell = initialMap[row][col];
                 switch (cell) {
-                    case DC:
+                    case DC:                       
                         c = new PathCell(row, col);
                         c.addAgent(new DiggerInfoAgent(AgentType.DIGGER, this.getDiggersCapacity()));
                         map[row][col] = c;

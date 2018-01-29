@@ -178,6 +178,7 @@ public class CoordinatorAgent extends ImasAgent {
         /*      BEHAVIOURS      */
         
         // Request map to System
+
         ACLMessage initialRequest = new ACLMessage(ACLMessage.REQUEST);
         initialRequest.clearAllReceiver();
         initialRequest.addReceiver(this.systemAgent);
@@ -193,7 +194,7 @@ public class CoordinatorAgent extends ImasAgent {
         
         MessageTemplate mt =MessageTemplate.MatchLanguage(MessageContent.DIG_ACTION);
         this.addBehaviour(new ActionHandlingCA(this, mt));
-       
+
         
         
         
