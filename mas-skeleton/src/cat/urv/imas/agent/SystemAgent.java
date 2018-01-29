@@ -452,22 +452,23 @@ public class SystemAgent extends ImasAgent {
                         AgentType agType = null;
                         if (agentID.getName().contains("Digger")){
                             agType = AgentType.DIGGER;
+                            DiggerInfoAgent infoAg = new DiggerInfoAgent(agType ,agentID);
+                            currentCell.addAgent(infoAg);
+                            int [] currentAgentPos = this.requestedAgentsPos.get(agentIndex).getPosition();
+                            currentCell = (PathCell) nextTurnMap[currentAgentPos[0]][currentAgentPos[1]];
+                            Thread.yield();
+                            currentCell.removeAgent(infoAg); 
                         } else if (agentID.getName().contains("Prospector")) {
                             agType = AgentType.PROSPECTOR;
+                            InfoAgent infoAg2 = new InfoAgent(agType ,agentID);
+                            currentCell.addAgent(infoAg2);
+                            int [] currentAgentPos = this.requestedAgentsPos.get(agentIndex).getPosition();
+                            currentCell = (PathCell) nextTurnMap[currentAgentPos[0]][currentAgentPos[1]];
+                            Thread.yield();
+                            currentCell.removeAgent(infoAg2); 
                         }
 
-                        InfoAgent infoAg = new InfoAgent(agType ,agentID);
-                        // Add agent to it's new cell
-                        currentCell.addAgent(infoAg);
-                        Thread.yield();
-                        // Remove agent from it's old cell
-                        int [] currentAgentPos = this.requestedAgentsPos.get(agentIndex).getPosition();
-                        currentCell = (PathCell) nextTurnMap[currentAgentPos[0]][currentAgentPos[1]];
-                        try{
-                            currentCell.removeAgent(infoAg); 
-                        } catch (Exception ex) {
-                         Logger.getLogger(SystemAgent.class.getName()).log(Level.SEVERE, null, ex);
-                        }
+                       
                     }
 
                 }

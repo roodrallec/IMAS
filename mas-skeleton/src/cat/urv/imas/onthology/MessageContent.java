@@ -27,6 +27,7 @@ public class MessageContent {
      * city information.
      */
     public static final String GET_MAP = "Get map";
+    public static final String NEW_MAP = "New map";
     public static final String MAP_RECEIVED = "Map received";
     public static final String OK = "OK";
     public static final String SELECTIVITY = "SelectivityVotingProtocol";

@@ -89,7 +89,8 @@ public class ChooseActionSA extends AchieveREResponder {
                 newmap.clearAllReceiver();
                 newmap.addReceiver(agent.getCoordinatorAgent());
                 newmap.setContentObject(agent.getGame());
-                agent.send(newmap);
+                newmap.setLanguage(MessageContent.NEW_MAP);
+                return newmap;
                 
             }
          

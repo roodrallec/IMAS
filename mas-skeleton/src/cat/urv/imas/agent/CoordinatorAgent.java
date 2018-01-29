@@ -196,7 +196,8 @@ public class CoordinatorAgent extends ImasAgent {
         this.addBehaviour(new ActionHandlingCA(this, mt));
 
         
-        
+        MessageTemplate mt2 =MessageTemplate.MatchLanguage(MessageContent.NEW_MAP);
+        this.addBehaviour(new RequestResponseBehaviour(this, mt2));
         
         
 
