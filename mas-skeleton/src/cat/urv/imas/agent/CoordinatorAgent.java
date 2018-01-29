@@ -142,18 +142,18 @@ public class CoordinatorAgent extends ImasAgent {
         /*      BEHAVIOURS      */
         
         // Request map to System
-        ACLMessage initialRequest = new ACLMessage(ACLMessage.REQUEST);
-        initialRequest.clearAllReceiver();
-        initialRequest.addReceiver(this.systemAgent);
-        initialRequest.setProtocol(InteractionProtocol.FIPA_REQUEST);
-        log("Request message to agent");
-        try {
-            initialRequest.setContent(MessageContent.GET_MAP);
-            log("Request message content:" + initialRequest.getContent());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        this.addBehaviour(new RequesterBehaviour(this, initialRequest));
+//        ACLMessage initialRequest = new ACLMessage(ACLMessage.REQUEST);
+//        initialRequest.clearAllReceiver();
+//        initialRequest.addReceiver(this.systemAgent);
+//        initialRequest.setProtocol(InteractionProtocol.FIPA_REQUEST);
+//        log("Request message to agent");
+//        try {
+//            initialRequest.setContent(MessageContent.GET_MAP);
+//            log("Request message content:" + initialRequest.getContent());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        this.addBehaviour(new RequesterBehaviour(this, initialRequest));
        
         
         

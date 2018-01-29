@@ -36,6 +36,9 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+//import cat.urv.imas.agent.SystemAgent;
+//import jade.domain.FIPAAgentManagement.ServiceDescription;
+
 /**
  * Initial game settings and automatic loading from file.
  *
@@ -176,7 +179,11 @@ public class InitialGameSettings extends GameSettings {
         int[] agentPos = new int[2];
         AID agentID = null;
         
-        //jade.wrapper.AgentContainer container = Agent.getContainerController();
+        
+//        SystemAgent systemAgent = new SystemAgent();
+//        jade.wrapper.AgentContainer container = systemAgent.getContainerController();
+//        
+//        ServiceDescription searchCriterion = new ServiceDescription();
         ///////////////////////////////////
 
         for (int row = 0; row < rows; row++) {
@@ -188,7 +195,7 @@ public class InitialGameSettings extends GameSettings {
 //                        agentPos = new int[] {row,col};
 //                        UtilsAgents.createAgent(container,"DiggerAgent"+diggersCount,"cat.urv.imas.agent.DiggerAgent" , null);
 //                        //Search the new created agent AID
-//                        searchCriterion.setName("DiggerAgent"+i);
+//                        searchCriterion.setName("DiggerAgent"+diggersCount);
 //                        agentID = UtilsAgents.searchAgent(this, searchCriterion);
                     
                         

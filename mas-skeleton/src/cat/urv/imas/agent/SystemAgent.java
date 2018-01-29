@@ -62,10 +62,22 @@ public class SystemAgent extends ImasAgent {
      * Current turn map.
      */
     private Cell[][] currentMap;// = (Cell[][]) this.game.getMap();
+    public Cell[][] getCurrentMap() {
+        return currentMap;
+    }
+    public void setCurrentMap(Cell[][] currentMap) {
+        this.currentMap = currentMap;
+    }
     /**
      * Requested map. The map that coordinator agent retrieve to System Agent. System Agent has to check if it is possible.
      */
     private Cell[][] requestedMap; // = (Cell[][]) this.game.getMap();
+    public Cell[][] getRequestedMap() {
+        return requestedMap;
+    }
+    public void setRequestedMap(Cell[][] requestedMap) {
+        this.requestedMap = requestedMap;
+    }
     /**
      * The Coordinator agent with which interacts sharing game settings every
      * round.
@@ -212,101 +224,67 @@ public class SystemAgent extends ImasAgent {
             log("GUI loaded");
         } catch (Exception e) {
             e.printStackTrace();
-        }
-        /*
-        ---------------
-        MY CODE - START
-        ---------------
-         */ 
+        }        
         
         // 4. Load all agents defined in game.settings
-        int numDiggers = this.game.getAgentList().get(AgentType.DIGGER).size();
-        int numProspectors = this.game.getAgentList().get(AgentType.PROSPECTOR).size();
+        //int numDiggers = this.game.getAgentList().get(AgentType.DIGGER).size();
+        //int numProspectors = this.game.getAgentList().get(AgentType.PROSPECTOR).size();
         
         jade.wrapper.AgentContainer container = this.getContainerController();
-        
-        UtilsAgents.createAgent(container,"DiggerCoordinatorAgent","cat.urv.imas.agent.DiggerCoordinatorAgent" , null);
-        UtilsAgents.createAgent(container,"ProspectorCoordinatorAgent","cat.urv.imas.agent.ProspectorCoordinatorAgent" , null);
-        
-        ServiceDescription searchCriterion = new ServiceDescription(); 
-        
                
+        ServiceDescription searchCriterion = new ServiceDescription(); 
+                      
         int[][] initialMap = this.game.getInitialMap();
-        this.currentMap = this.game.getMap();
-        
-//        Cell[][] auxMap = (Cell[][]) this.game.getMap();
-//        
-//        PathCell auxCell = (PathCell) auxMap[2][2];
-//        
-//        String strAux = auxCell.toString();
-        
-        //AID agentID = this.getAID();
-                    
-        //AgentType agType = null;
-        //agType = AgentType.DIGGER;
-        //InfoAgent infoAg = new InfoAgent(agType ,agentID);
-        // Add agent to it's new cell
-        //auxCell.addAgent((InfoAgent) infoAg);
-                
+        //this.currentMap = this.game.getMap();                
                 
         int diggersCount = 1;
         int prospectorsCount = 1;
-        int[] agentPos = new int[2];
+        //int[] agentPos = new int[2];
         AID agentID = null;
         InfoAgent infoAg = null;
-        AgentType agType;
-        PathCell currentCell;
-        Agents agent;
+        AgentType agType = null;
+        PathCell currentCell = null;
+        Agents agent = null;
         
         for (int i = 0; i < initialMap.length; i++){       
-            for (int j = 0; j < initialMap.length; j++){                              
+            for (int j = 0; j < initialMap.length; j++){  
                 if (initialMap[i][j] == -1){
-                    agentPos = new int[] {i,j};
+                    //agentPos = new int[] {i,j};
                     UtilsAgents.createAgent(container,"DiggerAgent"+diggersCount,"cat.urv.imas.agent.DiggerAgent" , null);
                     //Search the new created agent AID
-                    searchCriterion.setName("DiggerAgent"+i);
-                    agentID = UtilsAgents.searchAgent(this, searchCriterion);                    
+                    searchCriterion.setName("DiggerAgent"+diggersCount);
+                    agentID = UtilsAgents.searchAgent(this, searchCriterion);                                     
                     
-                    
-                    
-                    currentCell = (PathCell) this.currentMap[agentPos[0]][agentPos[1]];
+                    //currentCell = (PathCell) this.currentMap[agentPos[0]][agentPos[1]];
+                    currentCell = (PathCell) this.game.get(i,j);
                     
                     agType = AgentType.DIGGER;
                     agent = currentCell.getAgents();
+                    // Obtain agent in current cell info (as this case is the initial map, AID of the agent lacks
                     try {
                         infoAg = agent.getFirst();
                     } catch (Exception ex) {
                         Logger.getLogger(SystemAgent.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    
+                    // Set the agent AID, without modifying agent type, after setting AID all agents will be able to know the position of all agents in the current map
+                    // This condition check that there is only one agent in cell and this agent is a DIGGER
                     if ((infoAg.getType() == agType) && (agent.size() == 1)){
                         infoAg.setAID(agentID);
                     }
-                            
-                    
-//                    infoAg = new InfoAgent(agType ,agentID);
-//                    try {
-//                        currentCell.addAgent(infoAg);
-//                    } catch (Exception ex) {
-//                        Logger.getLogger(SystemAgent.class.getName()).log(Level.SEVERE, null, ex);
-//                    }
-//                    
-//                    agent = currentCell.getAgents();
-//                    String auxStr = agent.toString();
-//                    
 //                    
 //                    //Add the new agent to agents positions list
 //                    this.agentsPos.setNewAgent(agentPos, agentID);
                     diggersCount++;
                     
                 } else if (initialMap[i][j] == -2) {
-                    agentPos = new int[] {i,j};
+                    //agentPos = new int[] {i,j};
                     UtilsAgents.createAgent(container,"ProspectorAgent"+prospectorsCount,"cat.urv.imas.agent.ProspectorAgent" , null);
                     //Search the new created agent AID
-                    searchCriterion.setName("ProspectorAgent"+i);
+                    searchCriterion.setName("ProspectorAgent"+prospectorsCount);
                     agentID = UtilsAgents.searchAgent(this, searchCriterion); 
                     
-                    currentCell = (PathCell) this.currentMap[agentPos[0]][agentPos[1]];
+                    //currentCell = (PathCell) this.currentMap[agentPos[0]][agentPos[1]];
+                    currentCell = (PathCell) this.game.get(i,j);
                     
                     agType = AgentType.PROSPECTOR;
                     agent = currentCell.getAgents();
@@ -319,25 +297,18 @@ public class SystemAgent extends ImasAgent {
                     if ((infoAg.getType() == agType) && (agent.size() == 1)){
                         infoAg.setAID(agentID);
                     }
-                    
-                    
-                    
-                    //Add the new agent to agents positions list
-                    //this.agentsPos.setNewAgent(agentPos, agentID);
-                    prospectorsCount++;
+                   
+//                    //Add the new agent to agents positions list
+//                    //this.agentsPos.setNewAgent(agentPos, agentID);
+//                    prospectorsCount++;
                 }
             }
         }
 
-        /*
-        ---------------
-        MY CODE - END
-        ---------------
-         */
-        
-
+        UtilsAgents.createAgent(container,"DiggerCoordinatorAgent","cat.urv.imas.agent.DiggerCoordinatorAgent" , null);
+        UtilsAgents.createAgent(container,"ProspectorCoordinatorAgent","cat.urv.imas.agent.ProspectorCoordinatorAgent" , null);
+                
         // search CoordinatorAgent
-        //ServiceDescription searchCriterion = new ServiceDescription();
         searchCriterion.setType(AgentType.COORDINATOR.toString());
         this.coordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);
         // searchAgent is a blocking method, so we will obtain always a correct AID
@@ -456,9 +427,22 @@ public class SystemAgent extends ImasAgent {
         }
         
         // 6.Generate new metal fields randomly
+        // I think that this is done in 
+        // agent.addElementsForThisSimulationStep(); 
+        // in the prepareResultNotification in the RequestResponseBehaviour  
         
+        //7. Substitute the old map with the new checked map
+        currentMap = nextTurnMap.clone();
         
+        //8. Now we could update the GUI
+        this.gui.showGameMap(currentMap);
+        this.updateGUI();
         
+        //9. Decrement one remaining simulation step        
+        this.game.setSimulationSteps(this.game.getSimulationSteps() - 1);
+        if (this.game.getSimulationSteps() == 0){
+            // END GAME
+        }
     }
 
 }
