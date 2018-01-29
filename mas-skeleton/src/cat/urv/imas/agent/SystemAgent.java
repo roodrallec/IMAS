@@ -28,9 +28,15 @@ import cat.urv.imas.behaviour.system.*;
 //import cat.urv.imas.map.Cell;
 import cat.urv.imas.map.*;
 import cat.urv.imas.onthology.DiggerInfoAgent;
+import cat.urv.imas.onthology.DiggingMessage;
+import cat.urv.imas.onthology.ManufacturingMessage;
 import cat.urv.imas.onthology.MessageContent;
 import cat.urv.imas.onthology.MetalField;
+<<<<<<< HEAD
 import cat.urv.imas.onthology.MetalFieldList;
+=======
+import cat.urv.imas.onthology.MovingMessage;
+>>>>>>> 51ba84345194e4c0805d27bcb68b099af8d3cf2d
 //import jade.Boot;
 import jade.core.*;
 import jade.domain.*;
@@ -39,6 +45,7 @@ import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.*;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -97,37 +104,55 @@ public class SystemAgent extends ImasAgent {
      * that it is needed to free the cell where the digger was working.
      */
     private ActionsRequests currentWorkingDiggers = new ActionsRequests();
-
     /**
      * diggingRequests will contain the requesting diggers AID and current positions of metal fields to dig.
      */
-    private AgentsIdAssociatedWithFC diggingRequests = new AgentsIdAssociatedWithFC();
-    public AgentsIdAssociatedWithFC getDiggingRequests() {
+    private List<DiggingMessage> diggingRequests = new ArrayList<DiggingMessage>();
+
+    public List<DiggingMessage> getDiggingRequests() {
         return diggingRequests;
     }
-    public void setDiggingRequests(AgentsIdAssociatedWithFC movementsRequestsitions) {
-        this.diggingRequests = movementsRequestsitions;
+
+    public void setDiggingRequests(List<DiggingMessage> diggingRequests) {
+        this.diggingRequests = diggingRequests;
     }
+
     /**
      * requestedAgentsPos will contain the requested positions of next turn for all mobile agents.
      */
-    private ActionsRequests requestedAgentsPos = new ActionsRequests();
-    public ActionsRequests getRequestedAgentsPos() {
+    private List<MovingMessage> requestedAgentsPos = new ArrayList<MovingMessage>();
+
+    public List<MovingMessage> getRequestedAgentsPos() {
         return requestedAgentsPos;
     }
-    public void setRequestedAgentsPos(ActionsRequests requestedAgentsPos) {
+
+    public void setRequestedAgentsPos(List<MovingMessage> requestedAgentsPos) {
         this.requestedAgentsPos = requestedAgentsPos;
     }
+
     /**
      * manufactureRequests will contain the requesting diggers AID and current positions of manufacturing centers to manufacture.
      */
-    private AgentsIdAssociatedWithFC manufactureRequests = new AgentsIdAssociatedWithFC();
-    public AgentsIdAssociatedWithFC getManufactureRequests() {
+    private List<ManufacturingMessage> manufactureRequests = new ArrayList<ManufacturingMessage>();
+
+    public List<ManufacturingMessage> getManufactureRequests() {
         return manufactureRequests;
     }
-    public void setManufactureRequests(AgentsIdAssociatedWithFC requestedAgentsPos) {
-        this.manufactureRequests = requestedAgentsPos;
-    } 
+
+    public void setManufactureRequests(List<ManufacturingMessage> manufactureRequests) {
+        this.manufactureRequests = manufactureRequests;
+    }
+
+    private List<MetalField> metalFieldList = new ArrayList<MetalField>();
+
+    public List<MetalField> getMetalFieldList() {
+        return metalFieldList;
+    }
+
+    public void setMetalFieldList(List<MetalField> metalFieldList) {
+        this.metalFieldList = metalFieldList;
+    }
+    
     /**
      * knownMetalCells will contain the current metal fields known by all agents.
      */
@@ -370,13 +395,17 @@ public class SystemAgent extends ImasAgent {
             // Map where allowed changes will be reflected, at the end of this function, it will be the next turn map to pass to Coordinator Agent
             Cell[][] nextTurnMap = this.requestedMap;// = this.requestedMap;
 
+<<<<<<< HEAD
             //1. Set up diggers working and update metal fields capacity
             while (this.diggingRequests.getNumberOfAgentsInList() > 0){
+=======
+            //1. Set up diggers working
+            while (this.diggingRequests.size() > 0){
+>>>>>>> 51ba84345194e4c0805d27bcb68b099af8d3cf2d
                 // get agent name from it's AID
-                AID diggerID = this.diggingRequests.getAgentIDByIndex(0);
-                int[] metalFieldPos = this.diggingRequests.getFieldPosByIndex(0);
-                //int[] diggerPos = this.requestedAgentsPos.getAgentPosByIndex(0);
-                int[] diggerPos = this.diggingRequests.getFieldPosByIndex(0);
+                AID diggerID = this.diggingRequests.get(0).getDigger();
+                int[] metalFieldPos = this.diggingRequests.get(0).getMetalfield().getPosition();
+                int[] diggerPos = this.diggingRequests.get(0).getPosition();
 
                 // Remove 1 metal unit from metal field
                 FieldCell metalFieldCell = (FieldCell) nextTurnMap[metalFieldPos[0]][metalFieldPos[1]];
@@ -389,7 +418,7 @@ public class SystemAgent extends ImasAgent {
                 // Add digger to the current working diggers
                 this.currentWorkingDiggers.setNewAgent(diggerPos, diggerID);
 
-                this.diggingRequests.removeAgentByIndex(0);
+                this.diggingRequests.remove(0);
             }
             
             //2. Free cells where digger agents have finished working            

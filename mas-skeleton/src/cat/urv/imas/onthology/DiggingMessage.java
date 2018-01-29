@@ -15,10 +15,12 @@ import java.io.Serializable;
 public class DiggingMessage implements Serializable{
     private AID digger;
     private MetalField metalfield;
+    private int[] position; 
 
-    public DiggingMessage(AID digger, MetalField metalfield) {
+    public DiggingMessage(AID digger, MetalField metalfield, int[] position) {
         this.digger = digger;
         this.metalfield = metalfield;
+        this.position = position;
     }
 
     public AID getDigger() {
@@ -35,6 +37,14 @@ public class DiggingMessage implements Serializable{
 
     public void setMetalfield(MetalField metalfield) {
         this.metalfield = metalfield;
+    }
+
+    public int[] getPosition() {
+        return position;
+    }
+
+    public void setPosition(int[] position) {
+        this.position = position;
     }
     
     

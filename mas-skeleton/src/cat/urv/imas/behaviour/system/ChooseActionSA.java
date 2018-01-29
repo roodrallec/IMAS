@@ -69,19 +69,22 @@ public class ChooseActionSA extends AchieveREResponder {
         try {
             // Declares the current agent so you can use its getters and setters (and other methods)
             SystemAgent agent = (SystemAgent)this.getAgent();
-            if(msg.getContentObject().getClass().equals(MetalField.class)){
-                agent.setDiggingRequests((AgentsIdAssociatedWithFC) msg.getContentObject());
+            if(msg.getContentObject().getClass().equals(CompleteMessage.class)){
+                List<DiggingMessage> DMList= ((DiggingMessageList)msg.getContentObject()).getDiggingMessages();
+                agent.setDiggingRequests(DMList);
                 agent.log("System Agent has received digging requests.");
-            }
-            else if(msg.getContentObject().getClass().equals(int[].class)){
-                agent.setRequestedAgentsPos((ActionsRequests) msg.getContentObject());
+                List<MovingMessage> MMList= ((MovingMessageList)msg.getContentObject()).getMovingMessages();
+                agent.setRequestedAgentsPos(MMList);
                 agent.log("System Agent has received movements requests.");
+                List<ManufacturingMessage> MFMList= ((ManufacturingMessageList)msg.getContentObject()).getManufacturingMessage();
+                agent.setManufactureRequests(MFMList);
+                agent.log("System Agent has received manufacturing requests.");
+                List<MetalField> MFList = ((MetalFieldList)msg.getContentObject()).getMetalFields();
+                agent.setMetalFieldList(MFList);
+                agent.log("System Agent has received metal fields discovered.");
                 
             }
-            else if(msg.getContentObject().getClass().equals(ManufacturingCenterCell.class)){
-                agent.setManufactureRequests((AgentsIdAssociatedWithFC) msg.getContentObject());
-                agent.log("System Agent has received manufacturing requests.");   
-            }            
+         
             
         } catch (UnreadableException ex) {
             Logger.getLogger(ChooseActionSA.class.getName()).log(Level.SEVERE, null, ex);
