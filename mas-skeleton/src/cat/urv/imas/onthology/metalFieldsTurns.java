@@ -12,11 +12,11 @@ import java.util.HashMap;
  *
  * @author ALEIX
  */
-public class metalFieldsTurns {
+public class MetalFieldsTurns {
     //private List<FieldCell> metalFieldsList = new ArrayList<>();
     private HashMap metalFieldsList = new HashMap();
 
-    public metalFieldsTurns() {
+    public MetalFieldsTurns() {
     }    
     
     public void addNewMetalField(FieldCell fieldCell) {
