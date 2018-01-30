@@ -246,11 +246,11 @@ public class InitialGameSettings extends GameSettings {
         int maxInitial = this.getNumberInitialElements();
         int maxVisible = this.getNumberVisibleInitialElements();
 
-        addElements(maxInitial, maxVisible);
+        addElements(maxInitial, maxVisible, null);
     }
 
 
-    public void addElements(int maxElements, int maxVisible) {
+    public MetalFieldsTurns addElements(int maxElements, int maxVisible, MetalFieldsTurns undiscoveredMetalList) {
         CellType ctype = CellType.FIELD;
         int maxCells = getNumberOfCellsOfType(ctype);
         int freeCells = this.getNumberOfCellsOfType(ctype, true);
@@ -260,7 +260,7 @@ public class InitialGameSettings extends GameSettings {
         }
         if (maxElements > freeCells) {
             //throw new Error(getClass().getCanonicalName() + " : Not allowed add more elements than empty cells.");
-            return;
+            return undiscoveredMetalList;
         }
         if (maxVisible < 0) {
             throw new Error(getClass().getCanonicalName() + " : Not allowed negative number of visible elements.");
@@ -274,7 +274,7 @@ public class InitialGameSettings extends GameSettings {
                 maxCells + " cells (" + freeCells + " of them candidate).");
 
         if (0 == maxElements) {
-            return;
+            return undiscoveredMetalList;
         }
 
         Set<Integer> initialSet = new TreeSet();
@@ -300,8 +300,9 @@ public class InitialGameSettings extends GameSettings {
             type = types[numberGenerator.nextInt(types.length)];
             amount = numberGenerator.nextInt(this.getMaxAmountOfNewMetal()) + 1;
             visible = visibleSet.contains(i);
-            setElements(type, amount, visible, i);
+            setElements(type, amount, visible, i, undiscoveredMetalList);
         }
+        return undiscoveredMetalList;
     }
 
     /**
@@ -321,12 +322,16 @@ public class InitialGameSettings extends GameSettings {
      * @param ncell number of cell from a given list.
      * @param visible visible to agents?
      */
-    private void setElements(MetalType type, int amount, boolean visible, int ncell) {
+    private MetalFieldsTurns setElements(MetalType type, int amount, boolean visible, int ncell, MetalFieldsTurns undiscoveredMetalList) {
         SettableFieldCell cell = (SettableFieldCell)cellsOfType.get(CellType.FIELD).get(ncell);
         cell.setElements(type, amount);
         if (visible) {
             cell.detectMetal();
+        } else {
+            undiscoveredMetalList.addNewMetalField(cell);
         }
+        
+        return undiscoveredMetalList;
     }
 
     /**
@@ -340,7 +345,7 @@ public class InitialGameSettings extends GameSettings {
      * This process also checks that if there is room for the given number of
      * cells. Otherwise and error is thrown.
      */
-    public void addElementsForThisSimulationStep() {
+    public MetalFieldsTurns addElementsForThisSimulationStep(MetalFieldsTurns undiscoveredMetalList) {
         int probabilityOfNewElements = this.getNewMetalProbability();
         int stepProbability = numberGenerator.nextInt(100) +1;
 
@@ -348,7 +353,7 @@ public class InitialGameSettings extends GameSettings {
             System.out.println(getClass().getCanonicalName() + " : " + stepProbability +
                     " < " + probabilityOfNewElements +
                     " (step probability for new elements < probability of new elements)");
-            return;
+            return undiscoveredMetalList;
         }
 
         int maxCells = this.getMaxNumberFieldsWithNewMetal();
@@ -356,7 +361,8 @@ public class InitialGameSettings extends GameSettings {
 
         // add elements to the given number of cells for this simulation step.
         // all of them hidden.
-        addElements(numberCells, 0);
+        addElements(numberCells, 0, undiscoveredMetalList);
+        return undiscoveredMetalList;
     }
 
     /**

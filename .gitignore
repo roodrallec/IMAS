@@ -6,3 +6,4 @@ mas-skeleton/src/cat/urv/imas/agent/SystemAgent.java
 !/mas-skeleton/src/cat/urv/imas/behaviour/prospectorcoordinator/MapHandlingPC.java
 /mas-skeleton/dist/
 !/mas-skeleton/src/cat/urv/imas/onthology/metalFieldsTurns.java
+!/mas-skeleton/src/cat/urv/imas/onthology/MetalFieldsTurns.java
