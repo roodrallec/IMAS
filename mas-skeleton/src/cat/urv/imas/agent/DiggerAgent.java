@@ -200,7 +200,7 @@ public class DiggerAgent extends ImasAgent {
                 else{
                      unitbid = this.getParameters()[0]*1.0*mf.getQuantity()/EmptySlots + this.getParameters()[1]*1.0*EmptySlots;
                 }
-                if(distbid == 0){
+                if(abs(this.currentPosition[0]-mf.getPosition()[0]) <=1 && abs(this.currentPosition[1]-mf.getPosition()[1])<=1){
                     bids[i] = 10000;
                 }
                 else{
