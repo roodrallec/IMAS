@@ -365,7 +365,6 @@ public class SystemAgent extends ImasAgent {
         // END GAME
         if (this.game.getSimulationSteps() == 0){
             this.log("GAME OVER");
-            this.doDelete();
         }
         
         // ADD new metal fields
@@ -506,7 +505,7 @@ public class SystemAgent extends ImasAgent {
                 FieldCell metalCell = (FieldCell) nextTurnMap[metalPos[0]][metalPos[1]];                
                 metalCell.detectMetal();
                 this.discoveredMetalField.addNewMetalField(metalCell);
-                //this.gamePerformanceIndicators.addTurnsForDiscoveringMetal(this.undiscoveredMetalField.getMetalField(metalCell));
+                this.gamePerformanceIndicators.addTurnsForDiscoveringMetal(this.undiscoveredMetalField.getMetalField(metalCell));
                 this.undiscoveredMetalField.removeMetalField(metalCell);
             }
 
