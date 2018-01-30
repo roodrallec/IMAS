@@ -41,7 +41,7 @@ public class DiggerAgent extends ImasAgent {
     
     private GameSettings game;
     
-    private int[] currentPosition; //This has to be initializaed (TODO Aleix)
+    private int[] currentPosition; 
     
     private boolean waitingMapFlag = true;
     
