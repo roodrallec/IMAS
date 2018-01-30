@@ -522,7 +522,7 @@ public class SystemAgent extends ImasAgent {
 
             //6. Substitute the old map with the new checked map
             currentMap = nextTurnMap.clone();            
-            Thread.sleep(10);
+            //Thread.sleep(10);
             result = true;
         
         } catch (Exception ex) {
