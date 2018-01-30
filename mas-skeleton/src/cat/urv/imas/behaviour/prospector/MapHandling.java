@@ -97,11 +97,13 @@ public class MapHandling extends AchieveREResponder {
                 
                 
                 
-                Cell[][] map = ((GameMapUtility)msg.getContentObject()).getUtilitymap();
+                Cell[][] map = ((GameMapUtility)msg.getContentObject()).getGame().getMap();
                 agent.setMapView(map);
                 agent.log("MAP Updated");  
                 MetalFieldList currentMFL = agent.searchForMetal();
                 agent.log("MetalSearched");
+                Cell[][] map2 = ((GameMapUtility)msg.getContentObject()).getUtilitymap();
+                agent.setMapView(map2);
                 MovingMessage movobj = new MovingMessage(agent.getAID(),agent.move(),agent.getCurrentPosition());
                 //agent.log("MetalSearched");
                 reply.setContentObject(currentMFL);

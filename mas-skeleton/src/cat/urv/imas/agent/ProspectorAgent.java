@@ -71,9 +71,8 @@ public class ProspectorAgent extends ImasAgent {
         int quantity = 0;
         String metal = "";
         for(Cell c: this.mapView) {
-            if (c instanceof SettableFieldCell){
-                SettableFieldCell fc = (SettableFieldCell)(c);
-                //if(!((FieldCell)fc).isEmpty()){
+            if (c instanceof FieldCell){
+                FieldCell fc = (FieldCell)(c);
                     if (fc.detectMetal().size() == 1) {                    
                         quantity = (int) (fc.detectMetal().values().toArray()[0]);                    
                         metal = (fc.detectMetal().keySet().toArray())[0].toString();
@@ -88,7 +87,7 @@ public class ProspectorAgent extends ImasAgent {
                         MetalField currentMetal = new MetalField(metalLocation, metal, quantity);
                         this.currentMetalFields.add(currentMetal);
                     }
-                //}
+                
                 
             }         
         }        

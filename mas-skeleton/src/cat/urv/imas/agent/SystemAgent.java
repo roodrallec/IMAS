@@ -351,7 +351,9 @@ public class SystemAgent extends ImasAgent {
     public void incrementStep() {
 
         // Update statistics window
+
         this.gui.showStatistics(this.gamePerformanceIndicators);
+
         
         this.undiscoveredMetalField.incrementTurn();
         this.discoveredMetalField.incrementTurn();
@@ -359,7 +361,7 @@ public class SystemAgent extends ImasAgent {
         this.game.setSimulationSteps(this.game.getSimulationSteps() - 1);
         
         this.game.setTitle("TURNS LEFT: " + String.valueOf(this.game.getSimulationSteps()));
-        
+        this.log(this.game.getTitle());
         // END GAME
         if (this.game.getSimulationSteps() == 0){
             this.log("GAME OVER");
@@ -425,7 +427,8 @@ public class SystemAgent extends ImasAgent {
                 if (this.currentWorkingDiggers.getAllAgentsAID().contains(agentID)){
                     agentPos = this.currentWorkingDiggers.getAgentById(agentID);
                     currentCell = (PathCell) nextTurnMap[agentPos[0]][agentPos[1]];
-                    currentCell.removeDiggerAgentWorking();                   
+                    currentCell.removeDiggerAgentWorking();   
+                    this.currentWorkingDiggers.removeAgentById(agentID);
                 }
             }
             
