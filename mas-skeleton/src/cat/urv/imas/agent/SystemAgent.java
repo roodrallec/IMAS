@@ -365,6 +365,7 @@ public class SystemAgent extends ImasAgent {
         // END GAME
         if (this.game.getSimulationSteps() == 0){
             this.log("GAME OVER");
+            this.doDelete();
         }
         
         // ADD new metal fields
