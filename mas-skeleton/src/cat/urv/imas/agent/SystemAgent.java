@@ -339,6 +339,7 @@ public class SystemAgent extends ImasAgent {
         
         // this behaviour will wait until coordinator agent send the requested actions
         MessageTemplate mt2 = MessageTemplate.MatchLanguage(MessageContent.CHOOSE_ACTION);
+        this.addBehaviour(new ChooseActionSA(this,mt2));
 
         // Setup finished. When the last inform is received, the agent itself will add
         // a behaviour to send/receive actions
@@ -511,7 +512,7 @@ public class SystemAgent extends ImasAgent {
 
             //7. Substitute the old map with the new checked map
             currentMap = nextTurnMap.clone();            
-            //Thread.sleep(1000);
+            Thread.sleep(1000);
             result = true;
         
         } catch (Exception ex) {
