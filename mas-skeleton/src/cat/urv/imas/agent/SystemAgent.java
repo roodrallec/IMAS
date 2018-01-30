@@ -154,10 +154,10 @@ public class SystemAgent extends ImasAgent {
      */
     private PathCell pathCell;
     /**
-     * Path cell info.
+     * Game performance info.
      */
     private GamePerformanceIndicators gamePerformanceIndicators;
-
+    
     public AID getCoordinatorAgent() {
         return coordinatorAgent;
     }
@@ -351,7 +351,10 @@ public class SystemAgent extends ImasAgent {
     }
     
     // Function to go one step ahead
-    public void incrementStep() {        
+    public void incrementStep() {
+
+        // Update statistics window
+        this.gui.showStatistics(gamePerformanceIndicators);
         
         // Substract one remaining turn
         this.game.setSimulationSteps(this.game.getSimulationSteps() - 1);
@@ -368,6 +371,8 @@ public class SystemAgent extends ImasAgent {
 //        this.game.getMaxNumberFieldsWithNewMetal()
 //        this.game.getNewMetalProbability()
         this.addElementsForThisSimulationStep();
+        
+        
         
         this.updateGUI();
     }

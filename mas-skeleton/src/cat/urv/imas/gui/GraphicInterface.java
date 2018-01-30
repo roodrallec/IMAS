@@ -18,13 +18,16 @@
 package cat.urv.imas.gui;
 
 import cat.urv.imas.map.Cell;
+import cat.urv.imas.onthology.GamePerformanceIndicators;
 import cat.urv.imas.onthology.GameSettings;
+import cat.urv.imas.onthology.MetalType;
 import java.awt.*;
 import javax.swing.*;
 import java.awt.Font;
 import java.awt.Dimension;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
+import java.util.ArrayList;
 
 /**
  * Main class of the graphical interface controlled by the System Agent. It
@@ -163,8 +166,23 @@ public class GraphicInterface extends JFrame {
      *
      * @param msg String per mostrar
      */
-    public void showStatistics(String msg) {
-        this.jStatisticsPanel.showMessage(msg);
+    public void showStatistics(GamePerformanceIndicators gamePerformanceIndicators) {
+        this.jStatisticsPanel.removeAll();
+        
+        ArrayList<String> statisticsInfo = new ArrayList<String>();
+        statisticsInfo.add("Current benefits:                   " + gamePerformanceIndicators.getBenefits());
+        statisticsInfo.add("Manufactured gold:                  " + gamePerformanceIndicators.getManufacturedMetal().get(MetalType.GOLD));
+        statisticsInfo.add("Manufactured silver:                " + gamePerformanceIndicators.getManufacturedMetal().get(MetalType.SILVER));
+        statisticsInfo.add("Average benefit for unit of metal:  " + gamePerformanceIndicators.getAverageBenefitForUnitOfMetal());
+        statisticsInfo.add("Average time for discovering metal: " + gamePerformanceIndicators.getAverageTimeForDiscoveringMetal() + " turns");
+        statisticsInfo.add("Average time for digging metal:     " + gamePerformanceIndicators.getAverageTimeForDiggingMetal() + " turns");
+        statisticsInfo.add("Ratio of discovered metal:          " + gamePerformanceIndicators.getRatioOfDiscoveredMetal());
+        statisticsInfo.add("Ratio of collected metal:           " + gamePerformanceIndicators.getRatioOfCollectedMetal());
+        
+        
+        for (int counter = 0; counter < statisticsInfo.size(); counter++) { 	
+            this.jStatisticsPanel.showMessage(statisticsInfo.get(counter).toString());
+        }          
     }
 
     /**

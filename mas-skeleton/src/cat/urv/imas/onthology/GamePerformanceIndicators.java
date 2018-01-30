@@ -16,16 +16,19 @@ public class GamePerformanceIndicators {
     private Double benefits = new Double(0.0);  // amount of points received.
     private HashMap manufacturedMetal = new HashMap();  //: current amount of each metal already manufactured.
     private Double averageBenefitForUnitOfMetal = new Double(0.0); //: amount of points received per metal unit, regardless of the metal's type.
-    private long averageTimeForDiscoveringMetal = 0; //: the amount of time spent from metal appearance until a prospector discovers it.
-    private long averageTimeForDiggingMetal = 0; //: the amount of time spent from metal discoverage until the first digger gets to that point.
-    private int ratioOfDiscoveredMetal = 0; //: the ratio of the metal that is already discovered by prospectors from the total.
-    private int ratioOfCollectedMetal = 0; //: the ratio of the metal that is already collected by diggers, including that in the digger and that already disposed in manufacturing centers.
-
+    private double averageTimeForDiscoveringMetal = 0; //: the amount of time spent from metal appearance until a prospector discovers it.
+    private double averageTimeForDiggingMetal = 0; //: the amount of time spent from metal discoverage until the first digger gets to that point.
+    private double discoveredMetal = 0;
+    private double totalMetalFields = 0;
+    //private double ratioOfDiscoveredMetal = 0; //: the ratio of the metal that is already discovered by prospectors from the total.
+    private double collectedMetal = 0;
+    private double totalMetalUnits = 0;
+    //private double ratioOfCollectedMetal = 0; //: the ratio of the metal that is already collected by diggers, including that in the digger and that already disposed in manufacturing centers.
+      
     public GamePerformanceIndicators() {
         this.manufacturedMetal.put(MetalType.GOLD, new Double(0.0));
         this.manufacturedMetal.put(MetalType.SILVER, new Double(0.0));
     }  
-    
     
     /**
      * Add new reward to the accumulated reward.
@@ -55,7 +58,7 @@ public class GamePerformanceIndicators {
         return averageBenefitForUnitOfMetal;
     }
 
-    public long getAverageTimeForDiscoveringMetal() {
+    public double getAverageTimeForDiscoveringMetal() {
         return averageTimeForDiscoveringMetal;
     }
 
@@ -63,7 +66,7 @@ public class GamePerformanceIndicators {
         this.averageTimeForDiscoveringMetal = averageTimeForDiscoveringMetal;
     }
 
-    public long getAverageTimeForDiggingMetal() {
+    public double getAverageTimeForDiggingMetal() {
         return averageTimeForDiggingMetal;
     }
 
@@ -71,23 +74,45 @@ public class GamePerformanceIndicators {
         this.averageTimeForDiggingMetal = averageTimeForDiggingMetal;
     }
 
-    public int getRatioOfDiscoveredMetal() {
+    public double getDiscoveredMetal() {
+        return discoveredMetal;
+    }
+
+    public void addToDiscoveredMetal(int discoveredMetal) {
+        this.discoveredMetal = this.discoveredMetal + discoveredMetal;
+    }
+
+    public double getRatioOfDiscoveredMetal() {
+        double ratioOfDiscoveredMetal = discoveredMetal / totalMetalFields;
         return ratioOfDiscoveredMetal;
     }
-
-    public void setRatioOfDiscoveredMetal(int ratioOfDiscoveredMetal) {
-        this.ratioOfDiscoveredMetal = ratioOfDiscoveredMetal;
+    
+    public double getCollectedMetal() {
+        return collectedMetal;
     }
 
-    public int getRatioOfCollectedMetal() {
+    public void addCollectedMetal(int collectedMetal) {
+        this.collectedMetal = this.collectedMetal + collectedMetal;
+    }
+
+    public double getRatioOfCollectedMetal() {
+        double ratioOfCollectedMetal = collectedMetal / totalMetalUnits;
         return ratioOfCollectedMetal;
     }
 
-    public void setRatioOfCollectedMetal(int ratioOfCollectedMetal) {
-        this.ratioOfCollectedMetal = ratioOfCollectedMetal;
+    public double getTotalMetalFields() {
+        return totalMetalFields;
     }
 
+    public void addMetalField(double newMetalFields) {
+        this.totalMetalFields = this.totalMetalFields + newMetalFields;
+    }
 
-    
+    public double getTotalMetalUnits() {
+        return totalMetalUnits;
+    }
 
+    public void addMetalUnits(double newMetalUnits) {
+        this.totalMetalUnits = this.totalMetalUnits + newMetalUnits;
+    }
 }
