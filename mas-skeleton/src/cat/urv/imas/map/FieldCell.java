@@ -42,6 +42,8 @@ public class FieldCell extends Cell {
      * to find it yet.
      */
     protected boolean found = false;
+    
+    private int utility = 0;
 
     /**
      * Builds a cell corresponding to a field.
@@ -52,6 +54,22 @@ public class FieldCell extends Cell {
     public FieldCell(int row, int col) {
         super(CellType.FIELD, row, col);
         metal = new HashMap();
+    }
+    
+    public void resetUtility() {
+        this.utility = 0;
+    }
+    
+    public void incUtilityUnit() {
+        this.utility ++;
+    }
+    
+    public int getUtility() {
+        return this.utility;
+    }
+    
+    public void setUtility(int utility) {
+        this.utility = utility;
     }
 
     /**

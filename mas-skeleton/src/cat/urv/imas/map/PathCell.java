@@ -103,12 +103,16 @@ public class PathCell extends Cell {
         this.utility = 0;
     }
     
-    public void incUtility() {
-        this.utility ++;
+    public void incUtility(int amount) {
+        this.utility = this.utility + amount;
     }
     
     public int getUtility() {
         return this.utility;
+    }
+    
+    public void setUtility(int utility) {
+        this.utility = utility;
     }
     /* ********************************************************************** */
     /**

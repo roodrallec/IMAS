@@ -21,6 +21,12 @@ public class ActionsRequests {
     public ActionsRequests() {
     }
     
+    public void clear() {
+        ids.clear();
+        positions.clear();
+        agentsInList = 0;
+    }
+    
     public int getNumberOfAgentsInList() {
         return agentsInList;
     }

@@ -21,6 +21,8 @@ import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.behaviour.prospectorcoordinator.*;
 import cat.urv.imas.map.Agents;
 import cat.urv.imas.map.Cell;
+import cat.urv.imas.map.FieldCell;
+import cat.urv.imas.map.ActionsRequests;
 import cat.urv.imas.map.PathCell;
 import cat.urv.imas.onthology.InfoAgent;
 import cat.urv.imas.onthology.InitialGameSettings;
@@ -33,6 +35,8 @@ import jade.domain.FIPAAgentManagement.*;
 import jade.lang.acl.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class ProspectorCoordinatorAgent extends ImasAgent {
@@ -49,11 +53,15 @@ public class ProspectorCoordinatorAgent extends ImasAgent {
     }
     private List<AID> prospectorAgents = new ArrayList<AID>();
     
+    private ActionsRequests cellsWithAgents = new ActionsRequests();;
+    
     private GameSettings game;
     
     private int numProspectors = InitialGameSettings.load("game.settings").getAgentList().get(AgentType.PROSPECTOR).size();
     
-    private int[][] utilityMap;
+    private Cell[][] utilityMap;
+    
+    private boolean utilityMapInitialized = false;
     
     private int msgreceived;
     
@@ -104,21 +112,137 @@ public class ProspectorCoordinatorAgent extends ImasAgent {
         super(AgentType.PROSPECTOR_COORDINATOR);
     }
     
-    public Cell[][] applyUtility(Cell[][] map) {        
-        for(Cell[] row: map) {            
-            for(Cell col: row) {                
-                if (col instanceof PathCell) {
-                    PathCell pc = (PathCell)(col);                            
-                    Agents agents = pc.getAgents();
-                    if (agents.get(AgentType.PROSPECTOR).size() > 0) {
-                        pc.resetUtility();
-                    } else {
-                        pc.incUtility();
-                    }                   
-                }
-            }           
+    
+    @SuppressWarnings("empty-statement")
+    public Cell[][] applyUtility(Cell[][] newMap) {  
+        try{
+            if (!this.utilityMapInitialized) {
+                this.utilityMap = newMap;
+                this.utilityMapInitialized = true;
+            }
+            this.cellsWithAgents.clear();
+            //PathCell pc = null;
+            Agents cellAgents = null;
+            boolean auxBol = false;
+
+            // 1. FieldCells utility update            
+            for(int row = 0; row < newMap.length; row++) {          
+                for(int col = 0; col < newMap[0].length; col++) { 
+                    if (newMap[row][col] instanceof FieldCell) {
+                        FieldCell indFieldCell = (FieldCell) newMap[row][col];
+                        auxBol = indFieldCell.isEmpty();
+                        if (!auxBol) {
+                            //FieldCell utilityIndFieldCell = (FieldCell) this.utilityMap[row][col];
+                            //((FieldCell) utilityIndFieldCell).incUtilityUnit();
+                            ((FieldCell) this.utilityMap[row][col]).incUtilityUnit();
+                        }
+
+                    }
+                }           
+            }
+
+            // 2. Locate all agents positions and reset fieldCells inside visual field utility
+            int[] cellPos = new int[] {0,0};
+            FieldCell indFieldCell = new FieldCell(0,0);
+            for(int row = 0; row < newMap.length; row++) {          
+                for(int col = 0; col < newMap[0].length; col++) {                     
+                    if (newMap[row][col] instanceof PathCell) { 
+                        Cell indCell = (Cell) newMap[row][col];
+                        cellAgents = (Agents) ((PathCell) indCell).getAgents();
+                        if (cellAgents.get(AgentType.PROSPECTOR).size() > 0) {                        
+                            ((PathCell) indCell).resetUtility();
+                            cellPos[0] = row; cellPos[1] = col;
+                            // add that in this cell there is at least one prospector agent
+                            this.cellsWithAgents.setNewAgent(cellPos, cellAgents.get(AgentType.PROSPECTOR).get(0).getAID());
+                            // reset fieldCells inside visual field utility
+                            for(int x = -1; x < 2; x++) {          
+                                for(int y = -1; y < 2; y++) {
+                                    if (newMap[row + x][col + y] instanceof FieldCell) {
+                                        //indFieldCell = (FieldCell) newMap[row + x][col + y];
+                                        //indFieldCell.resetUtility();
+                                        
+                                        indFieldCell = (FieldCell) this.utilityMap[row + x][col + y];
+                                        indFieldCell.resetUtility();
+                                    }
+                                }
+                            }
+                        } 
+                        if (cellAgents.get(AgentType.DIGGER).size() > 0) {
+                            // add that in this cell there is at least one digger agent
+                            this.cellsWithAgents.setNewAgent(cellPos, cellAgents.get(AgentType.DIGGER).get(0).getAID());
+                        }                   
+                    }
+                }           
+            }
+
+            // 3. PathCells simple utility set
+            int utilitySum = 0;
+            for(int row = 0; row < newMap.length; row++) {          
+                for(int col = 0; col < newMap[0].length; col++) { 
+                    if (newMap[row][col] instanceof PathCell) {
+                        utilitySum = 0;
+                        //PathCell indCell = (PathCell) newMap[row][col];
+                        PathCell indCell = (PathCell) this.utilityMap[row][col];
+                        if (!indCell.isThereADiggerAgentWorking()) {
+                            for(int x = -1; x < 2; x++) {          
+                                for(int y = -1; y < 2; y++) {
+                                    if (newMap[row + x][col + y] instanceof FieldCell) {
+                                        //indFieldCell = (FieldCell) newMap[row + x][col + y];
+                                        //utilitySum = utilitySum + indFieldCell.getUtility();
+
+                                        indFieldCell = (FieldCell) this.utilityMap[row + x][col + y];
+                                        utilitySum = utilitySum + indFieldCell.getUtility();
+                                    }
+                                }
+                            }
+                            indCell.incUtility(utilitySum);
+                        }
+                    }
+                }           
+            }
+            
+            // 4. PathCells propagation utility update
+            for(int row = 0; row < newMap.length; row++) {          
+                for(int col = 0; col < newMap[0].length; col++) { 
+                    if (newMap[row][col] instanceof PathCell) { 
+                        //PathCell indCell = (PathCell) newMap[row][col];
+                        PathCell indCell = (PathCell) this.utilityMap[row][col];
+                        if (((PathCell) indCell).getUtility() == 0) {
+                            utilitySum = 0;
+                            for(int x = -1; x < 2; x++) {          
+                                for(int y = -1; y < 2; y++) {
+                                    if (newMap[row + x][col + y] instanceof PathCell) {
+                                        //PathCell surroundingPathCell = (PathCell) newMap[row + x][col + y];
+                                        //utilitySum = utilitySum + surroundingPathCell.getUtility();
+                                        
+                                        PathCell surroundingPathCell = (PathCell) this.utilityMap[row + x][col + y];
+                                        utilitySum = utilitySum + surroundingPathCell.getUtility();
+                                    }
+                                }
+                            }
+                            ((PathCell) indCell).setUtility(utilitySum);
+                        }
+                    }
+                }           
+            }
+            
+            // 4. Set FieldCells and digger agent working cells with negative utility
+            //indFieldCell = null;
+            for(int row = 0; row < this.utilityMap.length; row++) {          
+                for(int col = 0; col < this.utilityMap[0].length; col++) { 
+                    if (this.utilityMap[row][col] instanceof FieldCell) {
+                        ((FieldCell) this.utilityMap[row][col]).setUtility(-1);
+                    }
+                    if (this.utilityMap[row][col] instanceof PathCell) {
+                        ((PathCell) this.utilityMap[row][col]).setUtility(-1);
+                    }
+                }           
+            }
+            
+        } catch (Exception ex) {
+            Logger.getLogger(SystemAgent.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return map;
+        return newMap;
     }
             
     public GameSettings getGame() {
@@ -188,9 +312,9 @@ public class ProspectorCoordinatorAgent extends ImasAgent {
         } catch (FIPAException e) {
             System.err.println(getLocalName() + " registration with DF unsucceeded. Reason: " + e.getMessage());
             doDelete();
-        }
+        }     
         
-        
+               
         /*      SEARCHS     */
         // search CoordinatorAgent
         ServiceDescription searchCriterion = new ServiceDescription();
@@ -211,7 +335,7 @@ public class ProspectorCoordinatorAgent extends ImasAgent {
                
         // It triggers when the received message is an INFORM.
         MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
-        this.addBehaviour(new MapHandling(this, mt));
+        this.addBehaviour(new MapHandlingPC(this, mt));
         
         
         

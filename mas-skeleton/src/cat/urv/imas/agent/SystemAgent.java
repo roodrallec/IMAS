@@ -48,12 +48,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-//import jade.wrapper.AgentController;
-//import jade.wrapper.StaleProxyException;
-//import java.util.List;
-//import java.util.Map;
-//import java.util.logging.Level;
-//import java.util.logging.Logger;
 //
 /**
  * System agent that controls the GUI and loads initial configuration settings.
@@ -378,7 +372,7 @@ public class SystemAgent extends ImasAgent {
     
     // Function to update map and game variables
     public void updateGUI() {
-        this.gui.showGameMap(currentMap);
+        //this.gui.showGameMap(currentMap);
         this.gui.updateGame();
     }
     
@@ -488,6 +482,7 @@ public class SystemAgent extends ImasAgent {
                        
                     }
                     else{
+                        log("Not allowed movement request (requested movement to path cell where there is a working digger)");
                         if (this.requestedAgentsPos.get(agentIndex).getAgentID().getName().contains("Digger")){
                             digglist.add((Cell)currentCell);
                         }
@@ -496,6 +491,8 @@ public class SystemAgent extends ImasAgent {
                         }
                     }
 
+                } else {
+                    log("Not allowed movement request (requested movement to field cell)");
                 }
             }
             
