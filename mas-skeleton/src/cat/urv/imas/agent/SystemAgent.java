@@ -154,12 +154,12 @@ public class SystemAgent extends ImasAgent {
     /**
      * knownMetalCells will contain the current metal fields known by all agents.
      */
-  
-    public void addKnownMetalField(MetalField newFieldCells) {
-        this.metalFieldList.add(newFieldCells);
+    private List<FieldCell> knownMetalCells = new ArrayList<FieldCell>();
+    public void addKnownMetalField(FieldCell newFieldCells) {
+        this.knownMetalCells.add(newFieldCells);
     } 
-    public void removeKnownMetalField(MetalField emptiedFieldCell) {
-        this.metalFieldList.remove(emptiedFieldCell);
+    public void removeKnownMetalField(FieldCell emptiedFieldCell) {
+        this.knownMetalCells.remove(emptiedFieldCell);
     } 
     /**
      * Game settings. The game with the updated changes that the system agent
@@ -511,8 +511,9 @@ public class SystemAgent extends ImasAgent {
             int[] metalPos = new int[2]; 
             for (MetalField mf : this.metalFieldList) {
                 metalPos = mf.getPosition();
-                FieldCell metalCell = (FieldCell) nextTurnMap[metalPos[0]][metalPos[1]];
+                FieldCell metalCell = (FieldCell) nextTurnMap[metalPos[0]][metalPos[1]];                
                 metalCell.detectMetal();
+                this.addKnownMetalField(metalCell);
             }
 
             //5. Update manufacturing centers (rewards)
@@ -521,7 +522,7 @@ public class SystemAgent extends ImasAgent {
                 // Get the manufacturing reward
                 ManufacturingCenterCell manufacturingCenterFieldCell = this.manufactureRequests.get(0).getMancell();
                 // Add the new reward to the accumulated reward
-                gamePerformanceIndicators.addNewReward(manufacturingCenterFieldCell.getPrice());
+                gamePerformanceIndicators.addBenefits(manufacturingCenterFieldCell.getPrice(), manufacturingCenterFieldCell.getMetal());
 
                 this.manufactureRequests.remove(0);            
             }
