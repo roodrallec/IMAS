@@ -250,7 +250,7 @@ public class InitialGameSettings extends GameSettings {
     }
 
 
-    public MetalFieldsTurns addElements(int maxElements, int maxVisible, MetalFieldsTurns undiscoveredMetalList) {
+    public MetalFieldsTurnsNew addElements(int maxElements, int maxVisible, MetalFieldsTurnsNew undiscoveredMetalList) {
         CellType ctype = CellType.FIELD;
         int maxCells = getNumberOfCellsOfType(ctype);
         int freeCells = this.getNumberOfCellsOfType(ctype, true);
@@ -322,7 +322,7 @@ public class InitialGameSettings extends GameSettings {
      * @param ncell number of cell from a given list.
      * @param visible visible to agents?
      */
-    private MetalFieldsTurns setElements(MetalType type, int amount, boolean visible, int ncell, MetalFieldsTurns undiscoveredMetalList) {
+    private MetalFieldsTurnsNew setElements(MetalType type, int amount, boolean visible, int ncell, MetalFieldsTurnsNew undiscoveredMetalList) {
         SettableFieldCell cell = (SettableFieldCell)cellsOfType.get(CellType.FIELD).get(ncell);
         cell.setElements(type, amount);
         if (visible) {
@@ -345,7 +345,7 @@ public class InitialGameSettings extends GameSettings {
      * This process also checks that if there is room for the given number of
      * cells. Otherwise and error is thrown.
      */
-    public MetalFieldsTurns addElementsForThisSimulationStep(MetalFieldsTurns undiscoveredMetalList) {
+    public MetalFieldsTurnsNew addElementsForThisSimulationStep(MetalFieldsTurnsNew undiscoveredMetalList) {
         int probabilityOfNewElements = this.getNewMetalProbability();
         int stepProbability = numberGenerator.nextInt(100) +1;
 
