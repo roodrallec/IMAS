@@ -136,11 +136,11 @@ public class SystemAgent extends ImasAgent {
     /**
      * undiscoveredMetalField will contain the undiscovered metal fields until a prospector discovers them.
      */
-    private metalFieldsTurns undiscoveredMetalField = new metalFieldsTurns();
+    private MetalFieldsTurns undiscoveredMetalField = new MetalFieldsTurns();
     /**
      * discoveredMetalField will contain the discovered metal fields until a digger begin to dig them.
      */
-    private metalFieldsTurns discoveredMetalField = new metalFieldsTurns(); 
+    private MetalFieldsTurns discoveredMetalField = new MetalFieldsTurns(); 
     /**
      * Game settings. The game with the updated changes that the system agent
      * is constructing while checking that all changes are allowed.
@@ -213,8 +213,8 @@ public class SystemAgent extends ImasAgent {
      * This method is expected to be run from the corresponding Behaviour
      * to add new elements onto the map at each simulation step.
      */
-    public void addElementsForThisSimulationStep() {
-        this.game.addElementsForThisSimulationStep();
+    public MetalFieldsTurns addElementsForThisSimulationStep(MetalFieldsTurns undiscoveredMetalList) {
+        return this.game.addElementsForThisSimulationStep(undiscoveredMetalList);
     }
 
     /**
@@ -371,7 +371,7 @@ public class SystemAgent extends ImasAgent {
 //        this.game.getMaxAmountOfNewMetal()
 //        this.game.getMaxNumberFieldsWithNewMetal()
 //        this.game.getNewMetalProbability()
-        this.addElementsForThisSimulationStep();
+        this.undiscoveredMetalField = this.addElementsForThisSimulationStep(this.undiscoveredMetalField);
         
         this.updateGUI();
     }
