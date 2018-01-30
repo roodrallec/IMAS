@@ -66,13 +66,14 @@ public class ProspectorAgent extends ImasAgent {
     }            
 
     public MetalFieldList searchForMetal() {
+        this.currentMetalFields = new ArrayList<MetalField>();
         int[] metalLocation = new int[2];
         int quantity = 0;
         String metal = "";
         for(Cell c: this.mapView) {
             if (c instanceof SettableFieldCell){
                 SettableFieldCell fc = (SettableFieldCell)(c);
-                if(!((FieldCell)fc).isEmpty()){
+                //if(!((FieldCell)fc).isEmpty()){
                     if (fc.detectMetal().size() == 1) {                    
                         quantity = (int) (fc.detectMetal().values().toArray()[0]);                    
                         metal = (fc.detectMetal().keySet().toArray())[0].toString();
@@ -85,13 +86,13 @@ public class ProspectorAgent extends ImasAgent {
                         metalLocation[0] = c.getRow();                   
                         metalLocation[1] = c.getCol();
                         MetalField currentMetal = new MetalField(metalLocation, metal, quantity);
-                        currentMetalFields.add(currentMetal);
+                        this.currentMetalFields.add(currentMetal);
                     }
-                }
+                //}
                 
             }         
         }        
-        return new MetalFieldList(currentMetalFields);
+        return new MetalFieldList(this.currentMetalFields);
     }   
     
     public void shuffleView() {

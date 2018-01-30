@@ -24,12 +24,16 @@ import jade.lang.acl.MessageTemplate;
 import jade.proto.AchieveREResponder;
 import cat.urv.imas.agent.CoordinatorAgent;
 import cat.urv.imas.map.Cell;
+import cat.urv.imas.map.FieldCell;
 import cat.urv.imas.map.PathCell;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.MessageContent;
+import cat.urv.imas.onthology.MetalField;
+import cat.urv.imas.onthology.MetalFieldList;
 import jade.core.AID;
 import jade.lang.acl.UnreadableException;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -41,7 +45,7 @@ import java.util.logging.Logger;
  * game information and the System Agent sends an AGREE and then an INFORM
  * with the city information.
  */
-public class RequestResponseBehaviour extends AchieveREResponder {
+public class MapHandlingCA extends AchieveREResponder {
 
     /**
      * Sets up the System agent and the template of messages to catch.
@@ -49,7 +53,7 @@ public class RequestResponseBehaviour extends AchieveREResponder {
      * @param agent The agent owning this behaviour
      * @param mt Template to receive future responses in this conversation
      */
-    public RequestResponseBehaviour(CoordinatorAgent agent, MessageTemplate mt) {
+    public MapHandlingCA(CoordinatorAgent agent, MessageTemplate mt) {
         super(agent, mt);
         agent.log("Waiting For SystemAgentNewMap from authorized agents");
     }
@@ -78,12 +82,31 @@ public class RequestResponseBehaviour extends AchieveREResponder {
             mapmsg.setContentObject(agent.getGame());
             mapmsg.setLanguage(MessageContent.GET_MAP);
             agent.log("Map sent to underlying levels.");
+            
+            List<MetalField> mfl = agent.getCompleteMFL().getMetalFields();
+            Cell[][] currentmap = agent.getGame().getMap();
+            if(!mfl.isEmpty()){
+                int counter = 0;
+                while(counter < mfl.size()) {
+                    MetalField mf = mfl.get(counter);
+                    boolean stillMetal = ((FieldCell)currentmap[mf.getPosition()[0]][mf.getPosition()[1]]).isEmpty();
+                    if (stillMetal){
+                        mfl.remove(mf);
+                        counter--;
+                    }
+                    counter++;
+                }
+            }
+            agent.setCompleteMFL(new MetalFieldList(mfl));
+            
+            
+            
             return mapmsg;
         } 
         catch (UnreadableException ex) {
-            Logger.getLogger(RequestResponseBehaviour.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MapHandlingCA.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(RequestResponseBehaviour.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MapHandlingCA.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
             

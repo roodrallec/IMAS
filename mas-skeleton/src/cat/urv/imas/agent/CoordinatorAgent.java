@@ -26,6 +26,7 @@ import jade.domain.FIPAAgentManagement.*;
 import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.*;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The main Coordinator agent. 
@@ -207,7 +208,7 @@ public class CoordinatorAgent extends ImasAgent {
 
         
         MessageTemplate mt2 =MessageTemplate.MatchLanguage(MessageContent.NEW_MAP);
-        this.addBehaviour(new RequestResponseBehaviour(this, mt2));
+        this.addBehaviour(new MapHandlingCA(this, mt2));
         
         
 
@@ -232,5 +233,27 @@ public class CoordinatorAgent extends ImasAgent {
     public GameSettings getGame() {
         return this.game;
     }
+    
+    public void combineMFL(MetalFieldList newMFL){
+        
+        List<MetalField> completeMFL = this.completeMFL.getMetalFields();
+        List<MetalField> aux = newMFL.getMetalFields();
+
+        for (MetalField mf : aux) {
+            Boolean exists = false;
+            for (MetalField mfc : completeMFL) {
+                if ((mf.getPosition())[0] == (mfc.getPosition())[0] && (mf.getPosition())[1] == (mfc.getPosition())[1]){
+                    exists = true;
+                }                            
+            }
+            if (!(exists)) {
+                completeMFL.add(mf);
+            }
+        }
+        
+        this.setCompleteMFL(new MetalFieldList(completeMFL));
+        
+    }
+        
 
 }
