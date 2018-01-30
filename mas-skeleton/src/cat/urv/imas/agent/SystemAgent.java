@@ -354,7 +354,7 @@ public class SystemAgent extends ImasAgent {
     public void incrementStep() {
 
         // Update statistics window
-        this.gui.showStatistics(gamePerformanceIndicators);
+        //this.gui.showStatistics(gamePerformanceIndicators);
         
         // Substract one remaining turn
         this.game.setSimulationSteps(this.game.getSimulationSteps() - 1);
