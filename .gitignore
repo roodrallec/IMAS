@@ -3,3 +3,4 @@ mas-skeleton/APDescription.txt
 mas-skeleton/MTPs-Main-Container.txt
 mas-skeleton/src/cat/urv/imas/agent/SystemAgent.java
 *.java
+!/mas-skeleton/src/cat/urv/imas/behaviour/prospectorcoordinator/MapHandlingPC.java

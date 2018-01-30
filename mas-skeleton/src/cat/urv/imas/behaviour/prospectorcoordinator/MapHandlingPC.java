@@ -1,0 +1,178 @@
+/**
+ *  IMAS base code for the practical work.
+ *  Copyright (C) 2014 DEIM - URV
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package cat.urv.imas.behaviour.prospectorcoordinator;
+
+import cat.urv.imas.behaviour.diggercoordinator.*;
+import cat.urv.imas.behaviour.coordinator.*;
+import cat.urv.imas.behaviour.system.*;
+import cat.urv.imas.agent.AgentType;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
+import jade.proto.AchieveREResponder;
+import cat.urv.imas.agent.ProspectorCoordinatorAgent;
+import cat.urv.imas.map.Cell;
+import cat.urv.imas.map.PathCell;
+import cat.urv.imas.onthology.GameMapUtility;
+import cat.urv.imas.onthology.GameSettings;
+import cat.urv.imas.onthology.MessageContent;
+import static cat.urv.imas.onthology.MessageContent.DIG_ACTION;
+import cat.urv.imas.onthology.MetalField;
+import cat.urv.imas.onthology.MetalFieldList;
+import cat.urv.imas.onthology.MovingMessage;
+import cat.urv.imas.onthology.MovingMessageList;
+import jade.lang.acl.UnreadableException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+
+/**
+ * This method handles the Map sent from above
+ */
+public class MapHandlingPC extends AchieveREResponder {
+
+    /**
+     * Sets up the template of messages to catch.
+     *
+     * @param agent The agent owning this behaviour
+     * @param mt Template to receive future responses in this conversation
+     */
+    public MapHandlingPC(ProspectorCoordinatorAgent agent, MessageTemplate mt) {
+        super(agent, mt);
+        agent.log("Waiting for the updated map.");
+    }
+
+    
+    // PARTE 1 DE LA RESPUESTA
+    /**
+     * Triggers when the ProspectorCoordinator receives a message following the template
+     * @param msg message received.
+     * @return AGREE message when all was ok, or FAILURE otherwise.
+     */
+    @Override
+    protected ACLMessage handleRequest(ACLMessage msg) {
+        // Declares the current agent so you can use its getters and setters (and other methods)
+        ProspectorCoordinatorAgent agent = (ProspectorCoordinatorAgent)this.getAgent(); 
+        try {
+            // If the received message is a map.
+            if(msg.getContentObject().getClass() == cat.urv.imas.onthology.InitialGameSettings.class || msg.getContentObject().getClass() == cat.urv.imas.onthology.GameSettings.class){
+                // sets the value of the agents map to the received map.
+                agent.setGame((GameSettings) msg.getContentObject());
+                agent.log("MAP Updated");
+
+                // Send map to underlying level
+                ACLMessage mapmsg = new ACLMessage(ACLMessage.INFORM);
+                mapmsg.clearAllReceiver();
+                for (int i = 1; i <= agent.getNumProspectors(); i++ ){
+                    mapmsg.addReceiver(agent.getProspectorAgents().get(i-1));
+                }
+                Cell[][] map = agent.getGame().getMap();
+                map = agent.applyUtility(map);
+                GameMapUtility gmu = new GameMapUtility(agent.getGame(),map);
+                mapmsg.setContentObject(gmu);
+                agent.log("Map sent to underlying level");
+                return mapmsg;                
+            }else if(msg.getContentObject().getClass() == cat.urv.imas.onthology.MetalFieldList.class){
+                agent.setMsgreceived(agent.getMsgreceived()+1);
+                agent.log("List of metals received");
+                List<MetalFieldList> nowMFL = agent.getMFLreceived();
+                //LLamar al metodo para que las MF sean unicas
+                //Unir nowMFL
+                nowMFL.add((MetalFieldList) msg.getContentObject());
+                agent.setMFLreceived(nowMFL);
+                
+                       
+                if(agent.getMsgreceived() == agent.getNumProspectors()){
+                    agent.log("All list of metals received");                    
+                    List<MetalField> aux = agent.cleanDuplicatedMFL();
+                    agent.setMsgreceived(0);
+                                         
+                    ACLMessage MFLmsg = new ACLMessage(ACLMessage.INFORM);
+                    MFLmsg.clearAllReceiver();
+                    MFLmsg.addReceiver(agent.getCoordinatorAgent());
+                    
+                    //Para cada MFL sacar su lista de MF 
+                    //metodo a implementar
+                    //Cuando tenga la lista unica
+                    MetalFieldList currentMFL = new MetalFieldList(aux); 
+                    agent.log("Clean list of metals sent");
+                    MFLmsg.setContentObject(currentMFL);
+                    MFLmsg.setLanguage(DIG_ACTION);
+                    agent.setMFLreceived(new ArrayList<MetalFieldList>());
+                    return MFLmsg;
+                }
+            }
+            else if(msg.getContentObject().getClass() == cat.urv.imas.onthology.MovingMessage.class){
+                agent.setMovereceived(agent.getMovereceived()+1);
+                agent.log("Prospector Movement Received.");
+                List<MovingMessage> nowMML = agent.getMMreceived();
+                //LLamar al metodo para que las MF sean unicas
+                //Unir nowMFL
+                nowMML.add((MovingMessage) msg.getContentObject());
+                agent.setMMreceived(nowMML);
+                
+                       
+                if(agent.getMovereceived() == agent.getNumProspectors()){
+                                   
+                    MovingMessageList aux = new MovingMessageList(agent.getMMreceived());
+                    agent.setMovereceived(0);
+                    agent.setMMreceived(new ArrayList<MovingMessage>());
+                                         
+                    ACLMessage MMLmsg = new ACLMessage(ACLMessage.INFORM);
+                    MMLmsg.clearAllReceiver();
+                    MMLmsg.addReceiver(agent.getCoordinatorAgent());
+                    MMLmsg.setLanguage(MessageContent.DIG_ACTION);
+                    //Para cada MFL sacar su lista de MF 
+                    //metodo a implementar
+                    //Cuando tenga la lista unica
+                    MMLmsg.setContentObject(aux);
+                    agent.log("All Prospector Movements received");  
+                    return MMLmsg;
+                }
+            }
+            
+            
+        } catch (UnreadableException ex) {
+            Logger.getLogger(MapHandlingPC.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(MapHandlingPC.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
+    // PARTE 2 DE LA RESPUESTA (SOLO SE EJECUTA SI LA 1 DEVUELVE NULL O AGREE)
+    /*
+     * @param msg ACLMessage the received message
+     * @param response ACLMessage the previously sent response message
+     * @return ACLMessage to be sent as a result notification, of type INFORM
+     * when all was ok, or FAILURE otherwise.
+     */
+    @Override
+    protected ACLMessage prepareResultNotification(ACLMessage msg, ACLMessage response) {
+        return null;
+    }
+
+    
+    @Override
+    public void reset() {
+    }
+
+}
