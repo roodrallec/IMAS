@@ -108,7 +108,7 @@ public class ProspectorAgent extends ImasAgent {
     
     public int[] move() {                  
         this.shuffleView(); // Randomizes movement when there's equal utility
-        int maxCellUtility = -1;
+        double maxCellUtility = -1.0;
         int[] movement = new int[2];
         int dx;
         int dy;

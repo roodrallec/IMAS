@@ -33,7 +33,7 @@ public class PathCell extends Cell {
     
     private boolean diggerWorking = false;
     
-    private int utility = 0;
+    private double utility = 0.0;
     /**
      * Builds a cell with a given type.
      *
@@ -103,15 +103,15 @@ public class PathCell extends Cell {
         this.utility = 0;
     }
     
-    public void incUtility(int amount) {
+    public void incUtility(double amount) {
         this.utility = this.utility + amount;
     }
     
-    public int getUtility() {
+    public double getUtility() {
         return this.utility;
     }
     
-    public void setUtility(int utility) {
+    public void setUtility(double utility) {
         this.utility = utility;
     }
     /* ********************************************************************** */

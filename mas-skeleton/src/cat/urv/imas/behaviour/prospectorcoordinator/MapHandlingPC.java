@@ -85,8 +85,8 @@ public class MapHandlingPC extends AchieveREResponder {
                     mapmsg.addReceiver(agent.getProspectorAgents().get(i-1));
                 }
                 Cell[][] map = agent.getGame().getMap();
-                map = agent.applyUtility(map);
-                GameMapUtility gmu = new GameMapUtility(agent.getGame(),map);
+                Cell[][] utilityMap = agent.applyUtility(map);
+                GameMapUtility gmu = new GameMapUtility(agent.getGame(),utilityMap);
                 mapmsg.setContentObject(gmu);
                 agent.log("Map sent to underlying level");
                 return mapmsg;                
