@@ -91,6 +91,7 @@ public class ChooseActionDA extends AchieveREResponder {
                             if (agent.getUsedSlots()==0){
                                 agent.setMetaltype("N");
                             }
+                            return(mfmsg);
                         }
                         else{
                             agent.log("No metal assigned. Moving towards manufacturing center.");

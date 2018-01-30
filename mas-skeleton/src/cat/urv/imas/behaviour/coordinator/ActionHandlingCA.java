@@ -77,14 +77,20 @@ public class ActionHandlingCA extends AchieveREResponder {
                 ACLMessage MFLmsg = new ACLMessage(ACLMessage.INFORM);
                 MFLmsg.clearAllReceiver();
                 MFLmsg.addReceiver(agent.getDiggerCoordinatorAgent());
-                MFLmsg.setContentObject((MetalFieldList) msg.getContentObject());
+                //MFLmsg.setContentObject((MetalFieldList) msg.getContentObject());
                 MFLmsg.setLanguage(MessageContent.GET_MAP);
                 //agent.getGame().getCellsOfType()
                 
                 agent.setCurrentMFL((MetalFieldList) msg.getContentObject());
-                List<MetalField> comls = agent.getCompleteMFL().getMetalFields();
-                comls.addAll(agent.getCurrentMFL().getMetalFields());
-                agent.setCompleteMFL(new MetalFieldList(comls));
+                //List<MetalField> comls = agent.getCompleteMFL().getMetalFields();
+                //comls.addAll(agent.getCurrentMFL().getMetalFields());
+                //agent.setCompleteMFL(new MetalFieldList(comls));
+                agent.combineMFL(agent.getCurrentMFL());
+                
+                MFLmsg.setContentObject((MetalFieldList)agent.getCompleteMFL());
+                
+                
+                
                 
                 
                 return MFLmsg;

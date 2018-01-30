@@ -77,11 +77,16 @@ public class MapHandlingDA extends AchieveREResponder {
                 reply.addReceiver(agent.getDiggerCoordinatorAgent());
                 reply.setContentObject(MessageContent.MAP_RECEIVED);
                 List cells = agent.getGame().getAgentList().get(AgentType.DIGGER);
+                
                 boolean found = false;
                 for (Object cell : cells) {
                     List celldiggers = ((PathCell)cell).getAgents().get(AgentType.DIGGER);
                     for (Object digger : celldiggers){
                         if (agent.getAID().equals(((DiggerInfoAgent)digger).getAID())){
+                            if (!(agent.getCurrentPosition()==null)){
+                                int[] prevmov = {((PathCell)cell).getRow()-agent.getCurrentPosition()[0],((PathCell)cell).getCol()-agent.getCurrentPosition()[1]};
+                                agent.setPreviousMovement(prevmov);
+                            }
                             agent.setCurrentPosition(new int[]{((PathCell)cell).getRow(),((PathCell)cell).getCol()});
                             found = true;
                             break;
