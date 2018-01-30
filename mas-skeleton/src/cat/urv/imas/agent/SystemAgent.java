@@ -156,7 +156,7 @@ public class SystemAgent extends ImasAgent {
     /**
      * Game performance info.
      */
-    private GamePerformanceIndicators gamePerformanceIndicators;
+    private GamePerformanceIndicators gamePerformanceIndicators = new GamePerformanceIndicators();
     
     public AID getCoordinatorAgent() {
         return coordinatorAgent;
@@ -354,7 +354,7 @@ public class SystemAgent extends ImasAgent {
     public void incrementStep() {
 
         // Update statistics window
-        this.gui.showStatistics(gamePerformanceIndicators);
+        this.gui.showStatistics(this.gamePerformanceIndicators);
         
         // Substract one remaining turn
         this.game.setSimulationSteps(this.game.getSimulationSteps() - 1);
@@ -505,7 +505,7 @@ public class SystemAgent extends ImasAgent {
                 // Get the manufacturing reward
                 ManufacturingCenterCell manufacturingCenterFieldCell = this.manufactureRequests.get(0).getMancell();
                 // Add the new reward to the accumulated reward
-                gamePerformanceIndicators.addBenefits(manufacturingCenterFieldCell.getPrice(), manufacturingCenterFieldCell.getMetal());
+                this.gamePerformanceIndicators.addBenefits(manufacturingCenterFieldCell.getPrice(), manufacturingCenterFieldCell.getMetal());
 
                 this.manufactureRequests.remove(0);            
             }

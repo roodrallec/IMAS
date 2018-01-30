@@ -167,7 +167,7 @@ public class GraphicInterface extends JFrame {
      * @param msg String per mostrar
      */
     public void showStatistics(GamePerformanceIndicators gamePerformanceIndicators) {
-        this.jStatisticsPanel.removeAll();
+        this.jStatisticsPanel.removeAllMessages();
         
         ArrayList<String> statisticsInfo = new ArrayList<String>();
         statisticsInfo.add("Current benefits:                   " + gamePerformanceIndicators.getBenefits());
@@ -178,7 +178,6 @@ public class GraphicInterface extends JFrame {
         statisticsInfo.add("Average time for digging metal:     " + gamePerformanceIndicators.getAverageTimeForDiggingMetal() + " turns");
         statisticsInfo.add("Ratio of discovered metal:          " + gamePerformanceIndicators.getRatioOfDiscoveredMetal());
         statisticsInfo.add("Ratio of collected metal:           " + gamePerformanceIndicators.getRatioOfCollectedMetal());
-        
         
         for (int counter = 0; counter < statisticsInfo.size(); counter++) { 	
             this.jStatisticsPanel.showMessage(statisticsInfo.get(counter).toString());

@@ -27,6 +27,11 @@ public class StatisticsPanel
 
     public void showMessage(String msg) {
         jTextArea.append(msg);
+        jTextArea.append("\n");
+    }
+    
+    public void removeAllMessages() {
+        jTextArea.removeAll();
     }
 
     private void initComponents() {
