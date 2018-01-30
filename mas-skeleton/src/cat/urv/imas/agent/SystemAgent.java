@@ -133,16 +133,31 @@ public class SystemAgent extends ImasAgent {
     public void setMetalFieldList(List<MetalField> metalFieldList) {
         this.metalFieldList = metalFieldList;
     }
-    
     /**
-     * knownMetalCells will contain the current metal fields known by all agents.
+     * undiscoveredMetalField will contain the undiscovered metal fields until a prospector discovers them.
      */
-    private List<FieldCell> knownMetalCells = new ArrayList<>();
-    public void addKnownMetalField(FieldCell newFieldCells) {
-        this.knownMetalCells.add(newFieldCells);
+    private List<FieldCell> undiscoveredMetalField = new ArrayList<>();
+    public void addUndiscoveredMetalField(FieldCell newFieldCell) {
+        this.undiscoveredMetalField.add(newFieldCell);
+    }
+    public List<FieldCell> getUndiscoveredMetalFields() {
+        return this.undiscoveredMetalField;
     } 
-    public void removeKnownMetalField(FieldCell emptiedFieldCell) {
-        this.knownMetalCells.remove(emptiedFieldCell);
+    public void removeUndiscoveredMetalField(FieldCell fieldCell) {
+        this.undiscoveredMetalField.remove(fieldCell);
+    } 
+    /**
+     * discoveredMetalField will contain the discovered metal fields until a digger begin to dig them.
+     */
+    private List<FieldCell> discoveredMetalField = new ArrayList<>();
+    public void addDiscoveredMetalField(FieldCell newFieldCell) {
+        this.discoveredMetalField.add(newFieldCell);
+    }
+    public List<FieldCell> getDiscoveredMetalFields() {
+        return this.discoveredMetalField;
+    } 
+    public void removeDiscoveredMetalField(FieldCell fieldCell) {
+        this.discoveredMetalField.remove(fieldCell);
     } 
     /**
      * Game settings. The game with the updated changes that the system agent
@@ -402,6 +417,7 @@ public class SystemAgent extends ImasAgent {
                 // Remove 1 metal unit from metal field
                 FieldCell metalFieldCell = (FieldCell) nextTurnMap[metalFieldPos[0]][metalFieldPos[1]];
                 metalFieldCell.removeMetal();
+                this.gamePerformanceIndicators.addMetalUnits(1.0);
 
                 // Set digger agent working in the path cell
                 PathCell diggerCell = (PathCell) nextTurnMap[diggerPos[0]][diggerPos[1]];
@@ -496,7 +512,7 @@ public class SystemAgent extends ImasAgent {
                 metalPos = mf.getPosition();
                 FieldCell metalCell = (FieldCell) nextTurnMap[metalPos[0]][metalPos[1]];                
                 metalCell.detectMetal();
-                this.addKnownMetalField(metalCell);
+                //this.(metalCell);
             }
 
             //5. Update manufacturing centers (rewards)
