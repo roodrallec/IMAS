@@ -52,6 +52,14 @@ public class ActionsRequests {
         return agentPos;
     } 
     
+        
+    public void removeAgentById(AID agentId) {
+        int agentIndex = ids.indexOf(agentId);
+        ids.remove(agentIndex);
+        positions.remove(agentIndex);
+        agentsInList--;
+    } 
+    
     public int[] getAgentByName(String agentId) {
         int[] agentPos; // = new int[2];
         int agentIndex = ids.indexOf(agentId);
