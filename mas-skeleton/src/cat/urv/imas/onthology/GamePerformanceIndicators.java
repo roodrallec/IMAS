@@ -5,7 +5,9 @@ package cat.urv.imas.onthology;
 
 import cat.urv.imas.map.FieldCell;
 import cat.urv.imas.onthology.MetalType;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  *
@@ -16,8 +18,13 @@ public class GamePerformanceIndicators {
     private Double benefits = new Double(0.0);  // amount of points received.
     private HashMap manufacturedMetal = new HashMap();  //: current amount of each metal already manufactured.
     private Double averageBenefitForUnitOfMetal = new Double(0.0); //: amount of points received per metal unit, regardless of the metal's type.
+    
+    private List<Double> turnsForDiscoveringMetal = new ArrayList();
     private double averageTimeForDiscoveringMetal = 0; //: the amount of time spent from metal appearance until a prospector discovers it.
+    
+    private List<Double> turnsForDiggingMetal = new ArrayList();
     private double averageTimeForDiggingMetal = 0; //: the amount of time spent from metal discoverage until the first digger gets to that point.
+    
     private double discoveredMetal = 0;
     private double totalMetalFields = 0;
     //private double ratioOfDiscoveredMetal = 0; //: the ratio of the metal that is already discovered by prospectors from the total.
@@ -57,21 +64,31 @@ public class GamePerformanceIndicators {
     public Double getAverageBenefitForUnitOfMetal() {
         return averageBenefitForUnitOfMetal;
     }
+    
+    public void addTurnsForDiscoveringMetal(double turns) {
+        this.turnsForDiscoveringMetal.add(turns);
+    }
 
     public double getAverageTimeForDiscoveringMetal() {
+        double sum = 0.0;
+        for (double turns: this.turnsForDiscoveringMetal) {
+            sum = sum + turns;
+        }
+        this.averageTimeForDiscoveringMetal = sum / (double) this.turnsForDiscoveringMetal.size();
         return averageTimeForDiscoveringMetal;
     }
 
-    public void setAverageTimeForDiscoveringMetal(long averageTimeForDiscoveringMetal) {
-        this.averageTimeForDiscoveringMetal = averageTimeForDiscoveringMetal;
+    public void addTurnsForDiggingMetal(double turns) {
+        this.turnsForDiggingMetal.add(turns);
     }
-
+    
     public double getAverageTimeForDiggingMetal() {
+        double sum = 0.0;
+        for (double turns: this.turnsForDiggingMetal) {
+            sum = sum + turns;
+        }
+        this.averageTimeForDiggingMetal = sum / (double) this.turnsForDiggingMetal.size();
         return averageTimeForDiggingMetal;
-    }
-
-    public void setAverageTimeForDiggingMetal(long averageTimeForDiggingMetal) {
-        this.averageTimeForDiggingMetal = averageTimeForDiggingMetal;
     }
 
     public double getDiscoveredMetal() {
