@@ -17,23 +17,12 @@
  */
 package cat.urv.imas.agent;
 
-//import cat.urv.imas.behaviour.diggercoordinator.ChooseActionDCA;
 import static cat.urv.imas.agent.ImasAgent.OWNER;
-import cat.urv.imas.onthology.InitialGameSettings;
-import cat.urv.imas.onthology.GameSettings;
-import cat.urv.imas.onthology.InfoAgent;
-import cat.urv.imas.onthology.GamePerformanceIndicators;
+import cat.urv.imas.onthology.*;
 import cat.urv.imas.gui.GraphicInterface;
 import cat.urv.imas.behaviour.system.*;
 //import cat.urv.imas.map.Cell;
 import cat.urv.imas.map.*;
-import cat.urv.imas.onthology.DiggerInfoAgent;
-import cat.urv.imas.onthology.DiggingMessage;
-import cat.urv.imas.onthology.ManufacturingMessage;
-import cat.urv.imas.onthology.MessageContent;
-import cat.urv.imas.onthology.MetalField;
-import cat.urv.imas.onthology.MetalFieldList;
-import cat.urv.imas.onthology.MovingMessage;
 //import jade.Boot;
 import jade.core.*;
 import jade.domain.*;
@@ -148,7 +137,7 @@ public class SystemAgent extends ImasAgent {
     /**
      * knownMetalCells will contain the current metal fields known by all agents.
      */
-    private List<FieldCell> knownMetalCells = new ArrayList<FieldCell>();
+    private List<FieldCell> knownMetalCells = new ArrayList<>();
     public void addKnownMetalField(FieldCell newFieldCells) {
         this.knownMetalCells.add(newFieldCells);
     } 
@@ -175,8 +164,7 @@ public class SystemAgent extends ImasAgent {
 
     public void setCoordinatorAgent(AID coordinatorAgent) {
         this.coordinatorAgent = coordinatorAgent;
-    }
-    
+    }    
     
     /**
      * Builds the System agent.
@@ -238,7 +226,7 @@ public class SystemAgent extends ImasAgent {
      */
     @Override
     protected void setup() {
-
+        
         /* ** Very Important Line (VIL) ************************************* */
         this.setEnabledO2ACommunication(true, 1);
 
@@ -259,8 +247,9 @@ public class SystemAgent extends ImasAgent {
             doDelete();
         }
 
-        // 2. Load game settings.
+        // 2. Load game settings.        
         this.game = InitialGameSettings.load("game.settings");
+        //GenerateGameSettings.defineSettings(this.game);
         this.currentMap = this.game.getMap();
         log("Initial configuration settings loaded");
 
@@ -274,11 +263,8 @@ public class SystemAgent extends ImasAgent {
         }        
         
         // 4. Load all agents defined in game.settings
-        //int numDiggers = this.game.getAgentList().get(AgentType.DIGGER).size();
-        //int numProspectors = this.game.getAgentList().get(AgentType.PROSPECTOR).size();
         
         jade.wrapper.AgentContainer container = this.getContainerController();
-
                
         ServiceDescription searchCriterion = new ServiceDescription(); 
                       
@@ -301,8 +287,7 @@ public class SystemAgent extends ImasAgent {
         String agentName = null;
         String agentPrefix = null;
         
-        try {
-            
+        try {            
             while(outer.hasNext()) {
                Map.Entry agentsList = (Map.Entry)outer.next();           
                ArrayList innerSet = (ArrayList) agentsList.getValue();
@@ -329,9 +314,7 @@ public class SystemAgent extends ImasAgent {
                    // Set the agent AID, without modifying agent type, after setting AID all agents will be able to know the position of all agents in the current map
                    infoAg.setAID(agentID);
                 }
-
             }
-        
         } catch (Exception ex) {
             Logger.getLogger(SystemAgent.class.getName()).log(Level.SEVERE, null, ex);
         }       
@@ -356,31 +339,36 @@ public class SystemAgent extends ImasAgent {
         
         // this behaviour will wait until coordinator agent send the requested actions
         MessageTemplate mt2 = MessageTemplate.MatchLanguage(MessageContent.CHOOSE_ACTION);
-        this.addBehaviour(new ChooseActionSA(this, mt2));
-        
-        // It triggers when the received message is an INFORM.
-        //MessageTemplate mt3 = MessageTemplate.MatchLanguage(MessageContent.CHOOSE_ACTION);
-        //this.addBehaviour(new ChooseActionDCA(this, mt3));
 
         // Setup finished. When the last inform is received, the agent itself will add
         // a behaviour to send/receive actions
     }
-
-//    public void updateGUI() {
-//        this.gui.updateGame();
-//    }
     
-    // Function to update map and game variables
+    // Function to update game
     public void updateGUI() {
-        //this.gui.showGameMap(currentMap);
         this.gui.updateGame();
     }
     
-    public void incrementStep() {
+    // Function to go one step ahead
+    public void incrementStep() {        
+        
+        // Substract one remaining turn
         this.game.setSimulationSteps(this.game.getSimulationSteps() - 1);
+        
+        this.game.setTitle("TURNS LEFT: " + String.valueOf(this.game.getSimulationSteps()));
+        
+        // END GAME
         if (this.game.getSimulationSteps() == 0){
-            // END GAME
+            this.log("GAME OVER");
         }
+        
+        // ADD new metal fields
+//        this.game.getMaxAmountOfNewMetal()
+//        this.game.getMaxNumberFieldsWithNewMetal()
+//        this.game.getNewMetalProbability()
+        this.addElementsForThisSimulationStep();
+        
+        this.updateGUI();
     }
     
     public void checkTurnChanges() throws Exception {
@@ -397,8 +385,6 @@ public class SystemAgent extends ImasAgent {
             
             Map currentAgentList = this.game.getAgentList();
             
-
-
             //1. Set up diggers working
             while (this.diggingRequests.size() > 0){
 
@@ -410,8 +396,6 @@ public class SystemAgent extends ImasAgent {
                 // Remove 1 metal unit from metal field
                 FieldCell metalFieldCell = (FieldCell) nextTurnMap[metalFieldPos[0]][metalFieldPos[1]];
                 metalFieldCell.removeMetal();
-
-                    
 
                 // Set digger agent working in the path cell
                 PathCell diggerCell = (PathCell) nextTurnMap[diggerPos[0]][diggerPos[1]];
@@ -478,8 +462,6 @@ public class SystemAgent extends ImasAgent {
                             }
                             currentCell.removeAgent(infoAg2); 
                         }
-
-                       
                     }
                     else{
                         log("Not allowed movement request (requested movement to path cell where there is a working digger)");
@@ -495,14 +477,12 @@ public class SystemAgent extends ImasAgent {
                     log("Not allowed movement request (requested movement to field cell)");
                 }
             }
-            
          
             Map<AgentType, List<Cell>> newlist = new HashMap<AgentType, List<Cell>>();
             newlist.put(AgentType.DIGGER, digglist);
             newlist.put(AgentType.PROSPECTOR, prosplist);
             
             this.game.setAgentList(newlist);
-            
 
             //4. Set new metal fields detected to visible
             int[] metalPos = new int[2]; 
@@ -531,14 +511,12 @@ public class SystemAgent extends ImasAgent {
 
             //7. Substitute the old map with the new checked map
             currentMap = nextTurnMap.clone();            
-            Thread.sleep(1000);
+            //Thread.sleep(1000);
             result = true;
         
         } catch (Exception ex) {
             Logger.getLogger(SystemAgent.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        
+        } 
     }
 
 }
