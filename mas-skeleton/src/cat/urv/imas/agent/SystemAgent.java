@@ -136,29 +136,11 @@ public class SystemAgent extends ImasAgent {
     /**
      * undiscoveredMetalField will contain the undiscovered metal fields until a prospector discovers them.
      */
-    private List<FieldCell> undiscoveredMetalField = new ArrayList<>();
-    public void addUndiscoveredMetalField(FieldCell newFieldCell) {
-        this.undiscoveredMetalField.add(newFieldCell);
-    }
-    public List<FieldCell> getUndiscoveredMetalFields() {
-        return this.undiscoveredMetalField;
-    } 
-    public void removeUndiscoveredMetalField(FieldCell fieldCell) {
-        this.undiscoveredMetalField.remove(fieldCell);
-    } 
+    private metalFieldsTurns undiscoveredMetalField = new metalFieldsTurns();
     /**
      * discoveredMetalField will contain the discovered metal fields until a digger begin to dig them.
      */
-    private List<FieldCell> discoveredMetalField = new ArrayList<>();
-    public void addDiscoveredMetalField(FieldCell newFieldCell) {
-        this.discoveredMetalField.add(newFieldCell);
-    }
-    public List<FieldCell> getDiscoveredMetalFields() {
-        return this.discoveredMetalField;
-    } 
-    public void removeDiscoveredMetalField(FieldCell fieldCell) {
-        this.discoveredMetalField.remove(fieldCell);
-    } 
+    private metalFieldsTurns discoveredMetalField = new metalFieldsTurns(); 
     /**
      * Game settings. The game with the updated changes that the system agent
      * is constructing while checking that all changes are allowed.
@@ -371,6 +353,8 @@ public class SystemAgent extends ImasAgent {
         // Update statistics window
         this.gui.showStatistics(this.gamePerformanceIndicators);
         
+        this.undiscoveredMetalField.incrementTurn();
+        this.discoveredMetalField.incrementTurn();
         // Substract one remaining turn
         this.game.setSimulationSteps(this.game.getSimulationSteps() - 1);
         
@@ -386,8 +370,6 @@ public class SystemAgent extends ImasAgent {
 //        this.game.getMaxNumberFieldsWithNewMetal()
 //        this.game.getNewMetalProbability()
         this.addElementsForThisSimulationStep();
-        
-        
         
         this.updateGUI();
     }
@@ -416,6 +398,13 @@ public class SystemAgent extends ImasAgent {
 
                 // Remove 1 metal unit from metal field
                 FieldCell metalFieldCell = (FieldCell) nextTurnMap[metalFieldPos[0]][metalFieldPos[1]];
+                double remainingMetalUnits = (int) metalFieldCell.getMetal().values().toArray()[0];
+                
+                if (remainingMetalUnits < 2.0){
+                    this.gamePerformanceIndicators.addTurnsForDiggingMetal(this.discoveredMetalField.getMetalField(metalFieldCell));
+                    this.discoveredMetalField.removeMetalField(metalFieldCell);
+                }                
+                
                 metalFieldCell.removeMetal();
                 this.gamePerformanceIndicators.addMetalUnits(1.0);
 
@@ -425,7 +414,7 @@ public class SystemAgent extends ImasAgent {
                 
                 // Add digger to the current working diggers
                 this.currentWorkingDiggers.setNewAgent(diggerPos, diggerID);
-
+               
                 this.diggingRequests.remove(0);
             }
             
@@ -512,7 +501,9 @@ public class SystemAgent extends ImasAgent {
                 metalPos = mf.getPosition();
                 FieldCell metalCell = (FieldCell) nextTurnMap[metalPos[0]][metalPos[1]];                
                 metalCell.detectMetal();
-                //this.(metalCell);
+                this.discoveredMetalField.addNewMetalField(metalCell);
+                this.gamePerformanceIndicators.addTurnsForDiscoveringMetal(this.undiscoveredMetalField.getMetalField(metalCell));
+                this.undiscoveredMetalField.removeMetalField(metalCell);
             }
 
             //5. Update manufacturing centers (rewards)
@@ -524,14 +515,9 @@ public class SystemAgent extends ImasAgent {
                 this.gamePerformanceIndicators.addBenefits(manufacturingCenterFieldCell.getPrice(), manufacturingCenterFieldCell.getMetal());
 
                 this.manufactureRequests.remove(0);            
-            }
+            } 
 
-            // 6.Generate new metal fields randomly
-            // I think that this is done in 
-            // agent.addElementsForThisSimulationStep(); 
-            // in the prepareResultNotification in the RequestResponseBehaviour  
-
-            //7. Substitute the old map with the new checked map
+            //6. Substitute the old map with the new checked map
             currentMap = nextTurnMap.clone();            
             Thread.sleep(1000);
             result = true;
