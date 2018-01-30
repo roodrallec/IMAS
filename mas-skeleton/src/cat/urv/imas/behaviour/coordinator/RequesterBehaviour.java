@@ -21,11 +21,14 @@ import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import jade.proto.AchieveREInitiator;
 import cat.urv.imas.agent.CoordinatorAgent;
+import cat.urv.imas.map.Cell;
+import cat.urv.imas.map.FieldCell;
 import cat.urv.imas.onthology.*;
 import cat.urv.imas.onthology.MessageContent;
 import jade.domain.FIPANames;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -79,9 +82,17 @@ public class RequesterBehaviour extends AchieveREInitiator {
             agent.log("Map sent to underlying levels.");
             agent.send(mapmsg);
             
-            
+            List<MetalField> mfl = agent.getCompleteMFL().getMetalFields();
+            Cell[][] currentmap = agent.getGame().getMap();
+            for (Iterator<MetalField> it = mfl.iterator(); it.hasNext();) {
+                MetalField mf = it.next();
+                boolean stillMetal = ((FieldCell)currentmap[mf.getPosition()[0]][mf.getPosition()[1]]).isEmpty();
+                if (!stillMetal){
+                    mfl.remove(mf);
+                }
+            }
+            agent.setCompleteMFL(new MetalFieldList(mfl));
             /*
-            
             MetalField mf = new MetalField(new int[]{2,2},"G",1);
             MetalField mf2 = new MetalField(new int[]{5,3},"G",1);
             List<MetalField> metalFields = new ArrayList<MetalField>();
@@ -89,15 +100,13 @@ public class RequesterBehaviour extends AchieveREInitiator {
             metalFields.add(mf2);
             MetalFieldList currentMFL = new MetalFieldList(metalFields);
             agent.setCurrentMFL(currentMFL);
-            
             ACLMessage mflmsg = new ACLMessage(ACLMessage.INFORM);
             mflmsg.clearAllReceiver();
             mflmsg.addReceiver(agent.getDiggerCoordinatorAgent());
             mflmsg.setContentObject((Serializable) agent.getCurrentMFL());
             mflmsg.setLanguage(MessageContent.GET_MAP);
             agent.send(mflmsg);
-            
-           */
+             */
         } catch (Exception e) {
             agent.errorLog("Incorrect content: " + e.toString());
         }

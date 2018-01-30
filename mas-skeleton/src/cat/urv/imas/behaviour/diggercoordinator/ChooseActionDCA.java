@@ -102,6 +102,7 @@ public class ChooseActionDCA extends AchieveREResponder {
                 dmlmsg.setLanguage(MessageContent.DIG_ACTION);
                 dmlmsg.setContentObject(dml);
                 agent.send(dmlmsg);
+                agent.setCurrentDML(new ArrayList<DiggingMessage>());
                 
                 //Send the Moving Message list
                 MovingMessageList mml = new MovingMessageList(agent.getCurrentMML());
@@ -111,6 +112,7 @@ public class ChooseActionDCA extends AchieveREResponder {
                 mmlmsg.setLanguage(MessageContent.DIG_ACTION);
                 mmlmsg.setContentObject(mml);
                 agent.send(mmlmsg);
+                agent.setCurrentMML(new ArrayList<MovingMessage>());
                 
                 //Send the Manufacturing Message list
                 ManufacturingMessageList manml = new ManufacturingMessageList(agent.getCurrentManML());
@@ -120,6 +122,7 @@ public class ChooseActionDCA extends AchieveREResponder {
                 manmlmsg.setLanguage(MessageContent.DIG_ACTION);
                 manmlmsg.setContentObject(manml);
                 agent.send(manmlmsg);
+                agent.setCurrentManML(new ArrayList<ManufacturingMessage>());
                 
                 agent.log("ALL messages sent to CA.");
             }

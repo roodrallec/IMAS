@@ -77,7 +77,7 @@ public class ChooseActionDA extends AchieveREResponder {
                         //Aplicar el metode per anar al manufacture
                         
                         ManufacturingCenterCell mancencell = agent.chooseManufacturingCenter();
-                        int[] manCenDist = new int[]{agent.getCurrentPosition()[0]-mancencell.getRow(),agent.getCurrentPosition()[1]-mancencell.getCol()};
+                        int[] manCenDist = new int[]{mancencell.getRow()-agent.getCurrentPosition()[0],mancencell.getCol()-agent.getCurrentPosition()[1]};
                         
                         if(abs(manCenDist[0]) <= 1 && abs(manCenDist[1]) <= 1){
                             agent.log("No metal assigned. Manufacture.");
@@ -88,6 +88,9 @@ public class ChooseActionDA extends AchieveREResponder {
                             mfmsg.setContentObject(MFMsg);
                             mfmsg.setLanguage(MessageContent.CHOOSE_ACTION);
                             agent.setUsedSlots(agent.getUsedSlots()-1);
+                            if (agent.getUsedSlots()==0){
+                                agent.setMetaltype("N");
+                            }
                         }
                         else{
                             agent.log("No metal assigned. Moving towards manufacturing center.");
@@ -134,6 +137,8 @@ public class ChooseActionDA extends AchieveREResponder {
                         digmsg.addReceiver(agent.getDiggerCoordinatorAgent());
                         digmsg.setContentObject(DMsg);
                         digmsg.setLanguage(MessageContent.CHOOSE_ACTION);
+                        agent.setMetaltype(agent.getCurrentMF().getType());
+                        agent.setUsedSlots(agent.getUsedSlots()+1);
                         return digmsg;
                     }
                     else{

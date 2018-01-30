@@ -33,6 +33,7 @@ import cat.urv.imas.onthology.DiggingMessageList;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.ManufacturingMessageList;
 import cat.urv.imas.onthology.MessageContent;
+import cat.urv.imas.onthology.MetalField;
 import cat.urv.imas.onthology.MetalFieldList;
 import cat.urv.imas.onthology.MovingMessage;
 import cat.urv.imas.onthology.MovingMessageList;
@@ -78,7 +79,14 @@ public class ActionHandlingCA extends AchieveREResponder {
                 MFLmsg.addReceiver(agent.getDiggerCoordinatorAgent());
                 MFLmsg.setContentObject((MetalFieldList) msg.getContentObject());
                 MFLmsg.setLanguage(MessageContent.GET_MAP);
+                //agent.getGame().getCellsOfType()
+                
                 agent.setCurrentMFL((MetalFieldList) msg.getContentObject());
+                List<MetalField> comls = agent.getCompleteMFL().getMetalFields();
+                comls.addAll(agent.getCurrentMFL().getMetalFields());
+                agent.setCompleteMFL(new MetalFieldList(comls));
+                
+                
                 return MFLmsg;
             }
             else if(msg.getContentObject().getClass() == cat.urv.imas.onthology.DiggingMessageList.class){
@@ -107,6 +115,7 @@ public class ActionHandlingCA extends AchieveREResponder {
                 completemsg.addReceiver(agent.getSystemAgent());
                 completemsg.setLanguage(MessageContent.CHOOSE_ACTION);
                 completemsg.setContentObject(commsg);
+                agent.setMMList(new MovingMessageList());
                 agent.log("Turn information sent.");
                 return completemsg;
             }

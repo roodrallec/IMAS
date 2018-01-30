@@ -416,6 +416,7 @@ public class SystemAgent extends ImasAgent {
                 // Remove 1 metal unit from metal field
                 FieldCell metalFieldCell = (FieldCell) nextTurnMap[metalFieldPos[0]][metalFieldPos[1]];
                 metalFieldCell.removeMetal();
+
                     
 
                 // Set digger agent working in the path cell
@@ -532,7 +533,7 @@ public class SystemAgent extends ImasAgent {
 
             //7. Substitute the old map with the new checked map
             currentMap = nextTurnMap.clone();            
-            
+            Thread.sleep(1000);
             result = true;
         
         } catch (Exception ex) {

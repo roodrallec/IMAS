@@ -66,20 +66,29 @@ public class ProspectorAgent extends ImasAgent {
     }            
 
     public MetalFieldList searchForMetal() {
-        int[] metalLocation = {};
+        int[] metalLocation = new int[2];
         int quantity = 0;
         String metal = "";
         for(Cell c: this.mapView) {
             if (c instanceof SettableFieldCell){
                 SettableFieldCell fc = (SettableFieldCell)(c);
-                if (fc.detectMetal().size() == 1) {                    
-                    quantity = (int) (fc.detectMetal().values().toArray()[0]);                    
-                    metal = (fc.detectMetal().keySet().toArray())[0].toString();
-                    metalLocation[0] = c.getRow();                   
-                    metalLocation[1] = c.getCol();
-                    MetalField currentMetal = new MetalField(metalLocation, metal, quantity);
-                    currentMetalFields.add(currentMetal);
+                if(!((FieldCell)fc).isEmpty()){
+                    if (fc.detectMetal().size() == 1) {                    
+                        quantity = (int) (fc.detectMetal().values().toArray()[0]);                    
+                        metal = (fc.detectMetal().keySet().toArray())[0].toString();
+                        if (metal.equals("SILVER")){
+                            metal = "S";
+                        }
+                        else if (metal.equals("GOLD")){
+                            metal = "G";
+                        }
+                        metalLocation[0] = c.getRow();                   
+                        metalLocation[1] = c.getCol();
+                        MetalField currentMetal = new MetalField(metalLocation, metal, quantity);
+                        currentMetalFields.add(currentMetal);
+                    }
                 }
+                
             }         
         }        
         return new MetalFieldList(currentMetalFields);

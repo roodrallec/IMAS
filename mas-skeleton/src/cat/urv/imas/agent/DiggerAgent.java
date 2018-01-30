@@ -368,7 +368,7 @@ public class DiggerAgent extends ImasAgent {
         List mancells = this.game.getCellsOfType().get(CellType.MANUFACTURING_CENTER);
         for (int i = 0; i < mancells.size(); i++){
             ManufacturingCenterCell mancell = (ManufacturingCenterCell) mancells.get(i);
-            if(mancell.getMetal().getShortString() == this.metaltype){
+            if(mancell.getMetal().getShortString().equals(this.metaltype)){
                 double distbid = 1.0*abs(this.currentPosition[0]-mancell.getRow()) + 1.0*abs(this.currentPosition[1]-mancell.getCol());
                 if (distbid == 0){
                     
@@ -405,10 +405,11 @@ public class DiggerAgent extends ImasAgent {
         sd1.setOwnership(OWNER);
         this.setCrash(true);
         // PROVES! //
-        this.currentPosition = new int[] {5,2};
-        this.parameters = new double [] {0.5,0.5,0.5,0.1};
+        //this.currentPosition = new int[] {5,2};
+        this.parameters = new double [] {0.05,0.05,0.05,0.1};
         this.usedSlots = 0;
         this.previousMovement = new int[]{0,0};
+        this.metaltype = "N";
                 
         
         DFAgentDescription dfd = new DFAgentDescription();

@@ -25,6 +25,7 @@ import jade.domain.*;
 import jade.domain.FIPAAgentManagement.*;
 import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.*;
+import java.util.ArrayList;
 
 /**
  * The main Coordinator agent. 
@@ -45,6 +46,7 @@ public class CoordinatorAgent extends ImasAgent {
     private AID prospectorCoordinatorAgent;
     
     private MetalFieldList currentMFL;
+    private MetalFieldList completeMFL = new MetalFieldList(new ArrayList<MetalField>());
     private DiggingMessageList DMList;
     private MovingMessageList MMList = new MovingMessageList();
     private ManufacturingMessageList MFMList;
@@ -119,6 +121,14 @@ public class CoordinatorAgent extends ImasAgent {
 
     public void setFlag(int flag) {
         this.flag = flag;
+    }
+
+    public MetalFieldList getCompleteMFL() {
+        return completeMFL;
+    }
+
+    public void setCompleteMFL(MetalFieldList completeMFL) {
+        this.completeMFL = completeMFL;
     }
     
     

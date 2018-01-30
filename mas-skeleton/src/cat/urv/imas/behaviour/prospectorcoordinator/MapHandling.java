@@ -116,6 +116,7 @@ public class MapHandling extends AchieveREResponder {
                     agent.log("Clean list of metals sent");
                     MFLmsg.setContentObject(currentMFL);
                     MFLmsg.setLanguage(DIG_ACTION);
+                    agent.setMFLreceived(new ArrayList<MetalFieldList>());
                     return MFLmsg;
                 }
             }
