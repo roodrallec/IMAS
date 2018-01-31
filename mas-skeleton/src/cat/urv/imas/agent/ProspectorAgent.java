@@ -120,7 +120,7 @@ public class ProspectorAgent extends ImasAgent {
                 dx = pc.getCol()- this.currentPosition[1];
                 dy = pc.getRow()- this.currentPosition[0]; 
                 
-                if (!pc.isThereADiggerAgentWorking()){
+                if (!pc.isThereADiggerAgentWorking()){                    
                     // we give a momentum to the prospector movement, same movement as in last turn is better
                     if ((this.lastMovementDir[0] == dx) && (this.lastMovementDir[1] == dy)){                    
                         currentUtility = (int) (pc.getUtility() + 20.0 * this.momentum);

@@ -84,7 +84,7 @@ public class ChooseActionSA extends AchieveREResponder {
                 agent.log("System Agent has received metal fields discovered.");
                 
                 agent.checkTurnChanges();
-                agent.incrementStep();
+                agent.decrementStep();
                 ACLMessage newmap = new ACLMessage(ACLMessage.INFORM);
                 newmap.clearAllReceiver();
                 newmap.addReceiver(agent.getCoordinatorAgent());
