@@ -47,21 +47,6 @@ public class ManufacturingCenterCell extends Cell {
         this.price = price;
         this.metal = type;
     }
-    
-    /**
-     * Gets the reward of manufacturing a metal in this manufacturing center.
-     */
-    public int getPrice() {
-        return this.price;
-    }
-    
-    /**
-     * Gets the metal type that this manufacturing center can manufacture.
-     */
-    public MetalType getPMetalType() {
-        return this.getPMetalType();
-    }
-    
 
     @Override
     public boolean isEmpty() {
@@ -77,6 +62,10 @@ public class ManufacturingCenterCell extends Cell {
     @Override
     public String getMapMessage() {
         return price + ":" + metal.getShortString();
+    }
+
+    public int getPrice() {
+        return price;
     }
 
     public MetalType getMetal() {

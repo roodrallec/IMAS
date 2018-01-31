@@ -13,12 +13,18 @@ import java.util.List;
  *
  * @author ALEIX
  */
-public class AgentsPositions {
+public class ActionsRequests {
     private List<AID> ids = new ArrayList<>();
     private ArrayList<int[]> positions = new ArrayList<>();
     private int agentsInList = 0;
 
-    public AgentsPositions() {
+    public ActionsRequests() {
+    }
+    
+    public void clear() {
+        ids.clear();
+        positions.clear();
+        agentsInList = 0;
     }
     
     public int getNumberOfAgentsInList() {
@@ -46,6 +52,14 @@ public class AgentsPositions {
         return agentPos;
     } 
     
+        
+    public void removeAgentById(AID agentId) {
+        int agentIndex = ids.indexOf(agentId);
+        ids.remove(agentIndex);
+        positions.remove(agentIndex);
+        agentsInList--;
+    } 
+    
     public int[] getAgentByName(String agentId) {
         int[] agentPos; // = new int[2];
         int agentIndex = ids.indexOf(agentId);
@@ -66,6 +80,9 @@ public class AgentsPositions {
     }
     public AID getAgentAIDByIndex(int agentIndex) {            
         return ids.get(agentIndex);
+    }
+    public List<AID> getAllAgentsAID() {            
+        return ids;
     }
         
 }

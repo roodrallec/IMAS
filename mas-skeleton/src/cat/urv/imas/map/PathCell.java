@@ -30,12 +30,10 @@ public class PathCell extends Cell {
      * Information about the agent the cell contains.
      */
     private Agents agents = new Agents();
-    /**
-     * Notifies if digger Agent is working there. By default any digger is working.
-     */
+    
     private boolean diggerWorking = false;
     
-    private int utility = 0;
+    private double utility = 0.0;
     /**
      * Builds a cell with a given type.
      *
@@ -64,6 +62,7 @@ public class PathCell extends Cell {
         diggerWorking = false;
     }
 
+    
     /* ********************************************************************** */
     /**
      * Checks whether this cell contains a digger agent digging up some metal.
@@ -104,12 +103,16 @@ public class PathCell extends Cell {
         this.utility = 0;
     }
     
-    public void incUtility() {
-        this.utility ++;
+    public void incUtility(double amount) {
+        this.utility = this.utility + amount;
     }
     
-    public int getUtility() {
+    public double getUtility() {
         return this.utility;
+    }
+    
+    public void setUtility(double utility) {
+        this.utility = utility;
     }
     /* ********************************************************************** */
     /**

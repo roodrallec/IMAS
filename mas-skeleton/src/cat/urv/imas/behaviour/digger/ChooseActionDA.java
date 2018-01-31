@@ -30,6 +30,8 @@ import cat.urv.imas.map.*;
 import cat.urv.imas.map.PathCell;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.MessageContent;
+import jade.core.AID;
+import jade.domain.FIPANames;
 import jade.lang.acl.UnreadableException;
 import java.io.IOException;
 import static java.lang.Math.abs;
@@ -75,29 +77,47 @@ public class ChooseActionDA extends AchieveREResponder {
                         //Aplicar el metode per anar al manufacture
                         
                         ManufacturingCenterCell mancencell = agent.chooseManufacturingCenter();
-                        int[] manCenDist = new int[]{agent.getCurrentPosition()[0]-mancencell.getRow(),agent.getCurrentPosition()[1]-mancencell.getCol()};
+                        int[] manCenDist = new int[]{mancencell.getRow()-agent.getCurrentPosition()[0],mancencell.getCol()-agent.getCurrentPosition()[1]};
                         
                         if(abs(manCenDist[0]) <= 1 && abs(manCenDist[1]) <= 1){
                             agent.log("No metal assigned. Manufacture.");
-                            ACLMessage movemsg = new ACLMessage(ACLMessage.INFORM);
-                            movemsg.clearAllReceiver();
-                            movemsg.addReceiver(agent.getDiggerCoordinatorAgent());
-                            movemsg.setContentObject(mancencell);
-                            movemsg.setLanguage(MessageContent.CHOOSE_ACTION);
+                            ACLMessage mfmsg = new ACLMessage(ACLMessage.INFORM);
+                            ManufacturingMessage MFMsg = new ManufacturingMessage(agent.getAID(),mancencell,agent.getCurrentPosition());
+                            mfmsg.clearAllReceiver();
+                            mfmsg.addReceiver(agent.getDiggerCoordinatorAgent());
+                            mfmsg.setContentObject(MFMsg);
+                            mfmsg.setLanguage(MessageContent.CHOOSE_ACTION);
+                            agent.setUsedSlots(agent.getUsedSlots()-1);
+                            if (agent.getUsedSlots()==0){
+                                agent.setMetaltype("N");
+                            }
+                            return(mfmsg);
                         }
                         else{
                             agent.log("No metal assigned. Moving towards manufacturing center.");
                             int[] movement = agent.computeMovement(manCenDist);
+                            MovingMessage MMsg = new MovingMessage(agent.getAID(),movement,agent.getCurrentPosition());
                             ACLMessage movemsg = new ACLMessage(ACLMessage.INFORM);
                             movemsg.clearAllReceiver();
                             movemsg.addReceiver(agent.getDiggerCoordinatorAgent());
-                            movemsg.setContentObject(movement);
+                            movemsg.setContentObject(MMsg);
                             movemsg.setLanguage(MessageContent.CHOOSE_ACTION);
                             return movemsg;   
                         }
                     }
                     else{
                         agent.log("No metal assigned. Follow Prospector.");
+                        agent.log("Current Position:" + Arrays.toString(agent.getCurrentPosition()));
+                        
+                        List<AID> candidates = agent.getProspectorAgents();
+                        ACLMessage cnmsg = new ACLMessage(ACLMessage.CFP);
+                        for (int i = 0; i < candidates.size(); i++){
+                            cnmsg.addReceiver(candidates.get(i));
+                        }
+                        cnmsg.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
+                        cnmsg.setContent(MessageContent.COALITION);
+                        
+                        agent.addBehaviour(new ContractNetDA(agent,cnmsg));
                                 // contract net;
                     }
                 }
@@ -113,19 +133,23 @@ public class ChooseActionDA extends AchieveREResponder {
                     if(abs(distance[0]) <= 1 && abs(distance[1]) <= 1){
                         agent.log("Mine.");
                         ACLMessage digmsg = new ACLMessage(ACLMessage.INFORM);
+                        DiggingMessage DMsg = new DiggingMessage(agent.getAID(),agent.getCurrentMF(),agent.getCurrentPosition());
                         digmsg.clearAllReceiver();
                         digmsg.addReceiver(agent.getDiggerCoordinatorAgent());
-                        digmsg.setContentObject(agent.getCurrentMF());
+                        digmsg.setContentObject(DMsg);
                         digmsg.setLanguage(MessageContent.CHOOSE_ACTION);
+                        agent.setMetaltype(agent.getCurrentMF().getType());
+                        agent.setUsedSlots(agent.getUsedSlots()+1);
                         return digmsg;
                     }
                     else{
                         agent.log("Moving toward metal field.");
                         int[] movement = agent.computeMovement(distance);
+                        MovingMessage MMsg = new MovingMessage(agent.getAID(),movement,agent.getCurrentPosition());
                         ACLMessage movemsg = new ACLMessage(ACLMessage.INFORM);
                         movemsg.clearAllReceiver();
                         movemsg.addReceiver(agent.getDiggerCoordinatorAgent());
-                        movemsg.setContentObject(movement);
+                        movemsg.setContentObject(MMsg);
                         movemsg.setLanguage(MessageContent.CHOOSE_ACTION);
                         return movemsg;
                     }

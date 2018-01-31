@@ -31,9 +31,7 @@ public class FieldCell extends Cell {
      * When this metal is not found yet, an empty list of metal is returned.
      */
     protected static Map<MetalType, Integer> empty = new HashMap();
-    
-    //private int notVisitedTurns = 0;   
-    
+
     /**
      * Metal of the field: it can only be of one type at a time.
      * But, once generated, it can be of any type and amount.
@@ -44,6 +42,12 @@ public class FieldCell extends Cell {
      * to find it yet.
      */
     protected boolean found = false;
+    /**
+     * Aux var for SystemAgent. If true, it means that this is a metal field already found by prospectors and system agent had recieved it previously.
+     */
+    protected boolean detected = false;
+    
+    private int utility = 0;
 
     /**
      * Builds a cell corresponding to a field.
@@ -54,6 +58,36 @@ public class FieldCell extends Cell {
     public FieldCell(int row, int col) {
         super(CellType.FIELD, row, col);
         metal = new HashMap();
+    }
+    
+    
+
+    public boolean isDetected() {
+        return detected;
+    }
+
+    public void setDetected() {
+        this.detected = true;
+    }
+    
+    public void removeDetected() {
+        this.detected = false;
+    }
+    
+    public void resetUtility() {
+        this.utility = 0;
+    }
+    
+    public void incUtilityUnit() {
+        this.utility ++;
+    }
+    
+    public int getUtility() {
+        return this.utility;
+    }
+    
+    public void setUtility(int utility) {
+        this.utility = utility;
     }
 
     /**
@@ -80,7 +114,14 @@ public class FieldCell extends Cell {
         return found;
     }
 
+    public boolean isFound() {
+        return found;
+    }
 
+    public void setFound() {
+        this.found = true;
+    }
+    
     /**
      * Removes an item of the current metal, if any.
      * When there is no more metal after removing it, the set of

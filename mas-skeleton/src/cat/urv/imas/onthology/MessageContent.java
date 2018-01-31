@@ -27,6 +27,7 @@ public class MessageContent {
      * city information.
      */
     public static final String GET_MAP = "Get map";
+    public static final String NEW_MAP = "New map";
     public static final String MAP_RECEIVED = "Map received";
     public static final String OK = "OK";
     public static final String SELECTIVITY = "SelectivityVotingProtocol";
@@ -34,6 +35,8 @@ public class MessageContent {
     public static final String DIG_ACTION = "DigAction";
     public static final String MOVE_ACTION = "MoveAction";
     public static final String MANUFACTURE_ACTION = "ManufactureAction";
+    public static final String COALITION = "CoalitionFormation";
+    public static final InitialGameSettings IGS = InitialGameSettings.load("game.settings");
     
     
 }

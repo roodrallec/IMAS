@@ -27,7 +27,6 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.AchieveREResponder;
 import cat.urv.imas.agent.SystemAgent;
-import cat.urv.imas.agent.SystemAgent;
 import cat.urv.imas.map.*;
 import cat.urv.imas.map.PathCell;
 import cat.urv.imas.onthology.GameSettings;
@@ -44,7 +43,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * This method collects movements, manufacturing and digging actions computed by diggers.
+ * This method collects movements, manufacturing and digging actions computed by mobile agents.
  */
 public class ChooseActionSA extends AchieveREResponder {
 
@@ -56,7 +55,7 @@ public class ChooseActionSA extends AchieveREResponder {
      */
     public ChooseActionSA(SystemAgent agent, MessageTemplate mt) {
         super(agent, mt);
-        agent.log("Waiting for the coordinator to retrieve current turn diggers and prospectors actions.");
+        agent.log("Waiting for the diggers to decide action.");
     }
 
     /**
@@ -65,80 +64,46 @@ public class ChooseActionSA extends AchieveREResponder {
      * @param msg message received.
      * 
      */
-//    @Override
-//    protected ACLMessage handleRequest(ACLMessage msg) {
-//        try {
-//            // Declares the current agent so you can use its getters and setters (and other methods)
-//            SystemAgent agent = (SystemAgent)this.getAgent();
-//            if(msg.getContentObject().getClass().equals(MetalField.class)){
-//                //List<DiggingMessage> aux = agent.getCurrentDML();
-//                DiggingMessage digmes = new DiggingMessage(msg.getSender(),(MetalField)msg.getContentObject());
-//                aux.add(digmes);
-//                //agent.setCurrentDML(aux);
-//                agent.log("Received digging petition.");
-//
-//            }
-//            else if(msg.getContentObject().getClass().equals(int[].class)){
-//                List<MovingMessage> aux = agent.getCurrentMML();
-//                MovingMessage movmes = new MovingMessage(msg.getSender(),(int[])msg.getContentObject());
-//                aux.add(movmes);
-//                //agent.setCurrentMML(aux);
-//                agent.log("Received movement petition.");
-//                
-//            }
-//            else if(msg.getContentObject().getClass().equals(ManufacturingCenterCell.class)){
-//                List<ManufacturingMessage> aux = agent.getCurrentManML();
-//                ManufacturingMessage manmes = new ManufacturingMessage(msg.getSender(), (ManufacturingCenterCell) msg.getContentObject());
-//                aux.add(manmes);
-//                //agent.setCurrentManML(aux);
-//                
-//                agent.log("Received petition to manufacture.");   
-//            }
-//            
-////            int count = agent.getReceivedActions()+1;
-////            if (count == agent.getNumDiggers()){
-////                agent.setReceivedActions(0);
-////                //Send the Digging Message list
-////                DiggingMessageList dml = new DiggingMessageList(agent.getCurrentDML());
-////                ACLMessage dmlmsg = new ACLMessage(ACLMessage.INFORM);
-////                dmlmsg.clearAllReceiver();
-////                dmlmsg.addReceiver(agent.getCoordinatorAgent());
-////                dmlmsg.setLanguage(MessageContent.DIG_ACTION);
-////                dmlmsg.setContentObject(dml);
-////                agent.send(dmlmsg);
-////                
-////                //Send the Moving Message list
-////                MovingMessageList mml = new MovingMessageList(agent.getCurrentMML());
-////                ACLMessage mmlmsg = new ACLMessage(ACLMessage.INFORM);
-////                mmlmsg.clearAllReceiver();
-////                mmlmsg.addReceiver(agent.getCoordinatorAgent());
-////                mmlmsg.setLanguage(MessageContent.DIG_ACTION);
-////                mmlmsg.setContentObject(mml);
-////                agent.send(mmlmsg);
-////                
-////                //Send the Manufacturing Message list
-////                ManufacturingMessageList manml = new ManufacturingMessageList(agent.getCurrentManML());
-////                ACLMessage manmlmsg = new ACLMessage(ACLMessage.INFORM);
-////                manmlmsg.clearAllReceiver();
-////                manmlmsg.addReceiver(agent.getCoordinatorAgent());
-////                manmlmsg.setLanguage(MessageContent.DIG_ACTION);
-////                manmlmsg.setContentObject(manml);
-////                agent.send(manmlmsg);
-////                
-////                agent.log("ALL messages sent to DCA.");
-////            }
-////            else{
-////                agent.setReceivedActions(count);
-////            }
-//            
-//            
-////        } catch (UnreadableException ex) {
-////            Logger.getLogger(ChooseActionSA.class.getName()).log(Level.SEVERE, null, ex);
-////        } catch (IOException ex) {
-////            Logger.getLogger(ChooseActionSA.class.getName()).log(Level.SEVERE, null, ex);
-////        }
-////        return null;
-//    }
+    @Override
+    protected ACLMessage handleRequest(ACLMessage msg) {
+        try {
+            // Declares the current agent so you can use its getters and setters (and other methods)
+            SystemAgent agent = (SystemAgent)this.getAgent();
+            if(msg.getContentObject().getClass().equals(CompleteMessage.class)){
+                List<DiggingMessage> DMList= ((DiggingMessageList)((CompleteMessage) msg.getContentObject()).getDML()).getDiggingMessages();
+                agent.setDiggingRequests(DMList);
+                agent.log("System Agent has received digging requests.");
+                List<MovingMessage> MMList= ((MovingMessageList)((CompleteMessage) msg.getContentObject()).getMML()).getMovingMessages();
+                agent.setRequestedAgentsPos(MMList);
+                agent.log("System Agent has received movements requests.");
+                List<ManufacturingMessage> MFMList= ((ManufacturingMessageList)((CompleteMessage) msg.getContentObject()).getMFML()).getManufacturingMessage();
+                agent.setManufactureRequests(MFMList);
+                agent.log("System Agent has received manufacturing requests.");
+                List<MetalField> MFList = ((MetalFieldList)((CompleteMessage) msg.getContentObject()).getTurnMFL()).getMetalFields();
+                agent.setMetalFieldList(MFList);
+                agent.log("System Agent has received metal fields discovered.");
+                
+                agent.checkTurnChanges();
+                agent.incrementStep();
+                ACLMessage newmap = new ACLMessage(ACLMessage.INFORM);
+                newmap.clearAllReceiver();
+                newmap.addReceiver(agent.getCoordinatorAgent());
+                newmap.setContentObject(agent.getGame());
+                newmap.setLanguage(MessageContent.NEW_MAP);
+                return newmap;
+                
+            }
+         
+            
+        } catch (UnreadableException ex) {
+            Logger.getLogger(ChooseActionSA.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(ChooseActionSA.class.getName()).log(Level.SEVERE, null, ex);
+        } //catch (IOException ex) {
+//            Logger.getLogger(ChooseActionSA.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+        return null;
+    }
     
 
     /*
@@ -147,15 +112,18 @@ public class ChooseActionSA extends AchieveREResponder {
      * @return ACLMessage to be sent as a result notification, of type INFORM
      * when all was ok, or FAILURE otherwise.
      */
-//    @Override
-//    protected ACLMessage prepareResultNotification(ACLMessage msg, ACLMessage response) {
-//        return null;
-//    }
-//
-//    @Override
-//    public void reset() {
-//    }
-    
+    @Override
+    protected ACLMessage prepareResultNotification(ACLMessage msg, ACLMessage response) {
+        SystemAgent agent = (SystemAgent)this.getAgent();
+        try {
+            agent.checkTurnChanges();
+        } catch (Exception ex) {
+            Logger.getLogger(ChooseActionSA.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
 
-
+    @Override
+    public void reset() {
+    }
 }

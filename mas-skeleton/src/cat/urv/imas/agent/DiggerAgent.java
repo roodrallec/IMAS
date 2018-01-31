@@ -33,9 +33,6 @@ import static java.lang.Math.abs;
 import java.util.Arrays;
 import java.util.List;
 
-import cat.urv.imas.agent.SystemAgent;
-import cat.urv.imas.map.AgentsPositions;
-
 
 public class DiggerAgent extends ImasAgent {
 
@@ -44,9 +41,7 @@ public class DiggerAgent extends ImasAgent {
     
     private GameSettings game;
     
-    private SystemAgent systemAgent;
-    
-    private int[] currentPosition; //This has to be initializaed (TODO Aleix)
+    private int[] currentPosition; 
     
     private boolean waitingMapFlag = true;
     
@@ -63,6 +58,10 @@ public class DiggerAgent extends ImasAgent {
     private Boolean crash;
     
     private int[] previousMovement;
+    
+    private List<AID> prospectorAgents = new ArrayList<AID>();
+    
+    private int numProspectors = MessageContent.IGS.getAgentList().get(AgentType.PROSPECTOR).size();
     
     
     /*      METHODS     */
@@ -153,6 +152,22 @@ public class DiggerAgent extends ImasAgent {
     public void setPreviousMovement(int[] previousMovement) {
         this.previousMovement = previousMovement;
     }
+
+    public List<AID> getProspectorAgents() {
+        return prospectorAgents;
+    }
+
+    public void setProspectorAgents(List<AID> prospectorAgents) {
+        this.prospectorAgents = prospectorAgents;
+    }
+
+    public int getNumProspectors() {
+        return numProspectors;
+    }
+
+    public void setNumProspectors(int numProspectors) {
+        this.numProspectors = numProspectors;
+    }
        
     
     // Method to compute bids
@@ -185,7 +200,7 @@ public class DiggerAgent extends ImasAgent {
                 else{
                      unitbid = this.getParameters()[0]*1.0*mf.getQuantity()/EmptySlots + this.getParameters()[1]*1.0*EmptySlots;
                 }
-                if(distbid == 0){
+                if(abs(this.currentPosition[0]-mf.getPosition()[0]) <=1 && abs(this.currentPosition[1]-mf.getPosition()[1])<=1){
                     bids[i] = 10000;
                 }
                 else{
@@ -198,7 +213,8 @@ public class DiggerAgent extends ImasAgent {
         bids[bids.length-1] = this.game.getDiggersCapacity()-this.getUsedSlots();
         
         return bids;       
-    }    
+    }
+    
     
     public int[] computeMovement(int[] distance){
         GameSettings game = this.getGame();
@@ -242,39 +258,60 @@ public class DiggerAgent extends ImasAgent {
                 }  
             }
             
-            if (flag == 0) { //You can't reduce the distance --> Check whether you can  keep going back.
-                if(game.getMap()[pos[0]+previousmovement[0]][pos[1] + previousmovement[1]].getCellType() == CellType.PATH){
-                    movement[0] = previousmovement[0];
-                    movement[1] = previousmovement[1];
-                    this.log("Moving Backwards");
-                }
-                else if (abs(previousmovement[0])== 0){ //Change direction perpendicularly if you can't keep moving backwards.
-                    if(game.getMap()[pos[0]+1][pos[1]].getCellType() == CellType.PATH){
-                        movement[0] = 1;
-                        movement[1] = 0;
-                        this.log("Can't Move Backwards, Moving Up");
-                    }
+            if (flag == 0) {
+                if (previousmovement[0]+previousmovement[1] ==0){
+                    if(game.getMap()[pos[0]][pos[1]-1].getCellType() == CellType.PATH){
+                        movement = new int[]{0,-1};
+                        this.log("Moving left.");
+                    }  
+                    else if(game.getMap()[pos[0]][pos[1]+1].getCellType() == CellType.PATH){
+                        movement = new int[]{0,1};
+                        this.log("Moving right.");
+                    }  
+                    else if(game.getMap()[pos[0]+1][pos[1]].getCellType() == CellType.PATH){
+                        movement = new int[]{1,0};
+                        this.log("Moving down.");
+                    }  
                     else if(game.getMap()[pos[0]-1][pos[1]].getCellType() == CellType.PATH){
-                        movement[0] = -1;
-                        movement[1] = 0;
-                        this.log("Can't Move Backwards, Moving Down");
-                    }
+                        movement = new int[]{-1,0};
+                        this.log("Moving up.");
+                    }    
                 }
-                else if (abs(previousmovement[1])== 0){
-                    if(game.getMap()[pos[0]][pos[1]+1].getCellType() == CellType.PATH){
-                        movement[0] = 0;
-                        movement[1] = 1;
-                        this.log("Can't Move Backwards, Moving Right");
+//You can't reduce the distance --> Check whether you can  keep going back.
+                else{
+                    if(game.getMap()[pos[0]+previousmovement[0]][pos[1] + previousmovement[1]].getCellType() == CellType.PATH){
+                        movement[0] = previousmovement[0];
+                        movement[1] = previousmovement[1];
+                        this.log("Moving Backwards");
                     }
-                    else if(game.getMap()[pos[0]][pos[1]-1].getCellType() == CellType.PATH){
-                        movement[0] = 0;
-                        movement[1] = -1;
-                        this.log("Can't Move Backwards, Moving Left");
+                    else if (abs(previousmovement[0])== 0){ //Change direction perpendicularly if you can't keep moving backwards.
+                        if(game.getMap()[pos[0]+1][pos[1]].getCellType() == CellType.PATH){
+                            movement[0] = 1;
+                            movement[1] = 0;
+                            this.log("Can't Move Backwards, Moving Up");
+                        }
+                        else if(game.getMap()[pos[0]-1][pos[1]].getCellType() == CellType.PATH){
+                            movement[0] = -1;
+                            movement[1] = 0;
+                            this.log("Can't Move Backwards, Moving Down");
+                        }
+                    }
+                    else if (abs(previousmovement[1])== 0){
+                        if(game.getMap()[pos[0]][pos[1]+1].getCellType() == CellType.PATH){
+                            movement[0] = 0;
+                            movement[1] = 1;
+                            this.log("Can't Move Backwards, Moving Right");
+                        }
+                        else if(game.getMap()[pos[0]][pos[1]-1].getCellType() == CellType.PATH){
+                            movement[0] = 0;
+                            movement[1] = -1;
+                            this.log("Can't Move Backwards, Moving Left");
+                        }
                     }
                 }
 
                 
-            }
+            }   
         }
         else{
         
@@ -352,7 +389,7 @@ public class DiggerAgent extends ImasAgent {
         List mancells = this.game.getCellsOfType().get(CellType.MANUFACTURING_CENTER);
         for (int i = 0; i < mancells.size(); i++){
             ManufacturingCenterCell mancell = (ManufacturingCenterCell) mancells.get(i);
-            if(mancell.getMetal().getShortString() == this.metaltype){
+            if(mancell.getMetal().getShortString().equals(this.metaltype)){
                 double distbid = 1.0*abs(this.currentPosition[0]-mancell.getRow()) + 1.0*abs(this.currentPosition[1]-mancell.getCol());
                 if (distbid == 0){
                     
@@ -367,6 +404,9 @@ public class DiggerAgent extends ImasAgent {
         }
         return mcf;
     }
+    
+
+    
     
     /**
      * Agent setup method - called when it first come on-line. Configuration of
@@ -384,15 +424,13 @@ public class DiggerAgent extends ImasAgent {
         sd1.setType(AgentType.DIGGER.toString());
         sd1.setName(getLocalName());
         sd1.setOwnership(OWNER);
-        this.setMetaltype("G");
         this.setCrash(true);
-        this.setPreviousMovement(new int[] {0,1});
         // PROVES! //
-        AgentsPositions auxVar = (AgentsPositions) systemAgent.getAgentsPositions();
-        this.currentPosition = (int[]) auxVar.getAgentById(this.getAID());
-        
-        this.parameters = new double [] {0.5,0.5,0.5,0.1};
-        this.usedSlots = 1;
+        //this.currentPosition = new int[] {5,2};
+        this.parameters = new double [] {0.05,0.05,0.05,0.1};
+        this.usedSlots = 0;
+        this.previousMovement = new int[]{0,0};
+        this.metaltype = "N";
                 
         
         DFAgentDescription dfd = new DFAgentDescription();
@@ -411,7 +449,14 @@ public class DiggerAgent extends ImasAgent {
         // search CoordinatorAgent
         ServiceDescription searchCriterion = new ServiceDescription();
         searchCriterion.setType(AgentType.DIGGER_COORDINATOR.toString());
-        this.diggerCoordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);        
+        this.diggerCoordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);     
+        
+        // search ProspectorAgents
+        searchCriterion.setType(AgentType.PROSPECTOR.toString());
+        for (int i = 1; i <= this.numProspectors; i++ ){
+            searchCriterion.setName("ProspectorAgent"+i);
+            this.prospectorAgents.add(UtilsAgents.searchAgent(this, searchCriterion));
+        }
         
         
         /*      BEHAVIOURS        */

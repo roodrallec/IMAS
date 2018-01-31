@@ -24,6 +24,7 @@ import jade.core.*;
 import jade.domain.*;
 import jade.domain.FIPAAgentManagement.*;
 import jade.lang.acl.*;
+import java.util.List;
 import java.util.Random;
 
 public class ProspectorAgent extends ImasAgent {
@@ -33,23 +34,39 @@ public class ProspectorAgent extends ImasAgent {
     
     private Cell[] mapView = new Cell[9];
         
-    private int[] currentPosition = {2,2}; 
+    private int[] currentPosition = new int[2]; 
+    
+    private int[] lastPosition = {-1, -1};
+    
+    private int[] lastMovementDir = new int[2];
+    
+    private int momentum = 0;
     
     private ArrayList<MetalField> currentMetalFields = new ArrayList<MetalField>();
  
+    private List<AID> diggerAgents = new ArrayList<AID>();
+    
+    private int numDiggers = MessageContent.IGS.getAgentList().get(AgentType.DIGGER).size();
+    
+    
+    
     /*      METHODS     */
     public ProspectorAgent() {
         super(AgentType.PROSPECTOR);
     }
 /* Takes a whole map and stores just the agents view */
-    public void setMapView(Cell[][] map) {       
+    public void setMapView(Cell[][] map) { 
+        this.mapView = new Cell[9];
         int row = this.currentPosition[0];
         int column = this.currentPosition[1];    
         int idx = 0;
         for(int r=row-1; r <= row+1; r++) {
-            for(int c=column-1; c <= column+1; c++) {                               
+            for(int c=column-1; c <= column+1; c++) { 
+                if (r>=0 && c >= 0){
                 mapView[idx] = map[r][c];                
                 idx++;
+                    
+                }
             }
         }         
     }
@@ -59,24 +76,28 @@ public class ProspectorAgent extends ImasAgent {
     }            
 
     public MetalFieldList searchForMetal() {
-        int[] metalLocation = {};
+        this.currentMetalFields = new ArrayList<MetalField>();
         int quantity = 0;
         String metal = "";
         for(Cell c: this.mapView) {
-            if (c instanceof SettableFieldCell){
-                SettableFieldCell fc = (SettableFieldCell)(c);
+            if (c instanceof FieldCell){
+                FieldCell fc = (FieldCell)(c);
                 if (fc.detectMetal().size() == 1) {                    
                     quantity = (int) (fc.detectMetal().values().toArray()[0]);                    
                     metal = (fc.detectMetal().keySet().toArray())[0].toString();
-                    metalLocation[0] = c.getRow();                   
-                    metalLocation[1] = c.getCol();
-                    MetalField currentMetal = new MetalField(metalLocation, metal, quantity);
-                    currentMetalFields.add(currentMetal);
+                    if (metal.equals("SILVER")){
+                        metal = "S";
+                    }
+                    else if (metal.equals("GOLD")){
+                        metal = "G";
+                    }
+                    MetalField currentMetal = new MetalField(new int[]{c.getRow(),c.getCol()}, metal, quantity);
+                    this.currentMetalFields.add(currentMetal);
                 }
             }         
         }        
-        return new MetalFieldList(currentMetalFields);
-    }   
+        return new MetalFieldList(this.currentMetalFields);
+    }    
     
     public void shuffleView() {
         int n = this.mapView.length;
@@ -92,18 +113,44 @@ public class ProspectorAgent extends ImasAgent {
     
     public int[] move() {                  
         this.shuffleView(); // Randomizes movement when there's equal utility
-        int maxCellUtility = -1;
+        double maxCellUtility = -1.0;
+        int[] movement = this.lastMovementDir.clone();
+        int dx;
+        int dy;
+        double currentUtility;
         for(Cell c: this.mapView) {
             if (c instanceof PathCell) {
-                PathCell pc = (PathCell)(c);                            
-                if (pc.getUtility() > maxCellUtility) {
-                    maxCellUtility = pc.getUtility();
-                    this.currentPosition[0] = c.getRow();
-                    this.currentPosition[1] = c.getCol();
+                PathCell pc = (PathCell)(c);
+                dx = pc.getCol()- this.currentPosition[1];
+                dy = pc.getRow()- this.currentPosition[0]; 
+                
+                if (!pc.isThereADiggerAgentWorking()){
+                    // we give a momentum to the prospector movement, same movement as in last turn is better
+                    if ((this.lastMovementDir[0] == dx) && (this.lastMovementDir[1] == dy)){                    
+                        currentUtility = (int) (pc.getUtility() + 20.0 * this.momentum);
+                    } else {
+                        currentUtility = (int) pc.getUtility();
+                    }
+                } else {
+                    currentUtility = -1;
+                }
+                if (currentUtility > maxCellUtility && !this.diagonalMove(dx, dy)) {
+                    maxCellUtility = currentUtility;
+                    movement[0] = dy;
+                    movement[1] = dx;
                 }
             }
         }
-        return this.currentPosition;
+        if (movement == this.lastMovementDir){
+            this.momentum++;
+        } else {
+            this.momentum = 0;
+        }
+        return movement;
+    }
+    
+    public boolean diagonalMove(int dx, int dy) {        
+        return (dx != 0 && dy != 0);
     }
     
     public AID getProspectorCoordinatorAgent() {
@@ -113,6 +160,36 @@ public class ProspectorAgent extends ImasAgent {
     public void setProspectorCoordinatorAgent(AID prospectorCoordinatorAgent) {
         this.prospectorCoordinatorAgent = prospectorCoordinatorAgent;
     }
+
+    public int[] getCurrentPosition() {
+        return currentPosition;
+    }
+
+    public void setCurrentPosition(int[] currentPosition) {
+        this.currentPosition = currentPosition;
+    }
+
+    public int[] getLastMovementDir() {
+        return this.lastMovementDir;
+    }
+
+    public void setLastMovementDir(int[] lastMovementDir) {
+        this.lastMovementDir = lastMovementDir;
+    }
+
+    public int[] getLastPosition() {
+        if (this.lastPosition[0] == -1){
+            return this.currentPosition;
+        } else {
+            return this.lastPosition;
+        }
+    }
+
+    public void setLastPosition(int[] lastPosition) {
+        this.lastPosition = lastPosition;
+    }
+    
+    
     
     /**
      * Agent setup method - called when it first come on-line. Configuration of
@@ -147,11 +224,23 @@ public class ProspectorAgent extends ImasAgent {
         searchCriterion.setType(AgentType.PROSPECTOR_COORDINATOR.toString());
         this.prospectorCoordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);
         
-        
-        
+        // search DiggerAgent
+        searchCriterion.setType(AgentType.DIGGER.toString());
+        for (int i = 1; i <= this.numDiggers; i++ ){
+            searchCriterion.setName("DiggerAgent"+i);
+            this.diggerAgents.add(UtilsAgents.searchAgent(this, searchCriterion));
+        }
+         
         /*      BEHAVIOURS        */        
         // It triggers when the received message is an INFORM.
         MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
-        this.addBehaviour(new MapHandling(this, mt));
+        this.addBehaviour(new MapHandlingPA(this, mt));
+        
+        for (int i = 0; i < diggerAgents.size(); i++){
+        MessageTemplate mt2 = MessageTemplate.and(MessageTemplate.and(MessageTemplate.MatchProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET),
+                MessageTemplate.MatchPerformative(ACLMessage.CFP)),MessageTemplate.MatchSender(diggerAgents.get(i)));
+        
+        this.addBehaviour(new ContractNetPA(this,mt2));
+        }
     }
 }

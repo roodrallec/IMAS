@@ -25,6 +25,8 @@ import jade.domain.*;
 import jade.domain.FIPAAgentManagement.*;
 import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The main Coordinator agent. 
@@ -45,6 +47,11 @@ public class CoordinatorAgent extends ImasAgent {
     private AID prospectorCoordinatorAgent;
     
     private MetalFieldList currentMFL;
+    private MetalFieldList completeMFL = new MetalFieldList(new ArrayList<MetalField>());
+    private DiggingMessageList DMList;
+    private MovingMessageList MMList = new MovingMessageList();
+    private ManufacturingMessageList MFMList;
+    private int flag;
 
     /**
      * Builds the coordinator agent.
@@ -84,6 +91,46 @@ public class CoordinatorAgent extends ImasAgent {
     public void setCurrentMFL(MetalFieldList currentMFL) {
         this.currentMFL = currentMFL;
     }
+
+    public DiggingMessageList getDMList() {
+        return DMList;
+    }
+
+    public void setDMList(DiggingMessageList DMList) {
+        this.DMList = DMList;
+    }
+
+    public MovingMessageList getMMList() {
+        return MMList;
+    }
+
+    public void setMMList(MovingMessageList MMList) {
+        this.MMList = MMList;
+    }
+
+    public ManufacturingMessageList getMFMList() {
+        return MFMList;
+    }
+
+    public void setMFMList(ManufacturingMessageList MFMList) {
+        this.MFMList = MFMList;
+    }
+
+    public int getFlag() {
+        return flag;
+    }
+
+    public void setFlag(int flag) {
+        this.flag = flag;
+    }
+
+    public MetalFieldList getCompleteMFL() {
+        return completeMFL;
+    }
+
+    public void setCompleteMFL(MetalFieldList completeMFL) {
+        this.completeMFL = completeMFL;
+    }
     
     
     
@@ -105,7 +152,7 @@ public class CoordinatorAgent extends ImasAgent {
         sd1.setType(AgentType.COORDINATOR.toString());
         sd1.setName(getLocalName());
         sd1.setOwnership(OWNER);
-        
+        this.flag = 0;
         DFAgentDescription dfd = new DFAgentDescription();
         dfd.addServices(sd1);
         dfd.setName(getAID());
@@ -142,6 +189,7 @@ public class CoordinatorAgent extends ImasAgent {
         /*      BEHAVIOURS      */
         
         // Request map to System
+
         ACLMessage initialRequest = new ACLMessage(ACLMessage.REQUEST);
         initialRequest.clearAllReceiver();
         initialRequest.addReceiver(this.systemAgent);
@@ -154,9 +202,13 @@ public class CoordinatorAgent extends ImasAgent {
             e.printStackTrace();
         }
         this.addBehaviour(new RequesterBehaviour(this, initialRequest));
-       
         
+        MessageTemplate mt =MessageTemplate.MatchLanguage(MessageContent.DIG_ACTION);
+        this.addBehaviour(new ActionHandlingCA(this, mt));
+
         
+        MessageTemplate mt2 =MessageTemplate.MatchLanguage(MessageContent.NEW_MAP);
+        this.addBehaviour(new MapHandlingCA(this, mt2));
         
         
 
@@ -181,5 +233,30 @@ public class CoordinatorAgent extends ImasAgent {
     public GameSettings getGame() {
         return this.game;
     }
+    
+    public void combineMFL(MetalFieldList newMFL){
+        
+        List<MetalField> completeMFL = this.completeMFL.getMetalFields();
+        List<MetalField> aux = newMFL.getMetalFields();
+        List<MetalField> aux2 = new ArrayList<MetalField>();
+
+        for (MetalField mf : aux) {
+            Boolean exists = false;
+            for (MetalField mfc : completeMFL) {
+                if ((mf.getPosition())[0] == (mfc.getPosition())[0] && (mf.getPosition())[1] == (mfc.getPosition())[1]){
+                    exists = true;
+                }                            
+            }
+            if (!(exists)) {
+                completeMFL.add(mf);
+                aux2.add(mf);
+            }
+        }
+        
+        this.setCompleteMFL(new MetalFieldList(completeMFL));
+        this.setCurrentMFL(new MetalFieldList(aux2));
+        
+    }
+        
 
 }

@@ -64,7 +64,7 @@ public class MapHandlingDCA extends AchieveREResponder {
         DiggerCoordinatorAgent agent = (DiggerCoordinatorAgent)this.getAgent();
         try {         
             // If the received message is a map.
-            if(msg.getContentObject().getClass().equals(cat.urv.imas.onthology.InitialGameSettings.class)){
+            if(msg.getContentObject().getClass().equals(cat.urv.imas.onthology.InitialGameSettings.class) || msg.getContentObject().getClass().equals(cat.urv.imas.onthology.GameSettings.class)){
                 // sets the value of the agents map to the received map.
                 agent.setGame((GameSettings) msg.getContentObject());
                 agent.log("MAP Updated");

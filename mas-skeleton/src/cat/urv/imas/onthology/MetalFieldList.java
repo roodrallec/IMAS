@@ -33,7 +33,11 @@ public class MetalFieldList implements Serializable{
         this.metalFields.add(mf);
     }
     
+    public void remove(MetalField mf){
+        this.metalFields.remove(mf);
+    }
     
-    
-    
+    public int knownMetalFieldsNumber(){
+        return this.metalFields.size();
+    }
 }

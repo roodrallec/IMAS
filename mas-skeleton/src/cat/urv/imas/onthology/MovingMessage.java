@@ -13,20 +13,22 @@ import java.io.Serializable;
  * @author usuario
  */
 public class MovingMessage implements Serializable{
-    private AID agent;
+    private AID agentID;
     private int[] movement;
+    private int[] position;
 
-    public MovingMessage(AID agentID, int[] movement) {
-        this.agent = agentID;
+    public MovingMessage(AID agentID, int[] movement, int[] position) {
+        this.agentID = agentID;
         this.movement = movement;
+        this.position = position;
     }
 
     public AID getAgentID() {
-        return agent;
+        return agentID;
     }
 
     public void setAgentID(AID agentID) {
-        this.agent = agentID;
+        this.agentID = agentID;
     }
 
     public int[] getMovement() {
@@ -35,6 +37,14 @@ public class MovingMessage implements Serializable{
 
     public void setMovement(int[] movement) {
         this.movement = movement;
+    }
+
+    public int[] getPosition() {
+        return position;
+    }
+
+    public void setPosition(int[] position) {
+        this.position = position;
     }
     
     
