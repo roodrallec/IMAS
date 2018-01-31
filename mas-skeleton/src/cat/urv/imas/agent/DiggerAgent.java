@@ -279,35 +279,44 @@ public class DiggerAgent extends ImasAgent {
                 }
 //You can't reduce the distance --> Check whether you can  keep going back.
                 else{
-                    if(game.getMap()[pos[0]+previousmovement[0]][pos[1] + previousmovement[1]].getCellType() == CellType.PATH){
-                        movement[0] = previousmovement[0];
-                        movement[1] = previousmovement[1];
-                        this.log("Moving Backwards");
+                    if(pos[0]+previousmovement[0]>=0 && pos[1] + previousmovement[1]>=0){
+                        if(game.getMap()[pos[0]+previousmovement[0]][pos[1] + previousmovement[1]].getCellType() == CellType.PATH){
+                            movement[0] = previousmovement[0];
+                            movement[1] = previousmovement[1];
+                            this.log("Moving Backwards");
+                        }
+                        else if (abs(previousmovement[0])== 0){ //Change direction perpendicularly if you can't keep moving backwards.
+                            if(game.getMap()[pos[0]+1][pos[1]].getCellType() == CellType.PATH){
+                                movement[0] = 1;
+                                movement[1] = 0;
+                                this.log("Can't Move Backwards, Moving Up");
+                            }
+                            else if(game.getMap()[pos[0]-1][pos[1]].getCellType() == CellType.PATH){
+                                movement[0] = -1;
+                                movement[1] = 0;
+                                this.log("Can't Move Backwards, Moving Down");
+                            }
+                        }
+                        else if (abs(previousmovement[1])== 0){
+                            if(game.getMap()[pos[0]][pos[1]+1].getCellType() == CellType.PATH){
+                                movement[0] = 0;
+                                movement[1] = 1;
+                                this.log("Can't Move Backwards, Moving Right");
+                            }
+                            else if(game.getMap()[pos[0]][pos[1]-1].getCellType() == CellType.PATH){
+                                movement[0] = 0;
+                                movement[1] = -1;
+                                this.log("Can't Move Backwards, Moving Left");
+                            }
+                        }
+                        
                     }
-                    else if (abs(previousmovement[0])== 0){ //Change direction perpendicularly if you can't keep moving backwards.
-                        if(game.getMap()[pos[0]+1][pos[1]].getCellType() == CellType.PATH){
-                            movement[0] = 1;
-                            movement[1] = 0;
-                            this.log("Can't Move Backwards, Moving Up");
-                        }
-                        else if(game.getMap()[pos[0]-1][pos[1]].getCellType() == CellType.PATH){
-                            movement[0] = -1;
-                            movement[1] = 0;
-                            this.log("Can't Move Backwards, Moving Down");
-                        }
+                    else{
+                        movement[0] = -previousmovement[0];
+                        movement[1] = -previousmovement[1];
+                        
                     }
-                    else if (abs(previousmovement[1])== 0){
-                        if(game.getMap()[pos[0]][pos[1]+1].getCellType() == CellType.PATH){
-                            movement[0] = 0;
-                            movement[1] = 1;
-                            this.log("Can't Move Backwards, Moving Right");
-                        }
-                        else if(game.getMap()[pos[0]][pos[1]-1].getCellType() == CellType.PATH){
-                            movement[0] = 0;
-                            movement[1] = -1;
-                            this.log("Can't Move Backwards, Moving Left");
-                        }
-                    }
+
                 }
 
                 
