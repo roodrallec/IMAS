@@ -416,32 +416,39 @@ public class SystemAgent extends ImasAgent {
             
             //1. Set up diggers working
             while (this.diggingRequests.size() > 0){
-
-                // get agent name from it's AID
-                AID diggerID = this.diggingRequests.get(0).getDigger();
                 int[] metalFieldPos = this.diggingRequests.get(0).getMetalfield().getPosition();
-                int[] diggerPos = this.diggingRequests.get(0).getPosition();
-
-                // Remove 1 metal unit from metal field
                 FieldCell metalFieldCell = (FieldCell) nextTurnMap[metalFieldPos[0]][metalFieldPos[1]];
-                double remainingMetalUnits = (int) metalFieldCell.getMetal().values().toArray()[0];
                 
-                if (remainingMetalUnits < 2.0){
-                    this.gamePerformanceIndicators.addTurnsForDiggingMetal(this.discoveredMetalField.getMetalField(metalFieldCell));
-                    this.discoveredMetalField.removeMetalField(metalFieldCell);
-                    this.gamePerformanceIndicators.addCollectedMetalFields(1.0);
-                }                
-                
-                metalFieldCell.removeMetal();
-                //this.gamePerformanceIndicators.addCollectedMetalFields(1.0);
+                if (!metalFieldCell.isDetected()){
 
-                // Set digger agent working in the path cell
-                PathCell diggerCell = (PathCell) nextTurnMap[diggerPos[0]][diggerPos[1]];
-                diggerCell.setDiggerAgentWorking();
-                
-                // Add digger to the current working diggers
-                this.currentWorkingDiggers.setNewAgent(diggerPos, diggerID);
-               
+                    // get agent name from it's AID
+                    AID diggerID = this.diggingRequests.get(0).getDigger();                
+                    int[] diggerPos = this.diggingRequests.get(0).getPosition();
+
+                    double remainingMetalUnits = 0;
+                    try {
+                        remainingMetalUnits = (int) metalFieldCell.getMetal().values().toArray()[0];
+                    } catch (Exception ex) {
+                        Logger.getLogger(SystemAgent.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+
+                    if (remainingMetalUnits < 2.0){
+                        this.gamePerformanceIndicators.addTurnsForDiggingMetal(this.discoveredMetalField.getMetalField(metalFieldCell));
+                        this.discoveredMetalField.removeMetalField(metalFieldCell);
+                        this.gamePerformanceIndicators.addCollectedMetalFields(1.0);
+                    }
+                    
+                    // Remove 1 metal unit from metal field
+                    metalFieldCell.removeMetal();
+
+                    // Set digger agent working in the path cell
+                    PathCell diggerCell = (PathCell) nextTurnMap[diggerPos[0]][diggerPos[1]];
+                    diggerCell.setDiggerAgentWorking();
+
+                    // Add digger to the current working diggers
+                    this.currentWorkingDiggers.setNewAgent(diggerPos, diggerID);
+                }
+
                 this.diggingRequests.remove(0);
             }
             

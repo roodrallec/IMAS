@@ -126,9 +126,12 @@ public class ProspectorCoordinatorAgent extends ImasAgent {
                 for(int col = 0; col < newMap[0].length; col++) { 
                     if (newMap[row][col] instanceof FieldCell) {
                         FieldCell indFieldCell = (FieldCell) newMap[row][col];
-                        auxBol = indFieldCell.isEmpty();
+                        //auxBol = indFieldCell.isEmpty();
+                        auxBol = indFieldCell.isDetected();
                         if (auxBol) {
                             ((FieldCell) this.utilityMap[row][col]).incUtilityUnit();
+                        } else {
+                            ((FieldCell) this.utilityMap[row][col]).resetUtility();
                         }
                     }
                 }           
@@ -194,7 +197,7 @@ public class ProspectorCoordinatorAgent extends ImasAgent {
                         Cell indCell = (Cell) newMap[row][col];
                         cellAgents = (Agents) ((PathCell) indCell).getAgents();
                         if (cellAgents.get(AgentType.PROSPECTOR).size() > 0){
-                            ((PathCell) this.utilityMap[row][col]).setUtility(-1);
+                            ((PathCell) this.utilityMap[row][col]).setUtility(-4);
                         }
                     }
                 }           
@@ -236,7 +239,7 @@ public class ProspectorCoordinatorAgent extends ImasAgent {
 //                    }
                     if (this.utilityMap[row][col] instanceof PathCell){
                         if (((PathCell)newMap[row][col]).isThereADiggerAgentWorking()){
-                            ((PathCell) this.utilityMap[row][col]).setUtility(-1);
+                            ((PathCell) this.utilityMap[row][col]).setUtility(-10);
                         }
                     }
                 }           
