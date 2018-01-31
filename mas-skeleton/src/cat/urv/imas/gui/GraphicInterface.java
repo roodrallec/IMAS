@@ -17,6 +17,7 @@
  */
 package cat.urv.imas.gui;
 
+import cat.urv.imas.agent.SystemAgent;
 import cat.urv.imas.map.Cell;
 import cat.urv.imas.onthology.GamePerformanceIndicators;
 import cat.urv.imas.onthology.GameSettings;
@@ -27,7 +28,10 @@ import java.awt.Font;
 import java.awt.Dimension;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Main class of the graphical interface controlled by the System Agent. It
@@ -62,6 +66,10 @@ public class GraphicInterface extends JFrame {
      * Panel to include the game GUI.
      */
     private JPanel jGamePanel = new JPanel();
+    /**
+     * DecimalFormat round to 2 decimals.
+     */
+    private DecimalFormat round2Decimals = new DecimalFormat("##.00");
 
     /**
      * Initializes GUI elements, including the game.
@@ -166,22 +174,43 @@ public class GraphicInterface extends JFrame {
      *
      * @param msg String per mostrar
      */
-    public void showStatistics(GamePerformanceIndicators gamePerformanceIndicators) {
+    public void showStatistics(GamePerformanceIndicators gamePerformanceIndicators, int currentTurn, int totalTurns) {
         this.jStatisticsPanel.removeAllMessages();
         
-        ArrayList<String> statisticsInfo = new ArrayList<String>();
-        statisticsInfo.add("Current benefits:                   " + gamePerformanceIndicators.getBenefits());
-        statisticsInfo.add("Manufactured gold:                  " + gamePerformanceIndicators.getManufacturedMetal().get(MetalType.GOLD));
-        statisticsInfo.add("Manufactured silver:                " + gamePerformanceIndicators.getManufacturedMetal().get(MetalType.SILVER));
-        statisticsInfo.add("Average benefit for unit of metal:  " + gamePerformanceIndicators.getAverageBenefitForUnitOfMetal());
-        statisticsInfo.add("Average time for discovering metal: " + gamePerformanceIndicators.getAverageTimeForDiscoveringMetal() + " turns");
-        statisticsInfo.add("Average time for digging metal:     " + gamePerformanceIndicators.getAverageTimeForDiggingMetal() + " turns");
-        statisticsInfo.add("Ratio of discovered metal:          " + gamePerformanceIndicators.getRatioOfDiscoveredMetal());
-        statisticsInfo.add("Ratio of collected metal:           " + gamePerformanceIndicators.getRatioOfCollectedMetal());
+        ArrayList<String> statisticsInfoStrings = new ArrayList<String>();
+        statisticsInfoStrings.add("REMAINING TURNS: " + currentTurn + " OF " + totalTurns);
+        statisticsInfoStrings.add("Current benefits:                   ");
+        statisticsInfoStrings.add("Manufactured gold:                  " + this.round2Decimals.format(gamePerformanceIndicators.getManufacturedMetal().get(MetalType.GOLD)) + " units");
+        statisticsInfoStrings.add("Manufactured silver:                " + this.round2Decimals.format(gamePerformanceIndicators.getManufacturedMetal().get(MetalType.SILVER)) + " units");
+        statisticsInfoStrings.add("Average benefit for unit of metal:  ");
+        statisticsInfoStrings.add("Average time for discovering metal: " + this.round2Decimals.format(gamePerformanceIndicators.getAverageTimeForDiscoveringMetal()) + " turns");
+        statisticsInfoStrings.add("Average time for digging metal:     " + this.round2Decimals.format(gamePerformanceIndicators.getAverageTimeForDiggingMetal()) + " turns");
+        statisticsInfoStrings.add("Ratio of discovered metal:          ");
+        statisticsInfoStrings.add("Ratio of collected metal:           ");
         
-        for (int counter = 0; counter < statisticsInfo.size(); counter++) { 	
-            this.jStatisticsPanel.showMessage(statisticsInfo.get(counter).toString());
-        }          
+        ArrayList<Double> statisticsInfoDoubles = new ArrayList<Double>();
+        statisticsInfoDoubles.add(null);
+        statisticsInfoDoubles.add(gamePerformanceIndicators.getBenefits());
+        statisticsInfoDoubles.add(null);
+        statisticsInfoDoubles.add(null);
+        statisticsInfoDoubles.add(gamePerformanceIndicators.getAverageBenefitForUnitOfMetal());
+        statisticsInfoDoubles.add(null);
+        statisticsInfoDoubles.add(null);
+        statisticsInfoDoubles.add(gamePerformanceIndicators.getRatioOfDiscoveredMetal());
+        statisticsInfoDoubles.add(gamePerformanceIndicators.getRatioOfCollectedMetal());
+        
+        for (int counter = 0; counter < statisticsInfoStrings.size(); counter++) {
+            //if (statisticsInfo.get(counter).toString() != "NaN"){
+                try{
+                    this.jStatisticsPanel.showMessage(statisticsInfoStrings.get(counter).toString() + this.round2Decimals.format(statisticsInfoDoubles.get(counter)));
+                } catch (Exception ex) {
+                    this.jStatisticsPanel.showMessage(statisticsInfoStrings.get(counter).toString());
+                }
+            //}
+        }    
+        
+        this.jStatisticsPanel.addBlankLine();
+        this.jStatisticsPanel.setAutoscrolls(true);
     }
 
     /**

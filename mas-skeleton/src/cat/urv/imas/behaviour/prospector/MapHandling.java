@@ -77,7 +77,6 @@ public class MapHandling extends AchieveREResponder {
                 // sets the value of the agents map to the received map.
                 GameSettings game = ((GameMapUtility)msg.getContentObject()).getGame();
                 
-                
                 List cells = game.getAgentList().get(AgentType.PROSPECTOR);
                 boolean found = false;
                 for (Object cell : cells) {
@@ -94,8 +93,6 @@ public class MapHandling extends AchieveREResponder {
                         break;
                     }
                 }
-                
-                
                 
                 Cell[][] map = ((GameMapUtility)msg.getContentObject()).getGame().getMap();
                 agent.setMapView(map);

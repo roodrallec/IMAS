@@ -30,6 +30,10 @@ public class StatisticsPanel
         jTextArea.append("\n");
     }
     
+    public void addBlankLine() {
+        jTextArea.append("\n");
+    }
+    
     public void removeAllMessages() {
         jTextArea.removeAll();
     }

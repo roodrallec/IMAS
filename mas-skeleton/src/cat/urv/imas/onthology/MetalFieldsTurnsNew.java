@@ -15,8 +15,7 @@ import java.util.logging.Logger;
  *
  * @author ALEIX
  */
-public class MetalFieldsTurnsNew {
-    //private List<FieldCell> metalFieldsList = new ArrayList<>();
+public class MetalFieldsTurnsNew  implements java.io.Serializable {
     private HashMap metalFieldsList = new HashMap();
 
     public MetalFieldsTurnsNew() {
@@ -42,8 +41,8 @@ public class MetalFieldsTurnsNew {
     }
     public void incrementTurn() {        
         for (Object key : this.metalFieldsList.keySet()) {
-            double currentValue = (double) this.metalFieldsList.get(key);
-            this.metalFieldsList.replace(key, currentValue++);
+            double value = (double) this.metalFieldsList.get(key) + 1.0;
+            this.metalFieldsList.replace(key, value);
         }
     }
     

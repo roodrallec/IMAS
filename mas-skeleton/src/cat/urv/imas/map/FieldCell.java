@@ -42,6 +42,10 @@ public class FieldCell extends Cell {
      * to find it yet.
      */
     protected boolean found = false;
+    /**
+     * Aux var for SystemAgent. If true, it means that this is a metal field already found by prospectors and system agent had recieved it previously.
+     */
+    protected boolean detected = false;
     
     private int utility = 0;
 
@@ -54,6 +58,14 @@ public class FieldCell extends Cell {
     public FieldCell(int row, int col) {
         super(CellType.FIELD, row, col);
         metal = new HashMap();
+    }
+
+    public boolean isDetected() {
+        return detected;
+    }
+
+    public void setDetected() {
+        this.detected = true;
     }
     
     public void resetUtility() {
@@ -95,6 +107,16 @@ public class FieldCell extends Cell {
     public boolean isEmpty() {
         return found;
     }
+
+    public boolean isFound() {
+        return found;
+    }
+
+    public void setFound() {
+        this.found = true;
+    }
+    
+    
 
 
     /**

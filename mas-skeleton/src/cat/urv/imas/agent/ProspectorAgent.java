@@ -73,22 +73,20 @@ public class ProspectorAgent extends ImasAgent {
         for(Cell c: this.mapView) {
             if (c instanceof FieldCell){
                 FieldCell fc = (FieldCell)(c);
-                    if (fc.detectMetal().size() == 1) {                    
-                        quantity = (int) (fc.detectMetal().values().toArray()[0]);                    
-                        metal = (fc.detectMetal().keySet().toArray())[0].toString();
-                        if (metal.equals("SILVER")){
-                            metal = "S";
-                        }
-                        else if (metal.equals("GOLD")){
-                            metal = "G";
-                        }
-                        metalLocation[0] = c.getRow();                   
-                        metalLocation[1] = c.getCol();
-                        MetalField currentMetal = new MetalField(metalLocation, metal, quantity);
-                        this.currentMetalFields.add(currentMetal);
+                if ((fc.detectMetal().size() == 1) && (!fc.isDetected())) {                    
+                    quantity = (int) (fc.detectMetal().values().toArray()[0]);                    
+                    metal = (fc.detectMetal().keySet().toArray())[0].toString();
+                    if (metal.equals("SILVER")){
+                        metal = "S";
                     }
-                
-                
+                    else if (metal.equals("GOLD")){
+                        metal = "G";
+                    }
+                    metalLocation[0] = c.getRow();                   
+                    metalLocation[1] = c.getCol();
+                    MetalField currentMetal = new MetalField(metalLocation, metal, quantity);
+                    this.currentMetalFields.add(currentMetal);
+                }               
             }         
         }        
         return new MetalFieldList(this.currentMetalFields);
@@ -147,8 +145,6 @@ public class ProspectorAgent extends ImasAgent {
         this.currentPosition = currentPosition;
     }
     
-    
-    
     /**
      * Agent setup method - called when it first come on-line. Configuration of
      * language to use, ontology and initialization of behaviours.
@@ -188,10 +184,7 @@ public class ProspectorAgent extends ImasAgent {
             searchCriterion.setName("DiggerAgent"+i);
             this.diggerAgents.add(UtilsAgents.searchAgent(this, searchCriterion));
         }
-        
-        
-        
-        
+         
         /*      BEHAVIOURS        */        
         // It triggers when the received message is an INFORM.
         MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);

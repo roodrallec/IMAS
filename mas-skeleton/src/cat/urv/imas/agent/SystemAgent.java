@@ -55,6 +55,14 @@ public class SystemAgent extends ImasAgent {
      */
     private InitialGameSettings game;
     /**
+     * Total game turns.
+     */
+    private int totalTurns;
+    /**
+     * Total appeared fields.
+     */
+    //private int totalAppearedFields = 0;
+    /**
      * Current turn map.
      */
     private Cell[][] currentMap;// = (Cell[][]) this.game.getMap();
@@ -136,11 +144,11 @@ public class SystemAgent extends ImasAgent {
     /**
      * undiscoveredMetalField will contain the undiscovered metal fields until a prospector discovers them.
      */
-    private MetalFieldsTurnsNew undiscoveredMetalField = new MetalFieldsTurnsNew();
+    private MetalFieldsTurnsNew undiscoveredMetalField;// = new MetalFieldsTurnsNew();
     /**
      * discoveredMetalField will contain the discovered metal fields until a digger begin to dig them.
      */
-    private MetalFieldsTurnsNew discoveredMetalField = new MetalFieldsTurnsNew(); 
+    private MetalFieldsTurnsNew discoveredMetalField;// = new MetalFieldsTurnsNew(); 
     /**
      * Game settings. The game with the updated changes that the system agent
      * is constructing while checking that all changes are allowed.
@@ -213,8 +221,8 @@ public class SystemAgent extends ImasAgent {
      * This method is expected to be run from the corresponding Behaviour
      * to add new elements onto the map at each simulation step.
      */
-    public MetalFieldsTurnsNew addElementsForThisSimulationStep(MetalFieldsTurnsNew undiscoveredMetalList) {
-        return this.game.addElementsForThisSimulationStep(undiscoveredMetalList);
+    public List<MetalFieldsTurnsNew> addElementsForThisSimulationStep(List<MetalFieldsTurnsNew> retrievedMetalLists) {
+        return this.game.addElementsForThisSimulationStep(retrievedMetalLists);
     }
 
     /**
@@ -246,6 +254,17 @@ public class SystemAgent extends ImasAgent {
 
         // 2. Load game settings.        
         this.game = InitialGameSettings.load("game.settings");
+        
+        this.totalTurns = this.game.getSimulationSteps();
+        
+        this.undiscoveredMetalField = this.game.getInitialRetrievedMetalLists().get(0);
+        this.discoveredMetalField = this.game.getInitialRetrievedMetalLists().get(1);
+        
+        //this.totalAppearedFields = this.totalAppearedFields + this.undiscoveredMetalField.getAllMetalFields().size() - this.discoveredMetalField.getAllMetalFields().size();
+                 
+        this.gamePerformanceIndicators.addToDiscoveredMetalFieds(this.discoveredMetalField.getAllMetalFields().size());       
+        this.gamePerformanceIndicators.addMetalFieldsToHist(this.gamePerformanceIndicators.getTotalMetalFieldsHist() + this.undiscoveredMetalField.getAllMetalFields().size() + this.discoveredMetalField.getAllMetalFields().size());
+        
         //GenerateGameSettings.defineSettings(this.game);
         this.currentMap = this.game.getMap();
         log("Initial configuration settings loaded");
@@ -265,8 +284,7 @@ public class SystemAgent extends ImasAgent {
                
         ServiceDescription searchCriterion = new ServiceDescription(); 
                       
-        int[][] initialMap = this.game.getInitialMap();
-        //this.currentMap = this.game.getMap();                
+        int[][] initialMap = this.game.getInitialMap();         
                 
         int diggersCount = 1;
         int prospectorsCount = 1;
@@ -350,11 +368,10 @@ public class SystemAgent extends ImasAgent {
     // Function to go one step ahead
     public void incrementStep() {
 
-        // Update statistics window
-
-        this.gui.showStatistics(this.gamePerformanceIndicators);
-
+        // Update statistics window              
+        this.gui.showStatistics(this.gamePerformanceIndicators, this.game.getSimulationSteps(), this.totalTurns);
         
+        int initialListSize = this.undiscoveredMetalField.getAllMetalFields().size();
         this.undiscoveredMetalField.incrementTurn();
         this.discoveredMetalField.incrementTurn();
         // Substract one remaining turn
@@ -369,10 +386,16 @@ public class SystemAgent extends ImasAgent {
         }
         
         // ADD new metal fields
-//        this.game.getMaxAmountOfNewMetal()
-//        this.game.getMaxNumberFieldsWithNewMetal()
-//        this.game.getNewMetalProbability()
-        this.undiscoveredMetalField = this.addElementsForThisSimulationStep(this.undiscoveredMetalField);
+        List<MetalFieldsTurnsNew> retrievedMetalLists = new ArrayList<>();
+        retrievedMetalLists.add(undiscoveredMetalField); retrievedMetalLists.add(discoveredMetalField);
+        retrievedMetalLists = this.addElementsForThisSimulationStep(retrievedMetalLists);
+        
+        this.undiscoveredMetalField = this.game.getInitialRetrievedMetalLists().get(0);
+        this.discoveredMetalField = this.game.getInitialRetrievedMetalLists().get(1);
+        
+        //this.totalAppearedFields = this.totalAppearedFields + this.undiscoveredMetalField.getAllMetalFields().size() - initialListSize;
+        this.gamePerformanceIndicators.addMetalFieldsToHist(this.undiscoveredMetalField.getAllMetalFields().size() - initialListSize);
+        //this.gamePerformanceIndicators.setTotalMetalFields(this.totalAppearedFields);
         
         this.updateGUI();
     }
@@ -406,10 +429,11 @@ public class SystemAgent extends ImasAgent {
                 if (remainingMetalUnits < 2.0){
                     this.gamePerformanceIndicators.addTurnsForDiggingMetal(this.discoveredMetalField.getMetalField(metalFieldCell));
                     this.discoveredMetalField.removeMetalField(metalFieldCell);
+                    this.gamePerformanceIndicators.addCollectedMetalFields(1.0);
                 }                
                 
                 metalFieldCell.removeMetal();
-                this.gamePerformanceIndicators.addMetalUnits(1.0);
+                //this.gamePerformanceIndicators.addCollectedMetalFields(1.0);
 
                 // Set digger agent working in the path cell
                 PathCell diggerCell = (PathCell) nextTurnMap[diggerPos[0]][diggerPos[1]];
@@ -434,11 +458,8 @@ public class SystemAgent extends ImasAgent {
             }
             
             //3. Movements checking  
-            //List diggerlist = (ArrayList) currentAgentList.get(AgentType.DIGGER);
-            //List prospectorlist = (ArrayList) currentAgentList.get(AgentType.PROSPECTOR);
             List<Cell> digglist = new ArrayList<Cell>();
             List<Cell> prosplist = new ArrayList<Cell>();
-            
             
             for (int agentIndex = 0; agentIndex < this.requestedAgentsPos.size(); agentIndex++){
 
@@ -503,14 +524,20 @@ public class SystemAgent extends ImasAgent {
             int[] metalPos = new int[2]; 
             for (MetalField mf : this.metalFieldList) {
                 metalPos = mf.getPosition();
-                FieldCell metalCell = (FieldCell) nextTurnMap[metalPos[0]][metalPos[1]];                
-                metalCell.detectMetal();
-                this.discoveredMetalField.addNewMetalField(metalCell);
-                if (this.undiscoveredMetalField.getMetalField(metalCell) == -1.0){
-                    int a;
+                FieldCell metalCell = (FieldCell) nextTurnMap[metalPos[0]][metalPos[1]];
+                if ((!metalCell.isEmpty()) && (!metalCell.isDetected())){
+                    this.discoveredMetalField.addNewMetalField(metalCell);
+                    if (this.undiscoveredMetalField.getMetalField(metalCell) == -1.0){
+                        Thread.sleep(10);
+                    }
+                    this.gamePerformanceIndicators.addTurnsForDiscoveringMetal(this.undiscoveredMetalField.getMetalField(metalCell));
+                    this.gamePerformanceIndicators.addCollectedMetalFields(1.0);
+                    this.undiscoveredMetalField.removeMetalField(metalCell);
+                    metalCell.setDetected();
+                } else {
+                    Thread.sleep(1);
                 }
-                this.gamePerformanceIndicators.addTurnsForDiscoveringMetal(this.undiscoveredMetalField.getMetalField(metalCell));
-                this.undiscoveredMetalField.removeMetalField(metalCell);
+                metalCell.detectMetal();
             }
 
             //5. Update manufacturing centers (rewards)
@@ -521,7 +548,7 @@ public class SystemAgent extends ImasAgent {
                 // Add the new reward to the accumulated reward
                 this.gamePerformanceIndicators.addBenefits(manufacturingCenterFieldCell.getPrice(), manufacturingCenterFieldCell.getMetal());
 
-                this.manufactureRequests.remove(0);            
+                this.manufactureRequests.remove(0);
             } 
 
             //6. Substitute the old map with the new checked map

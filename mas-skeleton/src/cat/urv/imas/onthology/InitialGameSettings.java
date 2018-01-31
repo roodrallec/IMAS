@@ -111,6 +111,26 @@ public class InitialGameSettings extends GameSettings {
      * Random number generator.
      */
     private Random numberGenerator;
+    /**
+     * undiscoveredMetalField will contain the undiscovered metal fields until a prospector discovers them.
+     */
+    private MetalFieldsTurnsNew undiscoveredMetalField = new MetalFieldsTurnsNew();
+    /**
+     * discoveredMetalField will contain the discovered metal fields until a digger begin to dig them.
+     */
+    private MetalFieldsTurnsNew discoveredMetalField = new MetalFieldsTurnsNew(); 
+    /**
+     * Aux variable for metal lists in game initialization.
+     */
+    private List<MetalFieldsTurnsNew> initialRetrievedMetalLists = new ArrayList<>();
+
+    public List<MetalFieldsTurnsNew> getInitialRetrievedMetalLists() {
+        return initialRetrievedMetalLists;
+    }
+
+    public void setInitialRetrievedMetalLists(List<MetalFieldsTurnsNew> initialRetrievedMetalLists) {
+        this.initialRetrievedMetalLists = initialRetrievedMetalLists;
+    }
 
     @XmlElement(required = true)
     public void setNumberInitialElements(int initial) {
@@ -246,11 +266,14 @@ public class InitialGameSettings extends GameSettings {
         int maxInitial = this.getNumberInitialElements();
         int maxVisible = this.getNumberVisibleInitialElements();
 
-        addElements(maxInitial, maxVisible, null);
+        //addElements(maxInitial, maxVisible, null);
+        this.initialRetrievedMetalLists.add(undiscoveredMetalField);
+        this.initialRetrievedMetalLists.add(discoveredMetalField);
+        this.initialRetrievedMetalLists = addElements(maxInitial, maxVisible, this.initialRetrievedMetalLists);
     }
 
 
-    public MetalFieldsTurnsNew addElements(int maxElements, int maxVisible, MetalFieldsTurnsNew undiscoveredMetalList) {
+    public List<MetalFieldsTurnsNew> addElements(int maxElements, int maxVisible, List<MetalFieldsTurnsNew> retrievedMetalLists) {
         CellType ctype = CellType.FIELD;
         int maxCells = getNumberOfCellsOfType(ctype);
         int freeCells = this.getNumberOfCellsOfType(ctype, true);
@@ -259,8 +282,9 @@ public class InitialGameSettings extends GameSettings {
             throw new Error(getClass().getCanonicalName() + " : Not allowed negative number of elements.");
         }
         if (maxElements > freeCells) {
+            System.out.println(getClass().getCanonicalName() + " : Not allowed add more elements than empty cells.");
+            return retrievedMetalLists;
             //throw new Error(getClass().getCanonicalName() + " : Not allowed add more elements than empty cells.");
-            return undiscoveredMetalList;
         }
         if (maxVisible < 0) {
             throw new Error(getClass().getCanonicalName() + " : Not allowed negative number of visible elements.");
@@ -274,7 +298,7 @@ public class InitialGameSettings extends GameSettings {
                 maxCells + " cells (" + freeCells + " of them candidate).");
 
         if (0 == maxElements) {
-            return undiscoveredMetalList;
+            return retrievedMetalLists;
         }
 
         Set<Integer> initialSet = new TreeSet();
@@ -300,9 +324,10 @@ public class InitialGameSettings extends GameSettings {
             type = types[numberGenerator.nextInt(types.length)];
             amount = numberGenerator.nextInt(this.getMaxAmountOfNewMetal()) + 1;
             visible = visibleSet.contains(i);
-            setElements(type, amount, visible, i, undiscoveredMetalList);
+            setElements(type, amount, visible, i, retrievedMetalLists);
         }
-        return undiscoveredMetalList;
+        
+        return retrievedMetalLists;
     }
 
     /**
@@ -322,16 +347,23 @@ public class InitialGameSettings extends GameSettings {
      * @param ncell number of cell from a given list.
      * @param visible visible to agents?
      */
-    private MetalFieldsTurnsNew setElements(MetalType type, int amount, boolean visible, int ncell, MetalFieldsTurnsNew undiscoveredMetalList) {
+    private List<MetalFieldsTurnsNew> setElements(MetalType type, int amount, boolean visible, int ncell, List<MetalFieldsTurnsNew> retrievedMetalLists) {
+        MetalFieldsTurnsNew undiscoveredMetalList = retrievedMetalLists.get(0);
+        MetalFieldsTurnsNew discoveredMetalList = retrievedMetalLists.get(1);
         SettableFieldCell cell = (SettableFieldCell)cellsOfType.get(CellType.FIELD).get(ncell);
         cell.setElements(type, amount);
         if (visible) {
             cell.detectMetal();
+            cell.setDetected();
+            discoveredMetalList.addNewMetalField(cell);
         } else {
             undiscoveredMetalList.addNewMetalField(cell);
         }
         
-        return undiscoveredMetalList;
+        retrievedMetalLists.add(undiscoveredMetalList);
+        retrievedMetalLists.add(discoveredMetalList);
+        
+        return retrievedMetalLists;
     }
 
     /**
@@ -345,7 +377,7 @@ public class InitialGameSettings extends GameSettings {
      * This process also checks that if there is room for the given number of
      * cells. Otherwise and error is thrown.
      */
-    public MetalFieldsTurnsNew addElementsForThisSimulationStep(MetalFieldsTurnsNew undiscoveredMetalList) {
+    public List<MetalFieldsTurnsNew> addElementsForThisSimulationStep(List<MetalFieldsTurnsNew> retrievedMetalLists) {
         int probabilityOfNewElements = this.getNewMetalProbability();
         int stepProbability = numberGenerator.nextInt(100) +1;
 
@@ -353,7 +385,7 @@ public class InitialGameSettings extends GameSettings {
             System.out.println(getClass().getCanonicalName() + " : " + stepProbability +
                     " < " + probabilityOfNewElements +
                     " (step probability for new elements < probability of new elements)");
-            return undiscoveredMetalList;
+            return retrievedMetalLists;
         }
 
         int maxCells = this.getMaxNumberFieldsWithNewMetal();
@@ -361,8 +393,8 @@ public class InitialGameSettings extends GameSettings {
 
         // add elements to the given number of cells for this simulation step.
         // all of them hidden.
-        addElements(numberCells, 0, undiscoveredMetalList);
-        return undiscoveredMetalList;
+        retrievedMetalLists = addElements(numberCells, 0, retrievedMetalLists);
+        return retrievedMetalLists;
     }
 
     /**
