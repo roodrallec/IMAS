@@ -139,7 +139,7 @@ public class ProspectorCoordinatorAgent extends ImasAgent {
                 }           
             }
 
-            // 2. Locate all agents positions and reset fieldCells inside visual field utility
+            // 2. Reset fieldCells inside visual field utility and pathCells with prospector agents
             int[] cellPos = new int[] {0,0};
             FieldCell indFieldCell = new FieldCell(0,0);
             for(int row = 0; row < newMap.length; row++) {          
@@ -186,13 +186,14 @@ public class ProspectorCoordinatorAgent extends ImasAgent {
                                     }
                                 }
                             }
-                            indCell.setUtility(utilitySum);
+                            //indCell.setUtility(utilitySum);
+                            indCell.incUtility(utilitySum);
                         }
                     }
                 }           
             }
             
-            // 4. Penalize cells whith prospector agents (it is important to do this step before propagation)
+            // 4. Penalize cells with prospector agents (it is important to do this step before propagation)
             for(int row = 0; row < this.utilityMap.length; row++) {          
                 for(int col = 0; col < this.utilityMap[0].length; col++) { 
                     if (this.utilityMap[row][col] instanceof PathCell){
@@ -302,9 +303,10 @@ public class ProspectorCoordinatorAgent extends ImasAgent {
 //                        ((FieldCell) this.utilityMap[row][col]).setUtility(-1);
 //                    }
                     if (this.utilityMap[row][col] instanceof PathCell){
-                        if (((PathCell)newMap[row][col]).isThereADiggerAgentWorking()){
-                            ((PathCell) this.utilityMap[row][col]).setUtility(-1);
-                        }
+                        cellAgents = (Agents) ((PathCell) newMap[row][col]).getAgents();
+                        if (cellAgents.get(AgentType.PROSPECTOR).size() > 0 || ((PathCell)newMap[row][col]).isThereADiggerAgentWorking()) {                        
+                            ((PathCell) this.utilityMap[row][col]).setUtility(-100);
+                        }                       
                     }
                 }           
             }
@@ -332,7 +334,7 @@ public class ProspectorCoordinatorAgent extends ImasAgent {
     }
     
     public List<MetalField> cleanDuplicatedMFL(){
-        int a = 0;
+        //int a = 0;
         List<MetalFieldList> listoflist = this.MFLreceived;
         List<MetalField> aux = new ArrayList<MetalField>();
         //for(int i ; iterarenlista)
@@ -382,9 +384,8 @@ public class ProspectorCoordinatorAgent extends ImasAgent {
         } catch (FIPAException e) {
             System.err.println(getLocalName() + " registration with DF unsucceeded. Reason: " + e.getMessage());
             doDelete();
-        }     
-        
-               
+        }   
+                      
         /*      SEARCHS     */
         // search CoordinatorAgent
         ServiceDescription searchCriterion = new ServiceDescription();
@@ -398,16 +399,12 @@ public class ProspectorCoordinatorAgent extends ImasAgent {
             searchCriterion.setName("ProspectorAgent"+i);
             this.prospectorAgents.add(UtilsAgents.searchAgent(this, searchCriterion));
         }
-        
-        
-        
+           
         /*      BEHAVIOURS      */
                
         // It triggers when the received message is an INFORM.
         MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
         this.addBehaviour(new MapHandlingPC(this, mt));
-        
-        
-        
+       
     }
 }

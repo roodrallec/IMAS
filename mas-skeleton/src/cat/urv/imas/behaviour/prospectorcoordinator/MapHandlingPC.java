@@ -59,8 +59,7 @@ public class MapHandlingPC extends AchieveREResponder {
         super(agent, mt);
         agent.log("Waiting for the updated map.");
     }
-
-    
+   
     // PARTE 1 DE LA RESPUESTA
     /**
      * Triggers when the ProspectorCoordinator receives a message following the template
@@ -148,8 +147,7 @@ public class MapHandlingPC extends AchieveREResponder {
                     return MMLmsg;
                 }
             }
-            
-            
+                       
         } catch (UnreadableException ex) {
             Logger.getLogger(MapHandlingPC.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {

@@ -366,7 +366,7 @@ public class SystemAgent extends ImasAgent {
     }
     
     // Function to go one step ahead
-    public void incrementStep() {
+    public void decrementStep() {
 
         // Update statistics window              
         this.gui.showStatistics(this.gamePerformanceIndicators, this.game.getSimulationSteps(), this.totalTurns);
@@ -414,27 +414,22 @@ public class SystemAgent extends ImasAgent {
             
             Map currentAgentList = this.game.getAgentList();          
             
-            //4. Set new metal fields detected to visible
+            //1. Set new metal fields detected to visible
             int[] metalPos = new int[2]; 
             for (MetalField mf : this.metalFieldList) {
                 metalPos = mf.getPosition();
                 FieldCell metalCell = (FieldCell) nextTurnMap[metalPos[0]][metalPos[1]];
                 if ((!metalCell.isEmpty()) && (!metalCell.isDetected())){
                     this.discoveredMetalField.addNewMetalField(metalCell);
-                    if (this.undiscoveredMetalField.getMetalField(metalCell) == -1.0){
-                        Thread.sleep(10);
-                    }
                     this.gamePerformanceIndicators.addTurnsForDiscoveringMetal(this.undiscoveredMetalField.getMetalField(metalCell));                   
                     this.gamePerformanceIndicators.addToDiscoveredMetalFieds(1.0);
                     this.undiscoveredMetalField.removeMetalField(metalCell);
                     metalCell.setDetected();
-                } else {
-                    Thread.sleep(1);
                 }
                 metalCell.detectMetal();
             }
 
-            //1. Set up diggers working
+            //2. Set up diggers working
             while (this.diggingRequests.size() > 0){
                 int[] metalFieldPos = this.diggingRequests.get(0).getMetalfield().getPosition();
                 FieldCell metalFieldCell = (FieldCell) nextTurnMap[metalFieldPos[0]][metalFieldPos[1]];
@@ -468,7 +463,7 @@ public class SystemAgent extends ImasAgent {
                 this.diggingRequests.remove(0);
             }
             
-            //2. Free cells where digger agents have finished working            
+            //3. Free cells where digger agents have finished working            
             for (int agentIndex = 0; agentIndex < this.requestedAgentsPos.size(); agentIndex++){
                 agentID = this.requestedAgentsPos.get(agentIndex).getAgentID();                
 
@@ -480,7 +475,7 @@ public class SystemAgent extends ImasAgent {
                 }
             }
             
-            //3. Movements checking  
+            //4. Movements checking  
             List<Cell> digglist = new ArrayList<Cell>();
             List<Cell> prosplist = new ArrayList<Cell>();
             
@@ -515,10 +510,6 @@ public class SystemAgent extends ImasAgent {
                             prosplist.add((Cell)currentCell);
                             int [] currentAgentPos = this.requestedAgentsPos.get(agentIndex).getPosition();
                             currentCell = (PathCell) nextTurnMap[currentAgentPos[0]][currentAgentPos[1]];
-                            Thread.yield();
-                            if(currentCell.getAgents().size()==0){
-                                int a = 0;
-                            }
                             currentCell.removeAgent(infoAg2); 
                         }
                     }
