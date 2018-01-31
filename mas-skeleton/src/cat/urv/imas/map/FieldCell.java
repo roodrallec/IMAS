@@ -59,6 +59,8 @@ public class FieldCell extends Cell {
         super(CellType.FIELD, row, col);
         metal = new HashMap();
     }
+    
+    
 
     public boolean isDetected() {
         return detected;

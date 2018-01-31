@@ -55,14 +55,18 @@ public class ProspectorAgent extends ImasAgent {
         super(AgentType.PROSPECTOR);
     }
 /* Takes a whole map and stores just the agents view */
-    public void setMapView(Cell[][] map) {       
+    public void setMapView(Cell[][] map) { 
+        this.mapView = new Cell[9];
         int row = this.currentPosition[0];
         int column = this.currentPosition[1];    
         int idx = 0;
         for(int r=row-1; r <= row+1; r++) {
-            for(int c=column-1; c <= column+1; c++) {                               
+            for(int c=column-1; c <= column+1; c++) { 
+                if (r>=0 && c >= 0){
                 mapView[idx] = map[r][c];                
                 idx++;
+                    
+                }
             }
         }         
     }
