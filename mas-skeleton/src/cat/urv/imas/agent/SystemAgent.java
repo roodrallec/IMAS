@@ -424,8 +424,8 @@ public class SystemAgent extends ImasAgent {
                     if (this.undiscoveredMetalField.getMetalField(metalCell) == -1.0){
                         Thread.sleep(10);
                     }
-                    this.gamePerformanceIndicators.addTurnsForDiscoveringMetal(this.undiscoveredMetalField.getMetalField(metalCell));
-                    this.gamePerformanceIndicators.addCollectedMetalFields(1.0);
+                    this.gamePerformanceIndicators.addTurnsForDiscoveringMetal(this.undiscoveredMetalField.getMetalField(metalCell));                   
+                    this.gamePerformanceIndicators.addToDiscoveredMetalFieds(1.0);
                     this.undiscoveredMetalField.removeMetalField(metalCell);
                     metalCell.setDetected();
                 } else {
@@ -556,7 +556,7 @@ public class SystemAgent extends ImasAgent {
 
             //6. Substitute the old map with the new checked map
             currentMap = nextTurnMap.clone();            
-            Thread.sleep(10);
+            //Thread.sleep(10);
             result = true;
         
         } catch (Exception ex) {
