@@ -442,7 +442,7 @@ public class SystemAgent extends ImasAgent {
                 int[] metalFieldPos = this.diggingRequests.get(0).getMetalfield().getPosition();
                 FieldCell metalFieldCell = (FieldCell) nextTurnMap[metalFieldPos[0]][metalFieldPos[1]];
                 
-                if (!metalFieldCell.isDetected()){
+                //if (!metalFieldCell.isDetected()){
 
                     // get agent name from it's AID
                     AID diggerID = this.diggingRequests.get(0).getDigger();                
@@ -465,7 +465,7 @@ public class SystemAgent extends ImasAgent {
 
                     // Add digger to the current working diggers
                     this.currentWorkingDiggers.setNewAgent(diggerPos, diggerID);
-                }
+                //}
 
                 this.diggingRequests.remove(0);
             }
@@ -558,7 +558,7 @@ public class SystemAgent extends ImasAgent {
 
             //6. Substitute the old map with the new checked map
             currentMap = nextTurnMap.clone();            
-            //Thread.sleep(10);
+            Thread.sleep(100);
             result = true;
         
         } catch (Exception ex) {
