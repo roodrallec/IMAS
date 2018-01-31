@@ -238,6 +238,7 @@ public class CoordinatorAgent extends ImasAgent {
         
         List<MetalField> completeMFL = this.completeMFL.getMetalFields();
         List<MetalField> aux = newMFL.getMetalFields();
+        List<MetalField> aux2 = new ArrayList<MetalField>();
 
         for (MetalField mf : aux) {
             Boolean exists = false;
@@ -248,10 +249,12 @@ public class CoordinatorAgent extends ImasAgent {
             }
             if (!(exists)) {
                 completeMFL.add(mf);
+                aux2.add(mf);
             }
         }
         
         this.setCompleteMFL(new MetalFieldList(completeMFL));
+        this.setCurrentMFL(new MetalFieldList(aux2));
         
     }
         

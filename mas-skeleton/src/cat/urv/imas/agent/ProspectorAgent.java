@@ -67,7 +67,6 @@ public class ProspectorAgent extends ImasAgent {
 
     public MetalFieldList searchForMetal() {
         this.currentMetalFields = new ArrayList<MetalField>();
-        int[] metalLocation = new int[2];
         int quantity = 0;
         String metal = "";
         for(Cell c: this.mapView) {
@@ -82,9 +81,7 @@ public class ProspectorAgent extends ImasAgent {
                         else if (metal.equals("GOLD")){
                             metal = "G";
                         }
-                        metalLocation[0] = c.getRow();                   
-                        metalLocation[1] = c.getCol();
-                        MetalField currentMetal = new MetalField(metalLocation, metal, quantity);
+                        MetalField currentMetal = new MetalField(new int[]{c.getRow(),c.getCol()}, metal, quantity);
                         this.currentMetalFields.add(currentMetal);
                     }
                 

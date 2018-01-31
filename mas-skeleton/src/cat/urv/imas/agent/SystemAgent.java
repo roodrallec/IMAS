@@ -391,6 +391,17 @@ public class SystemAgent extends ImasAgent {
             
             Map currentAgentList = this.game.getAgentList();
             
+            //4. Set new metal fields detected to visible
+            int[] metalPos = new int[2]; 
+            for (MetalField mf : this.metalFieldList) {
+                metalPos = mf.getPosition();
+                FieldCell metalCell = (FieldCell) nextTurnMap[metalPos[0]][metalPos[1]];                
+                metalCell.detectMetal();
+                this.discoveredMetalField.addNewMetalField(metalCell);
+                //this.gamePerformanceIndicators.addTurnsForDiscoveringMetal(this.undiscoveredMetalField.getMetalField(metalCell));
+                this.undiscoveredMetalField.removeMetalField(metalCell);
+            }
+
             //1. Set up diggers working
             while (this.diggingRequests.size() > 0){
 
@@ -406,8 +417,8 @@ public class SystemAgent extends ImasAgent {
                 if (remainingMetalUnits < 2.0){
                     this.gamePerformanceIndicators.addTurnsForDiggingMetal(this.discoveredMetalField.getMetalField(metalFieldCell));
                     this.discoveredMetalField.removeMetalField(metalFieldCell);
-                }                
-                
+                }
+
                 metalFieldCell.removeMetal();
                 this.gamePerformanceIndicators.addMetalUnits(1.0);
 
@@ -499,16 +510,6 @@ public class SystemAgent extends ImasAgent {
             
             this.game.setAgentList(newlist);
 
-            //4. Set new metal fields detected to visible
-            int[] metalPos = new int[2]; 
-            for (MetalField mf : this.metalFieldList) {
-                metalPos = mf.getPosition();
-                FieldCell metalCell = (FieldCell) nextTurnMap[metalPos[0]][metalPos[1]];                
-                metalCell.detectMetal();
-                this.discoveredMetalField.addNewMetalField(metalCell);
-                //this.gamePerformanceIndicators.addTurnsForDiscoveringMetal(this.undiscoveredMetalField.getMetalField(metalCell));
-                this.undiscoveredMetalField.removeMetalField(metalCell);
-            }
 
             //5. Update manufacturing centers (rewards)
             while (this.manufactureRequests.size() > 0){

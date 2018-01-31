@@ -30,6 +30,7 @@ import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.MessageContent;
 import cat.urv.imas.onthology.MetalField;
 import cat.urv.imas.onthology.MetalFieldList;
+import cat.urv.imas.onthology.MetalType;
 import jade.core.AID;
 import jade.lang.acl.UnreadableException;
 import java.io.IOException;
@@ -93,6 +94,23 @@ public class MapHandlingCA extends AchieveREResponder {
                     if (stillMetal){
                         mfl.remove(mf);
                         counter--;
+                    }
+                    else {
+                        MetalType aux;
+                        if (mf.getType().equals("S")){
+                            aux = MetalType.SILVER;
+                        }
+                        else{
+                            aux = MetalType.GOLD;
+                        }
+                        try{
+                            mf.setQuantity(((FieldCell)currentmap[mf.getPosition()[0]][mf.getPosition()[1]]).getMetal().get(aux));
+                            mfl.set(counter,mf);
+                        }
+                        catch(Exception ex){
+                            int a = 0;
+                        }
+                        
                     }
                     counter++;
                 }
