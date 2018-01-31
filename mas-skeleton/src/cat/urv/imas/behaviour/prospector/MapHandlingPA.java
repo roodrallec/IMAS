@@ -45,7 +45,7 @@ import java.util.logging.Logger;
 /**
  * This method handles the Map sent from above
  */
-public class MapHandling extends AchieveREResponder {
+public class MapHandlingPA extends AchieveREResponder {
 
     /**
      * Sets up the template of messages to catch.
@@ -53,7 +53,7 @@ public class MapHandling extends AchieveREResponder {
      * @param agent The agent owning this behaviour
      * @param mt Template to receive future responses in this conversation
      */
-    public MapHandling(ProspectorAgent agent, MessageTemplate mt) {
+    public MapHandlingPA(ProspectorAgent agent, MessageTemplate mt) {
         super(agent, mt);
         agent.log("Waiting for the updated map.");
     }
@@ -84,7 +84,12 @@ public class MapHandling extends AchieveREResponder {
                     for (Object prospector : cellprospectors){
                         if (agent.getAID().equals(((InfoAgent)prospector).getAID())){
                             agent.setCurrentPosition(new int[]{((PathCell)cell).getRow(),((PathCell)cell).getCol()});
-                            agent.log(Arrays.toString(agent.getCurrentPosition()));
+                            agent.log(Arrays.toString(agent.getCurrentPosition())); 
+                            int[] auxMov = new int[2];
+                            auxMov[0] = agent.getLastPosition()[0] - agent.getCurrentPosition()[0];
+                            auxMov[1] = agent.getLastPosition()[1] - agent.getCurrentPosition()[1];
+                            agent.setLastMovementDir(auxMov);
+                            agent.setLastPosition(agent.getCurrentPosition());
                             found = true;
                             break;
                         }   
@@ -114,9 +119,9 @@ public class MapHandling extends AchieveREResponder {
             }           
             
         } catch (UnreadableException ex) {
-            Logger.getLogger(MapHandling.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MapHandlingPA.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(MapHandling.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MapHandlingPA.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         return reply;

@@ -68,6 +68,10 @@ public class FieldCell extends Cell {
         this.detected = true;
     }
     
+    public void removeDetected() {
+        this.detected = false;
+    }
+    
     public void resetUtility() {
         this.utility = 0;
     }
@@ -116,9 +120,6 @@ public class FieldCell extends Cell {
         this.found = true;
     }
     
-    
-
-
     /**
      * Removes an item of the current metal, if any.
      * When there is no more metal after removing it, the set of

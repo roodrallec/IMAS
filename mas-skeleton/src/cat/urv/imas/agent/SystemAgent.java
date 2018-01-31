@@ -433,9 +433,6 @@ public class SystemAgent extends ImasAgent {
                 }
                 metalCell.detectMetal();
             }
-            
-            
-            
 
             //1. Set up diggers working
             while (this.diggingRequests.size() > 0){
@@ -454,6 +451,7 @@ public class SystemAgent extends ImasAgent {
                         this.gamePerformanceIndicators.addTurnsForDiggingMetal(this.discoveredMetalField.getMetalField(metalFieldCell));
                         this.discoveredMetalField.removeMetalField(metalFieldCell);
                         this.gamePerformanceIndicators.addCollectedMetalFields(1.0);
+                        metalFieldCell.removeDetected();
                     }
                     
                     // Remove 1 metal unit from metal field
@@ -558,7 +556,7 @@ public class SystemAgent extends ImasAgent {
 
             //6. Substitute the old map with the new checked map
             currentMap = nextTurnMap.clone();            
-            Thread.sleep(100);
+            Thread.sleep(10);
             result = true;
         
         } catch (Exception ex) {
