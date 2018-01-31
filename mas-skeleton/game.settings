@@ -456,6 +456,6 @@
         <item>-4</item>
     </initialMap>
     <numberInitialElements>10</numberInitialElements>
-    <numberVisibleInitialElements>10</numberVisibleInitialElements>
+    <numberVisibleInitialElements>0</numberVisibleInitialElements>
 </InitialGameSettings>
 

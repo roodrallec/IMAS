@@ -26,10 +26,12 @@ import cat.urv.imas.agent.CoordinatorAgent;
 import cat.urv.imas.map.Cell;
 import cat.urv.imas.map.FieldCell;
 import cat.urv.imas.map.PathCell;
+import cat.urv.imas.map.SettableFieldCell;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.MessageContent;
 import cat.urv.imas.onthology.MetalField;
 import cat.urv.imas.onthology.MetalFieldList;
+import cat.urv.imas.onthology.MetalType;
 import jade.core.AID;
 import jade.lang.acl.UnreadableException;
 import java.io.IOException;
@@ -38,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Arrays;
 
 /**
  * A request-responder behaviour for System agent, answering to queries
@@ -89,10 +92,27 @@ public class MapHandlingCA extends AchieveREResponder {
                 int counter = 0;
                 while(counter < mfl.size()) {
                     MetalField mf = mfl.get(counter);
-                    boolean stillMetal = ((FieldCell)currentmap[mf.getPosition()[0]][mf.getPosition()[1]]).isEmpty();
-                    if (stillMetal){
+                    boolean stillMetal = ((SettableFieldCell)currentmap[mf.getPosition()[0]][mf.getPosition()[1]]).getFound();
+                    if (!stillMetal){
                         mfl.remove(mf);
                         counter--;
+                    }
+                    else {
+                        MetalType aux;
+                        if (mf.getType().equals("S")){
+                            aux = MetalType.SILVER;
+                        }
+                        else{
+                            aux = MetalType.GOLD;
+                        }
+                        try{
+                            mf.setQuantity(((FieldCell)currentmap[mf.getPosition()[0]][mf.getPosition()[1]]).getMetal().get(aux));
+                            mfl.set(counter,mf);
+                        }
+                        catch(Exception ex){
+                            int a = 0;
+                        }
+                        
                     }
                     counter++;
                 }

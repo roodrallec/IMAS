@@ -91,8 +91,6 @@ public class ActionHandlingCA extends AchieveREResponder {
                 
                 
                 
-                
-                
                 return MFLmsg;
             }
             else if(msg.getContentObject().getClass() == cat.urv.imas.onthology.DiggingMessageList.class){

@@ -41,5 +41,9 @@ public class SettableFieldCell extends FieldCell {
     public boolean isEmpty() {
         return metal.isEmpty();
     }
+    
+    public boolean getFound(){
+        return this.found;
+    }
 
 }
