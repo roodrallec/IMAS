@@ -44,6 +44,14 @@ import java.util.logging.Logger;
  * the Coordinator agent.
  */
 public class SystemAgent extends ImasAgent {
+    
+    //AUXILIAR PROPERTIES FOR FIXING THE CODE (TO ERASE LATER)
+    
+    private FieldCell auxiliarFC;
+    
+    private Cell[][] auxiliarMAP;
+    
+    
 
     /**
      * GUI with the map, system agent log and statistics.
@@ -412,6 +420,10 @@ public class SystemAgent extends ImasAgent {
 
                 // Remove 1 metal unit from metal field
                 FieldCell metalFieldCell = (FieldCell) nextTurnMap[metalFieldPos[0]][metalFieldPos[1]];
+                
+                this.auxiliarFC = metalFieldCell;
+                this.auxiliarMAP = nextTurnMap;
+                
                 double remainingMetalUnits = (int) metalFieldCell.getMetal().values().toArray()[0];
                 
                 if (remainingMetalUnits < 2.0){
